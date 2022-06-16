@@ -1,19 +1,19 @@
 # public screens (landing page)
 get "/leads/landing", :agent => /(.*)/ do
-    erb :"/leads/exports", :layout => :"/layouts/leads"
+    erb :"/leads/exports", :layout => :"/leads/layouts/public"
 end
 
 # internal wizard (funnel) screens
 get "/leads/step1", :auth1 => true, :agent => /(.*)/ do
-    erb :"/leads/step1", :layout => :"/layouts/leads"
+    erb :"/leads/step1", :layout => :"/leads/layouts/public"
 end
 
 get "/leads/step2", :auth1 => true, :agent => /(.*)/ do
-    erb :"/leads/step2", :layout => :"/layouts/leads"
+    erb :"/leads/step2", :layout => :"/leads/layouts/public"
 end
 
 get "/leads/tripwire", :auth1 => true, :agent => /(.*)/ do
-    erb :"/leads/tripwire", :layout => :"/layouts/leads"
+    erb :"/leads/tripwire", :layout => :"/leads/layouts/public"
 end
 
 # internal app screens
