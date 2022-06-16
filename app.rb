@@ -58,7 +58,6 @@ get "/leads/filter_tripwire", :auth1 => true
     erb :"/leads/filter_tripwire"
 end
 
-
-
+# TODO: add remaining filters about internal screens (searches, results, etc.)
 
 
