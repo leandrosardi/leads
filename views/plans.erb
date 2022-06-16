@@ -1,0 +1,483 @@
+<%
+PAYPAL_URL = "#"
+
+email=params[:email]
+password=""
+err=params[:err]
+title = params[:title]
+
+if (email==nil)
+	email=""
+end
+%>
+
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8"><![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]-->
+<head>
+	<meta charset="ISO-8859-1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>
+		27 Free Leads - Targeted Leads with Verified Emails & Phone Numbers 
+	</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width">
+	
+	<script src="../apps/javascripts/1.3.0/adminflare-demo-init.min.js" type="text/javascript"></script>
+
+	<!--
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		// Include Bootstrap stylesheet 
+		document.write('<link href="../apps/css/' + DEMO_ADMINFLARE_VERSION + '/' + DEMO_CURRENT_THEME + '/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" id="bootstrap-css">');
+		// Include AdminFlare stylesheet 
+		document.write('<link href="../apps/css/' + DEMO_ADMINFLARE_VERSION + '/' + DEMO_CURRENT_THEME + '/adminflare.min.css" media="all" rel="stylesheet" type="text/css" id="adminflare-css">');
+		// Include AdminFlare page stylesheet 
+		document.write('<link href="../apps/css/' + DEMO_ADMINFLARE_VERSION + '/pages.min.css" media="all" rel="stylesheet" type="text/css">');
+	</script>
+	-->
+	
+	<script src="../apps/javascripts/1.3.0/modernizr-jquery.min.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="../freeleads/css.plantable/style.css">
+
+    <!-- core styles -->
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="../freeleads/css.plantable/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../freeleads/css.salesletter/core.css">
+    <link rel="stylesheet" href="../freeleads/css.salesletter/menu-overlay.css">
+    <link rel="stylesheet" href="../freeleads/css.salesletter/colors.css">
+    <link rel="stylesheet" href="../freeleads/css.salesletter/anima.css">
+    <!-- end core styles -->
+    <link rel="stylesheet" href="../freeleads/css.salesletter/owl.carousel.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/sliders.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/modal.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/cta.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/numbers.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/features.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/forms.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/contents.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/socials.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/footer.css">
+	<link rel="stylesheet" href="../freeleads/css.salesletter/turquoise.css">
+
+<!--
+<link href="apps/css/1.3.0/default/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" id="bootstrap-css">
+<link href="apps/css/1.3.0/default/adminflare.min.css" media="all" rel="stylesheet" type="text/css" id="adminflare-css">
+<link href="apps/css/1.3.0/pages.min.css" media="all" rel="stylesheet" type="text/css">
+<script src="apps/javascripts/1.3.0/adminflare-demo.min.js" type="text/javascript"></script>
+<script src="apps/javascripts/1.3.0/adminflare.min.js" type="text/javascript"></script>
+<script src="apps/javascripts/1.3.0/modernizr-jquery.min.js" type="text/javascript"></script>
+-->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var updateBoxPosition = function() {
+				var top = $(window).height() - 62 - $('.error-box').height();
+				$('.error-box').css({
+					'margin-top': ((top > 0) ? Math.floor(top - top * 0.4) : 0) / 2
+				});
+			};
+			$(window).resize(updateBoxPosition);
+			setTimeout(updateBoxPosition, 50);
+		});
+	</script>
+
+	<!-- Facebook Pixel Code -->
+	<script>
+		!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+		n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+		n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+		t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+		document,'script','https://connect.facebook.net/en_US/fbevents.js');
+		fbq('init', '1105524919457812', {
+		em: 'insert_email_variable'
+		});
+		fbq('track', 'PageView');
+	</script>
+	<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1105524919457812&ev=PageView&noscript=1"/></noscript>
+	<!-- DO NOT MODIFY -->
+	<!-- End Facebook Pixel Code -->
+</head>
+
+<%
+if (title.to_i == 1) # Welcome, luego de haber adquirido el TripWire01
+%>
+	<script>
+	fbq('track', 'Puchase', { 
+		product_name: 'FreeLeadsData',
+		content_name: 'CoreOffer01',
+		value: 5,
+		currency: 'USD'
+	});
+	</script>
+<%
+else
+%>
+	<script>
+	fbq('track', 'Visitor', { 
+		product_name: 'FreeLeadsData',
+		content_name: 'CoreOffer01'
+	});
+	</script>	
+<%
+end
+%>
+
+<body id="home">
+
+	<div id="wrap">
+
+		<section id="home" class="text-center">
+		
+		
+	<section id='header' class="box" align='center' valign='middle'>
+		<div style='position:absolute;top:0;left:0;width:100%;height:16px;background-image: url("../freeleads/img/guarda.png");background-repeat: repeat-x;'></div>
+
+		<br/>
+		<br/>
+
+		<%
+		if (title.to_i == 1) # Welcome, luego de haber adquirido el TripWire
+		%>
+		<section class='row-fluid'>
+			<p style='font-size:28pt'><b>Welcome!</b> We are almost done!</p>
+		</section>
+			
+		<br/>
+		<section class='row-fluid'>
+			<p style='font-size:18pt'>
+				Do You Need Huge Data? (the <b>Silver Plan</b> is <b>12.5% Off</b> for Limited Time)
+			</p>
+		</section>		
+		<%
+		else
+		%>
+		<section class='row-fluid'>
+			<p style='font-size:28pt'>Risk-free 15-Day Trial for Just $1</p>
+		</section>
+			
+		<br/>
+		<section class='row-fluid'>
+			<p style='font-size:14pt'>Premium Filters. Phone Numbers. Verified Emails. And More.</p>
+		</section>
+		<%
+		end # if
+		%>
+	</section>
+	
+	<br/>
+
+	  <section class="container-fluid">
+      <div class='container'>
+						
+			<div class='col-sm-4'>
+		    <div class="plan">
+		      <h3 class="plan-title"><b>Bronze</b>
+		      </h3>
+		      <p class="plan-price">$199<span class="plan-unit">per month</span></p> <!-- 18 cents per lead -->
+		      
+		      <ul class="plan-features">
+		        <li class="plan-feature">25 <span class="plan-feature-unit">searches</span></li>
+		        <li class="plan-feature">1,100 <span class="plan-feature-unit">leads</span> <span class="plan-feature-name">18&#162; per lead</span></li>
+		        <li class="plan-feature">6 <span class="plan-feature-unit">fields</span><span class="plan-feature-name"> email, phone, fax,<br/>address, revenue, employees</span></li>
+		        <li class="plan-feature">6 <span class="plan-feature-unit">filters</span><span class="plan-feature-name"> job position, industry,<br/>country, city, gender, keywords</span></li>
+		      </ul>
+		      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4J42LJE66SA5E" class="plan-button">Start Your 15-Day</a>
+		    </div>
+	    	</div>
+
+			<div class='col-sm-4'>
+		    <div class="plan plan-highlight">
+	      	  <p class="plan-recommended">Best Deal</p>
+		      <h3 class="plan-title"><b>Silver</b>
+		      </h3>
+		      <p class="plan-price">$349<span class="plan-unit">per month</span></p> <!-- 15 cents per lead -->		      
+		      <ul class="plan-features">
+		        <li class="plan-feature">75 <span class="plan-feature-unit">searches</span></li>
+		        <li class="plan-feature">2,660 <span class="plan-feature-unit">leads</span> <span class="plan-feature-name"><strike>15&#162;</strike> 13&#162; per lead</span></li>
+		        <li class="plan-feature">6 <span class="plan-feature-unit">fields</span><span class="plan-feature-name"> email, phone, fax,<br/>address, revenue, employees</span></li>
+		        <li class="plan-feature">6 <span class="plan-feature-unit">filters</span><span class="plan-feature-name"> job position, industry,<br/>country, city, gender, keywords</span></li>
+		      </ul>
+		      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TBFRPHR7WW4AU" class="plan-button">Start Your 15-Day</a>
+		    </div>
+	    	</div>
+
+			<div class='col-sm-4'>
+		    <div class="plan">
+		      <h3 class="plan-title"><b>Gold</b>
+		      </h3>
+		      <p class="plan-price">$699<span class="plan-unit">per month</span></p> <!-- 12 cents per lead -->
+		      <ul class="plan-features">
+		        <li class="plan-feature">&infin; <span class="plan-feature-unit">searches</span></li>
+		        <li class="plan-feature">5,880 <span class="plan-feature-unit">leads</span> <span class="plan-feature-name">12&#162; per lead</span></li>
+		        <li class="plan-feature">6 <span class="plan-feature-unit">fields</span><span class="plan-feature-name"> email, phone, fax,<br/>address, revenue, employees</span></li>
+		        <li class="plan-feature">6 <span class="plan-feature-unit">filters</span><span class="plan-feature-name"> job position, industry,<br/>country, city, gender, keywords</span></li>
+		      </ul>
+		      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNS4PSVAC3ACQ" class="plan-button">Start Your 15-Day</a>
+		    </div>
+	    	</div>
+
+			<%
+			if (title.to_i == 1) # Welcome, luego de haber adquirido el TripWire
+			%>
+			<div class='container'>
+				<a href='./welcome' target="_window" style='font-size:24px'>No, Thank. I Want to Proceed With My Current Plan.</a>
+			</div>
+			<br/>
+			<%
+			end
+			%>
+		</div>
+		<br/>
+		<br/>
+		<a href="#banner1" class="hero-start-link smooth-scroll anchor-link"><i class="fa fa-angle-double-down"></i></a>
+		</section>
+
+
+	<section id='banner1' class="cta-1 bg-dark padding-top-bottom text-center white-text">
+		<div class="container-fluid anima scale-in">
+			<div class="row">
+				<div class="col-sm-12">
+					<span>
+						"To succeed in sales, simply talk to lots of people every day.<br/> 
+						And here’s what’s exciting – there are lots of people!" -- Jim Rohn
+					</span>
+					<a class="btn smooth-scroll" href="#header"><b>15-Day Trial</b> Join now</a>
+				</div>	
+			</div>
+		</div>
+	</section>	
+	
+	<section id="features" class="features-1">
+		<div class="container-fluid padding-top-bottom">
+			<div class="row header">
+				<div class="col-md-12">
+					<h2>Features</h2>
+					<p>Simply the Best Services & Price</p>
+				</div>
+			</div>
+			<div class="container">
+				<div class="row">
+		            <div class="col-md-4 col-sm-4 col-xs-12 anima scale-in ">
+		                <article class="text-center">
+			                <img src="img/screenshot2.png" alt="#" class="zoom-img img-responsive center-block">
+		                    <h3>ADVANCED FILTERS</h3>
+		                    <p>Search options let you find your target market within our platform by <b>Job Title</b>, <b>Location</b>, <b>Industry</b>, and <b>more</b>.</p>
+		                </article>
+		            </div>                       
+		            <div class="col-md-4 col-sm-4 col-xs-12 anima scale-in ">
+		                <article class="text-center">
+			                <img src="img/screenshot1.png" alt="#" class="zoom-img img-responsive center-block">
+		                    <h3>RESULTS PREVIEW</h3>
+		                    <p>See a summary of the contacts before you export with full data - including their emails and phone numbers.</p>
+		                </article>
+		            </div>                       
+					<div class="col-md-4 col-sm-4 col-xs-12 anima scale-in d1">
+		                <article class="text-center">	
+							<img src="img/screenshot4.png" alt="#" class="zoom-img img-responsive center-block">
+		                    <h3>EXPORT IMMEDIATELLY</h3>
+		                    <p>No need to go through a lengthy sales process.<br/><b>Download and use the list right away</b>.<br/>Manage multiple lists of leads.</p>
+		                </article>
+		            </div>             
+	            </div>             
+       		</div>
+		</div>	
+	</section>
+
+<!--
+		<section id="news" class="content-1 bg-image-2 padding-top-bottom bg-shop">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-6 col-md-offset-6">
+						<div class="white-box">
+							<h2><b>AMAZING Service :)</b></h2>
+							<p>
+							"This service was unbelievably helpful to me when I wanted to fuel my CRM with new leads. 
+							I ordered for 2,700 records then wanted to add 5,000 more. Then ended up wanting to add more and more.
+							The customer service was super helpful and was able to set me up where I continuously went for new targets."</p>
+							<blockquote class="blockquote-reverse">
+							  <p>Drew Edwards</p>
+							</blockquote>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+
+		<section class="cta-1 bg-dark padding-top-bottom text-center white-text">
+			<div class="container-fluid anima scale-in">
+				<div class="row">
+					<div class="col-sm-12">
+						<span>
+							"To succeed in sales, simply talk to lots of people every day.<br/> 
+							And here’s what’s exciting – there are lots of people!" -- Jim Rohn
+						</span>
+						<a class="btn" href="#" data-toggle="modal" data-target="#product-modal"><b>$5</b> Buy now</a>
+					</div>	
+				</div>
+			</div>
+		</section>	
+
+		<section id="facts" class="numbers-1 padding-top-bottom text-center">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-4 col-sm-4">
+						<div class="numbers-item">
+							<h2 class="counter">493,087</h2>
+							<h4>Records Sold</h4>
+						</div>
+					</div>
+					<div class="col-md-4 col-sm-4">
+						<div class="numbers-item">
+							<h2><span class="counter">99.1</span> <span>%</span></h2>
+							<h4>User Ratings</h4>
+						</div>
+					</div>
+					<div class="col-md-4 col-sm-4">
+						<div class="numbers-item">
+							<h2><span class="counter">170</span> <span>+</span></h2>
+							<h4>Clients</h4>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="cta-1 bg-shop padding-top-bottom text-center ">
+			<div class="container-fluid anima scale-in">
+				<span>​Email for a custom and/or unlimited license.</span>
+				<a class="btn dark" href="#" data-toggle="modal" data-target=".text-modal">Mock-up License</a>
+			</div>
+		</section>
+-->
+        <section class="footer-1 text-center">
+            <div class="container-fluid">
+                <a href="#home" class="back-to-top smooth-scroll"><i class="fa fa-chevron-up"></i></a>
+                <p>Made with <i class="fa fa-heart color-text"></i> by <a href="http://www.ExpandedVenture.com" target='_window'>Expanded Venture</a>.</p>
+				<!--
+            	<ul class="social-links-2 ">
+					<li><a href="https://twitter.com/angelo_studio"><i class="fa fa-facebook"></i></a></li>
+					<li><a href="http://dribbble.com/angelo_studio"><i class="fa fa-dribbble"></i></a></li>
+					<li><a href="https://vimeo.com/user10293733"><i class="fa fa-twitter"></i></a></li>
+				</ul>
+				-->
+            </div>
+        </section>
+
+		<div class="modal fade text-modal" id="text-modal" tabindex="-1" role="dialog" aria-labelledby="smallModal" aria-hidden="true">
+		    <div class="modal-dialog modal-sm2">
+		        <div class="modal-content">
+		            <div class="modal-header bg-shop">
+		                <a class="close-modal" href="#" data-dismiss="modal">
+		                    <span class="menu-icon"></span>
+		                </a>
+		                <h2 class=""><b>License</b></h2>
+		            </div>
+		            <div class="modal-body">
+		                <p>In order to simplify the legal terms, here are the rules of the game written in plain English, that you are obliged to follow when using the digital goods at 1E-shop.</p>
+		                <p>
+		                    <br><strong>You are free to…</strong>
+		                </p>
+		                <ul>
+		                    <li>Use the digital goods in a website for yourself or a client for personal, open-source or commercial use.</li>
+		                    <li>Use the digital goods to create an icon for your app or button icons.</li>
+		                    <li>Use the digital goods to create a logo or other brand material.</li>
+		                </ul>
+		                <p>
+		                    <br><strong>You are forbidden to…</strong>
+		                </p>
+		                <ul>
+		                    <li>Re-sell the digital goods, host the digital goods or rent the digital goods (either in existing or modiﬁed form).</li>
+		                    <li>Include the digital goods with a website offered for sale or distributed for free.</li>
+		                    <li>Convert the digital goods to a theme to sell or distribute for free.</li>
+		                </ul>
+		                <br>
+		                <p>While attribution is optional, it is always appreciated. Intellectual property rights are not transferred with the download of the icons.</p>
+		                <p>Should you happen to lost the purchased good, let me know the email you've used upon your purchase, and I will provide you with the new files.</p>
+		            </div>
+
+		        </div>
+		    </div>
+		</div>
+
+		<div class="modal fade" id="product-modal" tabindex="-1" role="dialog" aria-labelledby="smallModal" aria-hidden="true">
+		    <div class="modal-dialog modal-sm2">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <a class="close-modal" href="#" data-dismiss="modal">
+		                    <span class="menu-icon"></span>
+		                </a>
+		                <img src="img/cup1.jpg" alt="" class="img-responsive">
+		            </div>
+		            <div class="modal-body">
+		                <h3 class="text-center"><b>PaperCup - Mockup </b>($5,00)</h3>
+		            </div>
+		            <div class="modal-footer">
+		                <form id="buy" action="buy" class="myform" method="post" novalidate>
+		                    <div class="form-group">
+		                        <label class="control-label" for="contact-mail">Email</label>
+		                        <div class=" controls">
+		                            <input name="email" placeholder="PayPal Email" class="form-control input-lg requiredField" type="email" data-error-invalid="Invalid email address" data-error-empty="Enter email">
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="control-label">password</label>
+		                        <div class="controls">
+		                            <input id="password" class="form-control" type="password" placeholder="PayPal Password" name="password">
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <button type="button" class="btn btn-block">PAY NOW</button>
+		                    </div>
+		                    <p class="text-center"><a href="" data-dismiss="modal">Cancel</a>
+		                    </p>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+	</div>
+	</section>
+
+    <!-- Core scrips -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
+    <script type="text/javascript" src="js/core.js"></script>
+    <script type="text/javascript" src="js/menu-overlay.js"></script>
+    <script type="text/javascript" src="js/placeholders.min.js"></script>
+    <!-- end core scripts --> 
+    <!-- sliders -->
+    <script type="text/javascript" src="js/owl.carousel.min.js"></script>   	
+   	<script type="text/javascript" src="js/jquery.waitforimages.min.js"></script> 
+   	<script type="text/javascript" src="js/sliders.js"></script>
+	<script type="text/javascript" src="js/jquery.counterup.min.js"></script>
+	<script type="text/javascript" src="js/numbers.js"></script>
+	<script type="text/javascript" src="js/contact.js"></script>
+</div>
+
+</section>
+</div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-102299452-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
+
+<%
+DB.disconnect
+GC.start
+%>

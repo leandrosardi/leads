@@ -1,0 +1,66 @@
+<!-- HERE IS HOW TO CATCH POST/GET PARAMETERS -->
+<%
+=begin
+id_login = session['login.id']
+if (id_login == nil)
+	DB.disconnect
+	GC.start
+	redirect_adapted_to_nginx getDivisionURL + '/freeleads/'
+end
+=end
+
+n = 0
+array_positions = []
+
+# almaceno las posiciones seleccionadas en variables de sesion
+JOBPOSITIONS.each { |p|
+	session[p.to_sym] = params[p.to_sym]
+	puts(params[p.to_sym])
+	if (session[p.to_sym].to_s.size>0)
+		array_positions << p
+		n=n+1
+	end
+}
+
+# decido si los job titles seleccionados son amplios como para filtrar ademas por industria
+bRedirectToStep2 = false
+array_positions.each { |p|
+	if (
+		p == "Founder" ||
+		p == "President" ||
+		p == "Director" ||
+		p == "Manager" ||
+		p == "CEO" ||
+		p == "VP" ||
+		p == "Consultant" ||
+		p == "Owner" ||
+		p == "Partner" ||
+		p == "Expert" ||
+		p == "Advisor" ||
+		p == "MD" || #remaining positions values added by usman @22/09/2021
+		p== "Lawyer" || p== "Chiropractor" ||	p== "Keynote" ||	p== "Realtor" ||	p== "Sales" ||	p== "Doctor" ||	p== "Speaker" ||	p== "Broker"
+
+	)
+		bRedirectToStep2 = true
+
+		break
+	end
+}
+
+ array_positions
+
+DB.disconnect
+GC.start
+
+if (bRedirectToStep2 == true)
+	redirect_adapted_to_nginx getDivisionURL + '/freeleads/step2'
+else
+	#old
+	#session[:industry_name] = ""
+	#redirect_adapted_to_nginx getDivisionURL + '/freeleads/login'
+
+	#addedd by usman @22/09/21
+	redirect_adapted_to_nginx getDivisionURL + '/freeleads/landing'
+end
+%>
+<!-- ---------------------------------------- -->

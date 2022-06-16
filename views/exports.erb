@@ -1,0 +1,592 @@
+<%
+  theme = 'black-blue'
+%>
+
+<head>
+  <meta charset="ISO-8859-1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>
+    <%=APPNAME%>
+  </title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="icon" href="/apps/images/logo/32x32-01.png">
+
+  <script src="../apps/javascripts/1.3.0/adminflare-demo-init.min.js" type="text/javascript"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700" rel="stylesheet" type="text/css">
+
+  <script type="text/javascript">
+      DEMO_CURRENT_THEME = "<%=theme%>";
+
+      // Include Bootstrap stylesheet
+      document.write('<link href="../apps/css/' + DEMO_ADMINFLARE_VERSION + '/' + DEMO_CURRENT_THEME + '/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" id="bootstrap-css">');
+      // Include AdminFlare stylesheet
+      document.write('<link href="../apps/css/' + DEMO_ADMINFLARE_VERSION + '/' + DEMO_CURRENT_THEME + '/adminflare.min.css" media="all" rel="stylesheet" type="text/css" id="adminflare-css">');
+  </script>
+
+  <script type="text/javascript">
+      //
+      const reLinkedInGroup = /^http(s)?:\/\/(www\.)?linkedin\.com\/groups\/(\d+)(\/(profile)?)?$/;
+      const reLinkedInGroupUrlCode = /(\d+)/
+      function getLinkedInGroupUrlCode(url) {
+          if (!reLinkedInGroup.test(url)) {
+              return null;
+          }
+          return url.match(reLinkedInGroupUrlCode)[0];
+      }
+
+      //
+      function newHttpRequest()
+      {
+          var xmlhttp;
+          if (window.XMLHttpRequest)
+          {
+              // code for IE7+, Firefox, Chrome, Opera, Safari
+              xmlhttp=new XMLHttpRequest();
+          }
+          else
+          {
+              // code for IE6, IE5
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+          }
+
+          return xmlhttp ;
+      }
+
+      //
+      function newXmlParser(txt) {
+          if (window.DOMParser) {
+              parser = new DOMParser();
+              xmlDoc = parser.parseFromString(txt, "text/xml");
+          } else// Internet Explorer
+          {
+              xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+              xmlDoc.async = false;
+              xmlDoc.loadXML(txt);
+          }
+
+          return xmlDoc
+      }
+
+      //
+      function addEvent(element, eventName, fn) {
+          if (element.addEventListener)
+              element.addEventListener(eventName, fn, false);
+          else if (element.attachEvent)
+              element.attachEvent('on' + eventName, fn);
+      }
+
+      //
+      function drawPagination(o, page, pages, page_name,url=null)
+      {
+          if (url==null) {
+              url = './'+page_name+'?page='
+          }
+
+
+          if (page>pages && pages>0) {
+              window.location = url+pages.toString();
+          }
+
+
+          o.html("");
+          u = $("<ul></ul>");
+          o.append(u);
+
+          if (page>1) {
+              li = $('<li><a href="'+url+(page-1).toString()+'">Prev</a></li>');
+          } else {
+              li = $('<li class="disabled"><a href="#">Prev</a></li>')
+          }
+          u.append(li);
+
+          i=1
+          i_prev = 1
+          while (i<=pages) {
+              if (i==page) {
+                  sClassActive="class='active'"
+              } else {
+                  sClassActive=""
+              }
+              if ( i==1 || i==pages || (i>=page-2 && i<=page+2) ) {
+                  if (i>i_prev+1) {
+                      li = $('<li><span>...</span></li>')
+                      u.append(li)
+                  }
+                  li = $('<li '+sClassActive+'><a href="'+url+i.toString()+'">'+i.toString()+'</a></li>')
+                  u.append(li)
+                  i_prev=i
+              }
+              i=i+1
+          }
+
+          if (page<pages) {
+              i = $('<li><a href="./'+url+(page+1).toString()+'">Next</a></li>');
+          } else {
+              i = $('<li class="disabled"><a href="#">Next</a></li>')
+          }
+          u.append(i);
+      }
+
+      function showWait(s) {
+          $("#wait").show();
+          $("#wait-caption").text(s);
+      }
+
+      function hideWait(s) {
+          $("#wait").hide();
+      }
+  </script>
+
+  <script src="../apps/javascripts/1.3.0/modernizr-jquery.min.js" type="text/javascript"></script>
+  <script src="../apps/javascripts/1.3.0/bootstrap.min.js" type="text/javascript"></script>
+  <script src="../apps/javascripts/1.3.0/adminflare.min.js" type="text/javascript"></script>
+
+  <script src="../apps/javascripts/chartjs/dist/Chart.bundle.min.js" type="text/javascript"></script>
+
+  <script src="../apps/javascripts/commons-1.0.4.js" type="text/javascript"></script>
+  <script src="../apps/javascripts/templates-1.0.4.min.js" type="text/javascript"></script>
+  <script src="../apps/javascripts/editables-1.0.1.min.js" type="text/javascript"></script>
+  <script src="../apps/javascripts/ajax_status-1.0.1.min.js" type="text/javascript"></script>
+  <script src="../apps/javascripts/timelines-1.0.2.min.js" type="text/javascript"></script>
+  <script src="../apps/javascripts/progress-1.0.1.min.js" type="text/javascript"></script>
+
+  <link href="../awesomplete/awesomplete.css" media="all" rel="stylesheet" type="text/css" id="bootstrap-css">
+  <script src="../awesomplete/awesomplete.js" type="text/javascript"></script>
+
+  <link href="../apps/css/commons.css" media="all" rel="stylesheet" type="text/css" id="commonsjs-css">
+  <!-- TODO: Add this!
+  <link href="../apps/css/menus.css" media="all" rel="stylesheet" type="text/css" id="menus-css">
+  -->
+  <link href="../apps/css/templates.css" media="all" rel="stylesheet" type="text/css" id="templatesjs-css">
+  <link href="../apps/css/editables.css" media="all" rel="stylesheet" type="text/css" id="editablesjs-css">
+  <link href="../apps/css/ajax_status.css" media="all" rel="stylesheet" type="text/css" id="ajax-status-css">
+  <link href="../apps/css/timelines.css" media="all" rel="stylesheet" type="text/css" id="timelinesjs-css">
+
+  <style>
+    /*
+    * Style for menus in the pipeline edition screen.
+    *
+    */
+    .btn-filter {
+      width: 150px;
+      overflow-x: hidden;
+      text-align: left;
+    }
+
+    ul.btn-templates-list {
+      position: absolute;
+      top: -215px;
+      height: 200px;
+      width: 320px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    ul.btn-templates-list li.item {
+      font-size: 10px;
+    }
+
+    ul.btn-templates-list li.item a.template {
+      position: relative;
+      font-size: 10px;
+    }
+
+    .sa {
+      color: red;
+      padding-left: 10px;
+      padding-right: 5px;
+      position: absolute;
+      right: 0px;
+      background-color: white;
+    }
+
+    ul.btn-filter-list {
+      height: 200px;
+      width: 175px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    li.item {
+      background-color: white;
+      color: black;
+    }
+
+    li.item:hover {
+      background-color: blue;
+      color: white;
+    }
+
+
+    /*
+    * Style for scripts shown in both the responses and pipeline edition screen.
+    *
+    */
+    pre {
+      mergin: 0px;
+      padding: 0px;
+      border:0px;
+      background-color: transparent;
+      font-size: 14px;
+      font-name: Arial;
+      color: rgb(64, 97, 140);
+    }
+
+    span.filesample {
+      font-size: 12px;
+      font-name: Arial;
+      color: rgb(64, 97, 140);
+      border: 1px rgb(175,175,175) solid;
+      border-radius: 5px;
+      background-color: rgb(235,235,235);
+      margin: 5px;
+      padding: 5px;
+
+    }
+
+    pre.filesample {
+      font-size: 12px;
+      font-name: Arial;
+      color: rgb(64, 97, 140);
+      border: 1px rgb(175,175,175) solid;
+      border-radius: 5px;
+      background-color: rgb(235,235,235);
+      margin: 5px;
+      padding: 5px;
+
+    }
+
+    /*
+    * Waiting GIF
+    *
+    */
+    div.wait {
+      position:   absolute;
+      z-index:    1000;
+      top:        0;
+      left:       0;
+      height:     100%;
+      width:      100%;
+      background: rgba( 255, 255, 255, .8 )
+      url('http://i.stack.imgur.com/FhHRx.gif')
+      50% 50%
+      no-repeat;
+    }
+
+    /*
+     * Popups
+     *
+     */
+    div.popup {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:99999;
+      background-color:white;
+      opacity: 0.95;
+      overflow-y:scroll;
+      display:none;
+    }
+
+    div.popup div.top-right-buttons {
+      position:absolute;
+      top:17px;
+      right:17px;
+    }
+
+    div.popup div.area {
+      position:relative;
+      top:15%;
+      left:15%;
+      width:70%;
+      height:70%;
+    }
+
+    div.popup div.area h1 {
+      margin-bottom:34px;
+    }
+
+    /*
+     *
+     */
+    span.yellow-backgrownd {
+      background-color: yellow;
+      color: black;
+    }
+
+    div.fixed-position {
+      position: fixed;
+    }
+
+    .same-line {
+      display: inline-block;
+    }
+
+    .loading-container {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      opacity: 0.5;
+      text-align: center;
+      padding-top: 45vh;
+      display: none;
+      z-index: 9999;
+    }
+
+    #loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 120px;
+      height: 120px;
+      -webkit-animation: spin 2s linear infinite;
+      /* Safari */
+      animation: spin 2s linear infinite;
+    }
+
+    td.fix {
+      width: 125px;
+      max-width: 125px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+  </style>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-102299452-4"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-102299452-4');
+  </script>
+
+</head>
+<body>
+
+<header class="navbar navbar-fixed-top" id="main-navbar">
+
+  <div class="navbar-inner">
+    <div class="container">
+      <table width="100%">
+        <tbody><tr>
+          <td width="50px"><a class="logo" href="/prospecting/dashboard?program=ssm"><img alt="https://127.0.0.1:443_logo" src="/apps/images/logo/16x16-01.png" width="25px" height="25px"></a></td>
+
+          <td align="right" style="text-align: right;">
+
+            <div>
+              <ul class="nav pull-right">
+
+                <li>
+                  <a href="">
+											<span>
+												Credits:
+											</span>
+                  </a>
+                </li>
+
+                <li>
+                  <a href="">
+											<span>
+												<span class="label label-blue">0 warm leads</span>
+											</span>
+                  </a>
+                </li>
+
+                <li>
+                  <a href="">
+											<span>
+												<span class="label label-blue">+</span>
+											</span>
+                  </a>
+                </li>
+
+                <li>
+                  <a href="">
+											<span>
+												<span class="label label-blue">0 messeges</span>
+											</span>
+                  </a>
+                </li>
+
+                <li class="separator"></li>
+
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle usermenu" data-toggle="dropdown">
+                    <img alt="Avatar" src="https://www.gravatar.com/avatar/be32d069b6e5e6fd0bf6cd6e056b7a79">
+                    <!--
+                    <span>&nbsp;&nbsp;invozone</span>
+                    -->
+                  </a>
+                  <ul class="dropdown-menu" style="z-index: 99999;">
+                    <li>
+                      <a href="/logout"><i class="icon-signout"></i>Sign Out</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        </tbody></table>
+    </div>
+  </div>
+</header>
+
+<!--  this is left bar -->
+
+<nav id="left-panel">
+  <div id="left-panel-content">
+    <ul>
+      <li>
+        <a href="/freeleads/search"><span class="icon-search"></span>Search</a>
+      </li>
+      <li>
+        <a href="/freeleads/exports"><span class="icon-th-large"></span>Export</a>
+      </li>
+      <li>
+        <a href="/freeleads/saved_searches"><span class="icon-save"></span>Saved Searches</a>
+      </li>
+    </ul>
+  </div>
+  <div class="icon-caret-down"></div>
+  <div class="icon-caret-up"></div>
+</nav>
+
+<!--  this is main content-->
+<section class="row-fluid"><div class="span12"></div></section>
+<div class="mynavbar" style='overflow:visible;'>
+
+  <section class="row-fluid" style="margin-bottom: 10px;">
+    <div class='span6'>
+      <%=nav1("Exports")%>
+    </div>
+
+    <div class='span4 pull-right'>
+      <div style="margin-left: 100px; padding-left: 85px;">
+        <a class="btn btn-primary" href="/freeleads/search">New Search</a>
+
+      </div>
+    </div>
+
+  </section>
+</div>
+
+
+
+<section class="row-fluid">
+  <div class='span11 box'>
+
+    <table class="table table-bordered">
+      <thead>
+
+      <tr>
+        <div class="pull-right">
+          <div class="span8">
+            <input type='text' class='input-block-level select-all-on-focus' id='search_filter' name='search_filter'/>
+          </div>
+
+          <button class="btn btn-blue btn-medium btn-submit" style="margin-left: 2px;" type="submit" onclick="">
+            <i class='icon-search'></i> Search
+          </button>
+        </div>
+      </tr>
+
+      <tr>
+        <th>No. of Results <i class="icon-sort-up"></i></th>
+        <th>No. of Companies <i class="icon-sort-up"></i></th>
+        <th>Creation Date <i class="icon-sort-up"></i></th>
+        <th>Download </th>
+      </tr>
+
+      </thead>
+      <tbody>
+
+      <tr>
+        <td>112</td>
+        <td>17</td>
+        <td>10 Jun 2012 11:30pm</td>
+        <td>download</td>
+      </tr>
+
+      <tr>
+        <td>955</td>
+        <td>177</td>
+        <td>10 Jun 2012 11:30pm</td>
+        <td>processing..</td>
+      </tr>
+
+      <tr>
+        <td>1000</td>
+        <td>19</td>
+        <td>10 Jun 2012 11:30pm</td>
+        <td>download</td>
+      </tr>
+
+      </tbody>
+    </table>
+
+    <div class="pagination"></div>
+
+  </div>
+</section>
+
+
+
+<script>
+    // setup pagination control
+    drawPagination($(".pagination"), 1,3, 'saved_searches');
+
+</script>
+
+<!--  this is footer content-->
+
+<footer id="main-footer">
+  <section class='row-fluid'>
+    <div class='span3'>
+      <img src='/apps/images/logo/logo-32-01.png' height='90px' title='<%=APP_NAME%>' style='opacity:0.25;' />
+    </div>
+
+    <div class='span3 text-left'>
+      <b><a href='https://help.expandedventure.com/connectionsphere' target='_window'>Help</a></b><br/>
+      <a href='https://help.expandedventure.com/connectionsphere' target='_window'>Introducing <%=APP_NAME.to_s%></a><br/>
+      <a href='https://help.expandedventure.com/connectionsphere/getting-started' target='_window'>Getting Started</a><br/>
+      <a href='https://help.expandedventure.com/connectionsphere/setup-a-reseller-account' target='_window'>Setting Up a Reseller Account</a><br/>
+    </div>
+
+    <div class='span3 text-left'>
+      <b>Blog <i>(soon)</i></b><br/>
+      <span>Never Automate Your LinkedIn Account <i>(soon)</i></span><br/>
+    </div>
+
+    <div class='span3 text-left'>
+      <b><a href='https://help.expandedventure.com/developers' target='_window'>Developers</a></b><br/>
+      <a href='https://help.expandedventure.com/developers/getting-your-api-key' target='_window'>Generating Your API-KEY</a><br/>
+      <a href='https://help.expandedventure.com/developers/connectionsphere-api-1-5' target='_window'>API Specifications</a><br/>
+      <a href='https://help.expandedventure.com/developers/zapier-integrations' target='_window'>Zapier Integrations</a><br/>
+    </div>
+
+  </section>
+
+  <br/><br/><br/>
+
+  <b><%=APPNAME%></b>, version <a href='https://github.com/leandrosardi/blackstack/wiki/A02.Release-Notes' target='_window'></a><br/>
+  Copyright &copy; <%=DateTime.now.year.to_s%> <a href="<%=COMPANY_URL %>" target='_window'><%=COMPANY_NAME.to_s%></a>, all rights reserved.<br/>
+  Powered by <a href='https://github.com/leandrosardi/blackstack' target='_window'>BlackStack</a>.
+  <a href="#" class="pull-right" id="on-top-link">
+    On Top&nbsp;<i class=" icon-chevron-up"></i>
+  </a>
+</footer>
+
+</body>
+

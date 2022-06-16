@@ -1,0 +1,82 @@
+<!-- HERE IS HOW TO CATCH POST/GET PARAMETERS -->
+<%
+id_login = session['login.id']
+if (id_login == nil)
+	DB.disconnect
+	GC.start
+	redirect_adapted_to_nginx getDivisionURL + '/freeleads/'
+end
+
+  login = BlackStack::Login.where(:id=>id_login).first
+  # TODO: validar que existe el objeto login
+  id_user = login.id_user
+
+  app_url = DB["SELECT app_url FROM division WITH (NOLOCK) WHERE [name]='#{SIGNUP_DIVISION}'"].first[:app_url]
+  app_port = DB["SELECT app_port FROM division WITH (NOLOCK) WHERE [name]='#{SIGNUP_DIVISION}'"].first[:app_port]
+  param_positions = ""
+
+  session[:industry_name] = params[:industry_name]
+  industry_name = session[:industry_name]
+
+  #ws_url = DB["SELECT ws_url FROM division WITH (NOLOCK) WHERE [name]='#{SIGNUP_DIVISION}'"].first[:ws_url]
+  #ws_port = DB["SELECT ws_port FROM division WITH (NOLOCK) WHERE [name]='#{SIGNUP_DIVISION}'"].first[:ws_port]
+
+  if ( industry_name.to_s.size > 0 )
+	row = DB["SELECT id FROM lnindustry WHERE [name]='#{industry_name.gsub("'","''")}'"].first
+	if (row==nil)
+	  DB.disconnect
+	  GC.start
+	  redirect_adapted_to_nginx getDivisionURL + '/freeleads/step2?err=Please%20Choose%20a%20Valid%20Industry.'
+	end
+  end
+
+  id_login = session['login.id']
+  id_user = DB["SELECT id_user FROM login WITH (NOLOCK) WHERE [id]='#{id_login}'"].first[:id_user]
+
+  # almaceno el busqueda en la base de datos
+  sid = guid()
+
+  q =
+  "INSERT INTO sample_search (id,create_time,id_user,industry_name,positions) VALUES " +
+  "('#{sid}',GETDATE(),'#{id_user}','#{session[:industry_name].to_s.gsub("'","''")}','"
+
+  i = 0
+  JOBPOSITIONS.each { |p|
+    if (session[p.to_sym].to_s.size>0)
+      if (i>0)
+        q = q + "|"
+      end
+      q = q + "#{p.to_s.gsub("'","''")}"
+      i=i+1
+    end
+  }
+
+  q = q + "')"
+  DB.execute(q)
+
+  DB.disconnect
+  GC.start
+
+  # armo la url para hacer login
+  nField = 0
+
+#  login_url = "#{BlackStack::Pampa::api_protocol}://#{app_url}:#{app_port}/api1.2/division/login2.json?"
+#  login_url += "api_key=#{BlackStack::Pampa::api_key}&id_login=#{id_login}&redirect=/edb/results?"
+  login_url = "#{getDivisionURL}/freeleads/search?"
+
+  if (industry_name.to_s.size > 0)
+  	nField += 1
+  	login_url += CGI.escape("field#{nField.to_s}=industry&value#{nField.to_s}=#{industry_name.to_s}&positive#{nField.to_s}=yes&")
+  end
+  JOBPOSITIONS.each { |p|
+    if (session[p.to_sym].to_s.size>0)
+  	  nField += 1
+  	  login_url += CGI.escape("field#{nField.to_s}=position&value#{nField.to_s}=#{p.to_s.gsub("'","''")}&positive#{nField.to_s}=yes&")
+    end
+  }
+  if (nField>0)
+  	login_url += CGI.escape("n=#{nField.to_s}")
+  end
+  redirect_adapted_to_nginx login_url
+%>
+<!-- ---------------------------------------- -->
