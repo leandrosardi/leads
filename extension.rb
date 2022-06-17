@@ -1,4 +1,4 @@
-BlackStack::Extensions::add(
+BlackStack::Extension::set (
     # descriptive name and descriptor
     :name => 'Leads',
     :description => 'Leads is a mySaaS extension to add a marketplace of B2B contacts.'
