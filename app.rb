@@ -4,41 +4,41 @@ get "/leads/landing", :agent => /(.*)/ do
 end
 
 # internal wizard (funnel) screens
-get "/leads/step1", :auth1 => true, :agent => /(.*)/ do
+get "/leads/step1", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/step1", :layout => :"/views/layouts/public"
 end
 
-get "/leads/step2", :auth1 => true, :agent => /(.*)/ do
+get "/leads/step2", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/step2", :layout => :"/views/layouts/public"
 end
 
-get "/leads/tripwire", :auth1 => true, :agent => /(.*)/ do
+get "/leads/tripwire", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/tripwire", :layout => :"/views/layouts/public"
 end
 
 # internal app screens
-get "/leads/plans", :auth1 => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/plans", :layout => ":/views/layouts/core"
+get "/leads/plans", :auth => true, :agent => /(.*)/ do
+    erb :"/extensions/leads/views/plans", :layout => :"/views/layouts/core"
 end
 
-get "/leads/welcome", :auth1 => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/welcome", :layout => ":/views/layouts/core"
+get "/leads/welcome", :auth => true, :agent => /(.*)/ do
+    erb :"/extensions/leads/views/welcome", :layout => :"/views/layouts/core"
 end
 
-get "/leads/search", :auth1 => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/search", :layout => ":/views/layouts/core"
+get "/leads/search", :auth => true, :agent => /(.*)/ do
+    erb :"/extensions/leads/views/search", :layout => :"/views/layouts/core"
 end
 
-get "/leads/saved_searches", :auth1 => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/saved_searches", :layout => ":/views/layouts/core"
+get "/leads/saved_searches", :auth => true, :agent => /(.*)/ do
+    erb :"/extensions/leads/views/saved_searches", :layout => :"/views/layouts/core"
 end
 
-get "/leads/results", :auth1 => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/results", :layout => ":/views/layouts/core"
+get "/leads/results", :auth => true, :agent => /(.*)/ do
+    erb :"/extensions/leads/views/results", :layout => :"/views/layouts/core"
 end
 
-get "/leads/exports", :auth1 => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/exports", :layout => ":/views/layouts/core"
+get "/leads/exports", :auth => true, :agent => /(.*)/ do
+    erb :"/extensions/leads/views/exports", :layout => :"/views/layouts/core"
 end
 
 # filters
@@ -46,15 +46,15 @@ get "/leads/filter_landing" do
     erb :"/extensions/leads/views/filter_landing"
 end
 
-get "/leads/filter_step1", :auth1 => true do
+get "/leads/filter_step1", :auth => true do
     erb :"/extensions/leads/views/filter_step1"
 end
 
-get "/leads/filter_step2", :auth1 => true do
+get "/leads/filter_step2", :auth => true do
     erb :"/extensions/leads/views/filter_step2"
 end
 
-get "/leads/filter_tripwire", :auth1 => true do
+get "/leads/filter_tripwire", :auth => true do
     erb :"/extensions/leads/views/filter_tripwire"
 end
 
