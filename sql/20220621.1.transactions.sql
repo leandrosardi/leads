@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS fl_search (
-    id int not null,
-    id_users int,
+    id uuid not null,
+    id_users uuid,
     name varchar (8000),
     creation_time timestamp not null,
     no_of_results int,
@@ -13,22 +13,22 @@ CREATE TABLE IF NOT EXISTS fl_search (
 );
 
 CREATE TABLE IF NOT EXISTS fl_industry (
-    id int not null,
+    id uuid not null,
     name varchar (8000),
     PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS fl_location (
-    id int not null,
+    id uuid not null,
     name varchar (8000),
     PRIMARY KEY (id)
 );
 
 
 CREATE TABLE IF NOT EXISTS fl_search_industry (
-    id int not null,
-    id_industry int,
-    id_search int,
+    id uuid not null,
+    id_industry uuid,
+    id_search uuid,
     positive bit,
     PRIMARY KEY (id),
     FOREIGN KEY (id_industry) REFERENCES fl_industry(id),
@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS fl_search_industry (
 );
 
 CREATE TABLE IF NOT EXISTS fl_search_location (
-    id int not null,
-    id_location int,
-    id_search int,
+    id uuid not null,
+    id_location uuid,
+    id_search uuid,
     positive bit,
     PRIMARY KEY (id),
     FOREIGN KEY (id_location) REFERENCES fl_location(id),
@@ -46,8 +46,8 @@ CREATE TABLE IF NOT EXISTS fl_search_location (
 );
 
 CREATE TABLE IF NOT EXISTS fl_search_position (
-    id int not null,
-    id_search int,
+    id uuid not null,
+    id_search uuid,
     positive bit,
     value varchar (8000) not null,
     PRIMARY KEY (id),
@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS fl_search_position (
 );
 
 CREATE TABLE IF NOT EXISTS fl_invite (
-    id int not null,
-    id_users int,
+    id uuid not null,
+    id_users uuid,
     first_name varchar (8000) not null,
     last_name varchar (8000) not null,
     email varchar (8000) not null,
@@ -66,9 +66,9 @@ CREATE TABLE IF NOT EXISTS fl_invite (
 );
 
 CREATE TABLE IF NOT EXISTS fl_export (
-    id int not null,
-    id_users int,
-    id_search int,
+    id uuid not null,
+    id_users uuid,
+    id_search uuid,
     creation_time timestamp not null,
     PRIMARY KEY (id),
     FOREIGN KEY (id_search) REFERENCES fl_search(id),
@@ -76,41 +76,41 @@ CREATE TABLE IF NOT EXISTS fl_export (
 );
 
 CREATE TABLE IF NOT EXISTS fl_company (
-    id int not null,
+    id uuid not null,
     name varchar (8000) null,
     PRIMARY KEY (id)
 );
 
 
 CREATE TABLE IF NOT EXISTS fl_lead (
-     id int not null,
-     position varchar (8000),
-     id_company int,
-     id_industry int,
-     id_location int,
-     stat_has_email bit null,
-     stat_has_phone bit null,
-     stat_company_name varchar(8000) null,
-     stat_industry_name varchar(8000) null,
-     stat_location_name varchar(8000) null,
-     PRIMARY KEY (id),
-     FOREIGN KEY (id_company) REFERENCES fl_company(id),
-     FOREIGN KEY (id_location) REFERENCES fl_location(id),
-     FOREIGN KEY (id_industry) REFERENCES fl_industry(id)
+    id uuid not null,
+    position varchar (8000),
+    id_company uuid,
+    id_industry uuid,
+    id_location uuid,
+    stat_has_email bit null,
+    stat_has_phone bit null,
+    stat_company_name varchar(8000) null,
+    stat_industry_name varchar(8000) null,
+    stat_location_name varchar(8000) null,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_company) REFERENCES fl_company(id),
+    FOREIGN KEY (id_location) REFERENCES fl_location(id),
+    FOREIGN KEY (id_industry) REFERENCES fl_industry(id)
 );
 
 CREATE TABLE IF NOT EXISTS fl_export_lead (
-    id int not null,
-    id_export int,
-    id_lead int,
+    id uuid not null,
+    id_export uuid,
+    id_lead uuid,
     PRIMARY KEY (id),
     FOREIGN KEY (id_export) REFERENCES fl_export(id),
     FOREIGN KEY (id_lead) REFERENCES fl_lead(id)
 );
 
 CREATE TABLE IF NOT EXISTS fl_data (
-    id int not null,
-    id_lead int,
+    id uuid not null,
+    id_lead uuid,
     type int not null,
     value varchar(8000) not null,
     PRIMARY KEY (id),
