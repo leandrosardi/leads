@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS fl_search (
 
 CREATE TABLE IF NOT EXISTS fl_industry (
     id uuid not null,
+    code varchar(500) NOT NULL,
     name varchar (8000),
     PRIMARY KEY (id)
 );
@@ -21,6 +22,8 @@ CREATE TABLE IF NOT EXISTS fl_industry (
 CREATE TABLE IF NOT EXISTS fl_location (
     id uuid not null,
     name varchar (8000),
+    code varchar(500) NOT NULL,
+    id_country uuid,
     PRIMARY KEY (id)
 );
 
