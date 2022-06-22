@@ -28,6 +28,6 @@ BlackStack::Extensions::add ({
  
     # add a folder to the storage from where user can download the exports.
     :storage_folders => [
-        { :name => 'exports', },
+        { :name => 'exports.leads', },
     ],
 })
