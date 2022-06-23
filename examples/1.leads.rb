@@ -1,3 +1,12 @@
+# load gem and connect database
+require 'mysaas'
+require 'lib/stubs'
+require 'config'
+require 'version'
+DB = BlackStack::CRDB::connect
+require 'lib/skeletons'
+require 'extensions/leads/lib/skeletons'
+
 Leads::FlLead.new(
     :name => 'Leandro Sardi',
     :position => 'Founder and CEO',
@@ -20,7 +29,3 @@ Leads::FlLead.new(
 )
 
 
-
-=begin
-ALTER TABLE fl_company ADD COLUMN IF NOT EXISTS "url" varchar(8000) not null;
-=end

@@ -3,7 +3,7 @@ module Leads
     many_to_one :fl_company, :class=>:'Leads::FlCompany', :key=>:id_company
     many_to_one :fl_industry, :class=>:'Leads::FlSearchIndustry', :key=>:id_industry
     many_to_one :fl_location, :class=>:'Leads::FlSearchLocation', :key=>:id_location
-    one_to_many :fl_data, :class=:'Leads::FlData', :key=>:id_lead
+    one_to_many :fl_data, :class=>:'Leads::FlData', :key=>:id_lead
 
     # validate the strucutre of the hash descritpor.
     # return an arrow of strings with the errors found. 
@@ -33,7 +33,7 @@ module Leads
 
       # validate: if :industry is a string, validate it
       if h[:industry].is_a?(String)
-        erros += Leads::FlSearchIndustry::validate_descriptor({ :name => h[:industry] })
+        errors += Leads::FlIndustry::validate_descriptor({ :name => h[:industry] })
       end
 
       # validate: :location is string or is nil
@@ -41,7 +41,7 @@ module Leads
 
       # validate: if :location is a string, validate it
       if h[:location].is_a?(String)
-        erros += Leads::FlSearchLocation::validate_descriptor({ :name => h[:location] })
+        errors += Leads::FlLocation::validate_descriptor({ :name => h[:location] })
       end
 
       # validate: :datas is an array or is nil
@@ -60,7 +60,8 @@ module Leads
 
     # what happen if the lead works in more than 1 company (example: founder of 2 companies) --> create 2 records
     def initialize(h)
-
+      errors = self.class.validate_descriptor(h)
+      puts "Errors found:\n#{errors.join("\n")}"
     end
 
   end

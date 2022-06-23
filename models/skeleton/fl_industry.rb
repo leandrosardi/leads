@@ -13,7 +13,7 @@ module Leads
       errors << "Descriptor :industry must have :name" if h.is_a?(Hash) && !h.has_key?(:name)
 
       if h[:industry].is_a?(String)
-        if !Leads::FlSearchIndustry.where(:name=>h[:name]).first
+        if !Leads::FlIndustry.where(:name=>h[:name]).first
           errors << "Descriptor :industry :name #{h[:name]} not valid"
         end
       end

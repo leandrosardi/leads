@@ -13,7 +13,7 @@ module Leads
       # validate: if it has :url, then :url must be a valid URL
       if h.is_a?(Hash) && h.has_key?(:url)
         begin
-          URI.parse(h[:company][:url])
+          URI.parse(h[:url])
         rescue URI::InvalidURIError
           errors << "Descriptor :company :url must be a valid URL"
         end
