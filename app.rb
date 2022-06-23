@@ -42,19 +42,19 @@ get "/leads/exports", :auth => true, :agent => /(.*)/ do
 end
 
 # filters
-get "/leads/filter_landing" do
+post "/leads/filter_landing" do
     erb :"/extensions/leads/views/filter_landing"
 end
 
-get "/leads/filter_step1", :auth => true do
+post "/leads/filter_step1", :auth => true do
     erb :"/extensions/leads/views/filter_step1"
 end
 
-get "/leads/filter_step2", :auth => true do
+post "/leads/filter_step2", :auth => true do
     erb :"/extensions/leads/views/filter_step2"
 end
 
-get "/leads/filter_tripwire", :auth => true do
+post "/leads/filter_tripwire", :auth => true do
     erb :"/extensions/leads/views/filter_tripwire"
 end
 

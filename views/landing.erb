@@ -1,3 +1,28 @@
+<%
+	username = session['username'].to_s
+	email = session['email'].to_s
+	msgerr = params[:msgerr]
+	err = params[:err]
+	msg = params[:msg]
+%>
+<% if msgerr!=nil %>
+	<div class="alert alert-error">
+		<a href="#" class="close" data-dismiss="alert"><i class='icon-remove-sign'></i></a><%=msgerr.to_s.encode_html%>
+	</div>
+<% end # err %>
+
+<% if err!=nil %>
+	<div class="alert alert-error">
+		<%=err.to_s.encode_html%>
+	</div>
+<% end # err %>
+
+<% if msg!=nil %>
+	<div class="alert alert-info">
+		<a href="#" class="close" data-dismiss="alert"><i class='icon-remove-sign'></i></a><%=msg.encode_html%>
+	</div>
+<% end # msg %>
+
 <div class="top_banner"></div>
 
 <div class="container">
@@ -10,14 +35,14 @@
 
 		<p>Enter your email below to get a sample.</p>
 		<div class="flex-container text-left">
-			<form class='fancy-form span5' action="../filter_signup" method="post" style="margin-top: 15px;">
+			<form class='fancy-form span5' action="/leads/filter_landing" method="post" style="margin-top: 15px;">
 				<fieldset>
 					<div class="fields">
-						<input id="input-username" class=" span5 input-block-level" type="text"  name="username" placeholder="Full name" tabindex=1 required>
-						<input id="input-email" class=" span5 input-block-level" type="text" name="email" placeholder="your@email.com" tabindex=1 required>
+						<input id="input-username" onfocusout="validateInputs()" class=" span5 input-block-level" type="text"  name="username" value="<%= username %>" placeholder="Full name" tabindex=1 required>
+						<input id="input-email" onfocusout="validateInputs()" class=" span5 input-block-level" type="email" name="email" value="<%= email %>" placeholder="your@email.com" tabindex=1 required>
 
 					</div>
-					<button class="btn btn-large btn-primary" type="submit" value='START' tabindex=2>START</button>
+					<button id="submit-btn" class="btn btn-large btn-primary" type="submit" value='START' tabindex=2>START</button>
 				</fieldset>
 			</form>
 		</div>
@@ -27,3 +52,15 @@
 		<p class="pull-right" style="margin-left: 20px;">&copy;<%=Date.today.year.to_s%> Expanded Venture - With the help of SendGrid.</p>
 	</footer>
 </div>
+
+<script type="text/javascript" charset="utf-8">
+	function validateInputs() {
+		if ($('#input-username').val().length === 0 ||  $('#input-email').val().length ===  0)
+		{
+			$('#submit-btn').prop('disabled', true);
+		}
+		else{
+			$('#submit-btn').prop('disabled', false);
+		}
+	}
+</script>
