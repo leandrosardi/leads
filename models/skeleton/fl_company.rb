@@ -26,6 +26,39 @@ module Leads
       errors
     end
 
+    # normalize the url in the hash descriptor.
+    # this method should not be called by the user.
+    def self.normalize_url(url)
+      return nil if url.nil?
+      URI.parse(url).normalize.to_s
+    end
+
+    # normalize the url in the hash descriptor.
+    # if exsits a company with the same normalized url, then return it. otherwise, create a new company.
+    def self.merge(h)
+      if h.is_a?(Hash) && h.has_key?(:url)
+        # normalize the url in the hash descriptor.
+        h[:url] = BlackStack::FlCompany.normalize_url(h[:url]) 
+        # if exsits a company with the same normalized url, then return it.
+        company = BlackStack::FlCompany.where(:url => h[:url]).first
+        if company
+          return company
+        end
+        # otherwise, create a new company.
+        return self.new(h)
+      end
+    end
+
+    # constructor
+    def initialize(h)
+      errors = self.class.validate_descriptor(h)
+      raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
+      # map the hash to the attributes of the model.
+      self.id = guid
+      self.name = h[:name]
+      self.url = BlackStack::FlCompany.normalize_url(h[:url])
+    end
+
     # return a hash descriptor for the data.
     def to_h
       { :name => name, :url => url }

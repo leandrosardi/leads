@@ -77,6 +77,16 @@ module Leads
       errors
     end
 
+    # constructor
+    def initialize(h)
+      errors = self.class.validate_descriptor(h)
+      raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
+      # map the hash to the attributes of the model.
+      self.id = guid
+      self.type = h[:type]
+      self.value = h[:value]
+    end
+
     # return a hash descriptor for the data.
     def to_h
       {
