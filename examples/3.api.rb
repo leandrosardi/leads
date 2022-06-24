@@ -7,9 +7,6 @@ require 'version'
 res = nil
 
 url = "#{CS_HOME_WEBSITE}/api1.0/leads/merge.json"
-puts
-puts url
-
 
 params = {
     :api_key => BlackStack::API.api_key,
@@ -29,11 +26,7 @@ params = {
         },
         {
             :type => 20,
-            :value => "leandro.sardi@expandedventure.com",
-        },
-        {
-            :type => 20,
-            :value => "tickets@expandedventure.com",
+            :value => "support@expandedventure.com",
         },
     ],
 }
@@ -42,6 +35,7 @@ begin
     res = BlackStack::Netting::call_post(url, params)
     parsed = JSON.parse(res.body)
     raise parsed['status'] if parsed['status']!='success'
+    puts parsed.to_s
 rescue Errno::ECONNREFUSED => e
     raise "Errno::ECONNREFUSED:" + e.message
 rescue => e2
