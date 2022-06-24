@@ -3,11 +3,17 @@ require 'mysaas'
 require 'lib/stubs'
 require 'config'
 require 'version'
-DB = BlackStack::CRDB::connect
-require 'lib/skeletons'
-require 'extensions/leads/lib/skeletons'
 
-o = Leads::FlLead.merge ({
+res = nil
+
+url = "#{CS_HOME_WEBSITE}/api1.0/leads/merge.json"
+puts
+puts url
+
+
+params = {
+    :api_key => BlackStack::API.api_key,
+
     :name => 'Leandro Sardi',
     :position => 'Founder and CEO',
     :company => {
@@ -18,20 +24,27 @@ o = Leads::FlLead.merge ({
     :location => "Argentina",
     :datas => [
         {
-            :type => Leads::FlData::TYPE_PHONE,
+            :type => 10,
             :value => "+54 9 11 5555-5555",
         },
         {
-            :type => Leads::FlData::TYPE_EMAIL,
+            :type => 20,
             :value => "leandro.sardi@expandedventure.com",
         },
         {
-            :type => Leads::FlData::TYPE_EMAIL,
+            :type => 20,
             :value => "tickets@expandedventure.com",
         },
     ],
-})
+}
 
-o.save
+begin
+    res = BlackStack::Netting::call_post(url, params)
+    parsed = JSON.parse(res.body)
+    raise parsed['status'] if parsed['status']!='success'
+rescue Errno::ECONNREFUSED => e
+    raise "Errno::ECONNREFUSED:" + e.message
+rescue => e2
+    raise "Exception:" + e2.message
+end
 
-puts "o: #{o.to_h}"
