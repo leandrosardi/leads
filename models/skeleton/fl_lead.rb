@@ -39,9 +39,15 @@ module Leads
           errors += Leads::FlLocation::validate_descriptor({ :name => h[:location] })
         end
 
-        # validate: :datas is an array or is nil
-        errors << "Descriptor :datas must be an array or nil" if !h[:datas].is_a?(Array) && !h[:datas].nil?
-          
+        # validate: :datas is required
+        errors << "Descriptor must have a :datas" if !h.has_key?(:datas)
+
+        # validate: :datas is an array of hashes
+        errors << "Descriptor :datas must be an array of hashes" if h[:datas].is_a?(Array) && h[:datas].select{|d| !d.is_a?(Hash)}.size>0
+
+        # validate: :datas must have at least 1 email
+        errors << "Descriptor :datas must have at least 1 email" if h[:datas].is_a?(Array) && h[:datas].select{|d| d[:type]==Leads::FlData::TYPE_EMAIL}.size==0
+
         # validate: if :datas is an array, then validate each element of the array
         if h.has_key?(:datas) && h[:datas].is_a?(Array)
           h[:datas].each do |d|
@@ -56,12 +62,24 @@ module Leads
 
     # what happen if the lead works in more than 1 company (example: founder of 2 companies) --> create 2 records
     def initialize(h)
-      errors = self.class.validate_descriptor(h)
+      super()
+      errors = Leads::FlLead.validate_descriptor(h)
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
-
       # map the hash to the attributes of the model.
-      self.id = guid
+      self.id = guid()
       self.update(h)
+    end
+
+    # save the company.
+    # save the lead itself.
+    # save each data.
+    def save
+      self.fl_company.save if !self.fl_company.nil?
+      super
+      self.fl_datas.each { |d|
+        d.id_lead = self.id 
+        d.save 
+      }
     end
 
     # map the name attribues name, position, industry, location to the model.
@@ -90,19 +108,18 @@ module Leads
 
     # build an array of exisiting lead ids, with one or more of the emails in the descriptor.
     def self.merge(h)
-      errors = self.class.validate_descriptor(h)
+      errors = Leads::FlLead.validate_descriptor(h)
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
 
       # build an array of exisiting lead ids, with one or more of the emails in the descriptor.
+      ids = []
       if h[:datas].is_a?(Array) && h[:datas].select { |d| d[:type] == Leads::FlData::TYPE_EMAIL }.size>0
-        ids = BlackStack::FlData.where(
-          :type => Leads::FlData::TYPE_EMAIL, 
+        ids = Leads::FlData.where(
+          :type => Leads::FlData::TYPE_EMAIL,
           :value => h[:datas].select { |d| 
             d[:type] == Leads::FlData::TYPE_EMAIL 
-          }.map{ |d| 
-            d[:value]
-          }.uniq
-        ).map{ |d| 
+          }.map { |d| d[:value] }
+        ).all.map{ |d| 
           d.id_lead
         }.uniq
       end
@@ -112,25 +129,27 @@ module Leads
 
       # if the lead already exists, then update it and return it.
       if ids.size==1
-        o = BlackStack::FlLead.where(:id => ids.first).first
+        o = Leads::FlLead.where(:id => ids.first).first
         o.update(h)
         return o
       end
 
-      # if there is no lead with the same email, create a new one.
-      return BlackStack::FlLead.new(h)
+      # if there is no lead with the same email, create a new one and return it.
+      return Leads::FlLead.new(h)
     end
 
     # return a hash descriptor for the data.
     def to_h
-      { 
+      ret = { 
         :name => name, 
         :position => position, 
-        :company => self.fl_company.to_hash, 
-        :industry => self.fl_industry.name, 
-        :location => self.fl_location.name,
-        :datas => self.fl_datas.map{|d| d.to_hash},
       }
+      ret[:company] = self.fl_company.nil? ? nil : self.fl_company.to_hash
+      ret[:industry] = self.fl_industry.nil? ? nil : self.fl_industry.name
+      ret[:location] = self.fl_location.nil? ? nil : self.fl_location.name
+      ret[:datas] = self.fl_datas.map{|d| d.to_hash}
+      # return
+      ret
     end
 
   end

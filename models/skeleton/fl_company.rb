@@ -38,9 +38,9 @@ module Leads
     def self.merge(h)
       if h.is_a?(Hash) && h.has_key?(:url)
         # normalize the url in the hash descriptor.
-        h[:url] = BlackStack::FlCompany.normalize_url(h[:url]) 
+        h[:url] = Leads::FlCompany.normalize_url(h[:url]) 
         # if exsits a company with the same normalized url, then return it.
-        company = BlackStack::FlCompany.where(:url => h[:url]).first
+        company = Leads::FlCompany.where(:url => h[:url]).first
         if company
           return company
         end
@@ -51,12 +51,13 @@ module Leads
 
     # constructor
     def initialize(h)
-      errors = self.class.validate_descriptor(h)
+      super()
+      errors = Leads::FlCompany.validate_descriptor(h)
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
       # map the hash to the attributes of the model.
       self.id = guid
       self.name = h[:name]
-      self.url = BlackStack::FlCompany.normalize_url(h[:url])
+      self.url = Leads::FlCompany.normalize_url(h[:url])
     end
 
     # return a hash descriptor for the data.

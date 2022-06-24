@@ -22,7 +22,8 @@ module Leads
 
     # constructor
     def initialize(h)
-      errors = self.class.validate_descriptor(h)
+      super()
+      errors = Leads::FlLocation.validate_descriptor(h)
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
       # map the hash to the attributes of the model.
       self.id = guid
