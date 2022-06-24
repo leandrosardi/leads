@@ -77,6 +77,12 @@ module Leads
       errors
     end
 
-
+    # return a hash descriptor for the data.
+    def to_h
+      {
+        :type => self.type,
+        :value => self.value,
+      }
+    end
   end
 end

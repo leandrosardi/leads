@@ -20,5 +20,10 @@ module Leads
       errors
     end
 
+    # return a hash descriptor for the data.
+    def to_h
+      { :name => name }
+    end
+
   end
 end

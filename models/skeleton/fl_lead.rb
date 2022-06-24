@@ -19,11 +19,7 @@ module Leads
       # validate: :name is a string
       errors << "Descriptor :name must be a string" if !h[:name].is_a?(String)
 
-      # validate: :position is a string or is nil
-      errors << "Descriptor :position must be a string or nil" if !h[:position].is_a?(String) && !h[:position].nil?
-
-      # validate: :company is a hash or is nil
-      errors << "Descriptor :company must be a hash or nil" if !h[:company].is_a?(Hash) && !h[:company].nil?
+     
 
       # validate: if :company is a hash, validate it
       errors += Leads::FlCompany::validate_descriptor(h[:company]) if h[:company].is_a?(Hash)
@@ -62,6 +58,18 @@ module Leads
     def initialize(h)
       errors = self.class.validate_descriptor(h)
       puts "Errors found:\n#{errors.join("\n")}"
+    end
+
+    # return a hash descriptor for the data.
+    def to_h
+      { 
+        :name => name, 
+        :position => position, 
+        :company => self.fl_company.to_hash, 
+        :industry => self.fl_industry.name, 
+        :location => self.fl_location.name,
+        :datas => self.fl_data.map{|d| d.to_hash},
+      }
     end
 
   end
