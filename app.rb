@@ -60,4 +60,10 @@ end
 
 # TODO: add remaining filters about internal screens (searches, results, etc.)
 
+# API
+get "/api1.0/leads/merge.json", :api_key => true do
+    erb :"/extensions/leads/views/api1.0/merge"
+end
+
+
 
