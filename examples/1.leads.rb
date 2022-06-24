@@ -12,7 +12,7 @@ o = Leads::FlLead.merge ({
     :position => 'Founder and CEO',
     :company => {
         :name => "ConnectionSphere",
-        :url => "connectionsphere.com",
+        :url => "https://connectionsphere.com",
     },
     :industry => "Internet",
     :location => "Argentina",
@@ -23,11 +23,11 @@ o = Leads::FlLead.merge ({
         },
         {
             :type => Leads::FlData::TYPE_EMAIL,
-            :value => "leandro.sardi@expandedventure.com",
+            :value => "leandro.SARDI@expandedventure.com",
         },
         {
             :type => Leads::FlData::TYPE_EMAIL,
-            :value => "tickets@expandedventure.com",
+            :value => "TICKETS@expandedventure.com",
         },
     ],
 })

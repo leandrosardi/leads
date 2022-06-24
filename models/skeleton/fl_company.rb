@@ -22,15 +22,22 @@ module Leads
       # validate: if :company is a hash, then it must have :name
       errors << "Descriptor :company must have :name" if h.is_a?(Hash) && !h.has_key?(:name)
 
+      # validate: if the key :url exists, its value is a valid url
+      if h.is_a?(Hash) && h.has_key?(:url)
+        errors << "Descriptor :company :url must be a valid URL" if !h[:url].to_s.url?
+      end
+
       # return the errors found.
       errors
     end
 
-    # normalize the url in the hash descriptor.
+    # normalize the url in the hash descriptor, getting the domain with its subdomains, except `www.`, and finally downcasing it.
     # this method should not be called by the user.
     def self.normalize_url(url)
       return nil if url.nil?
-      URI.parse(url).normalize.to_s
+      return nil if !url.to_s.url?
+      # get the domain with its subdomains, except www.
+      url.to_s.gsub(/^https?:\/\//, '').gsub(/www\./, '').gsub(/\/.*$/, '').downcase
     end
 
     # normalize the url in the hash descriptor.

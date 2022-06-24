@@ -101,6 +101,7 @@ module Leads
       # if :data is an array, then add each data which value does not exist in the existing ones.
       if h[:datas].is_a?(Array)
         h[:datas].each do |d|
+          d[:value].downcase!
           self.fl_datas << Leads::FlData.new(d) unless self.fl_datas.select{ |dd| dd.value==d[:value] }.size>0
         end
       end
@@ -118,7 +119,7 @@ module Leads
           :type => Leads::FlData::TYPE_EMAIL,
           :value => h[:datas].select { |d| 
             d[:type] == Leads::FlData::TYPE_EMAIL 
-          }.map { |d| d[:value] }
+          }.map { |d| d[:value].downcase }
         ).all.map{ |d| 
           d.id_lead
         }.uniq
