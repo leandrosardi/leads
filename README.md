@@ -36,5 +36,5 @@ Restart the **MySaaS** webserver in order to get working the new extension.
 
 This project is still under construction.
 
-The logo has been taken from [here](https://www.shareicon.net/data-analytics-interface-circles-lines-analytics-symbol-circle-dots-data-807857).
+The logo has been taken from [here](https://www.shareicon.net/shot-shooting-target-circular-target-targeting-target-interface-duck-700809).
 
