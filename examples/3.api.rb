@@ -11,6 +11,8 @@ url = "#{CS_HOME_WEBSITE}/api1.0/leads/merge.json"
 params = {
     :api_key => BlackStack::API.api_key,
 
+#    :leads => [{
+
     :name => 'Leandro Sardi',
     :position => 'Founder and CEO',
     :company => {
@@ -29,6 +31,7 @@ params = {
             :value => "support@expandedventure.com",
         },
     ],
+#   }]
 }
 
 begin

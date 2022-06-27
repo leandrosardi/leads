@@ -139,6 +139,20 @@ module Leads
       return Leads::FlLead.new(h)
     end
 
+    # receive a hash descritor or an array of hash-descriptors
+    # return an array of Leads::FlLead objects.
+    #
+    def self.merge_many(h)
+      if h.has_key?(:leads)
+        raise ":leads must be an array" if !h[:leads].is_a?(Array)
+        ret = []
+        h[:leads].each { |l| ret << Leads::FlLead.merge_simple_descritor(l) }
+        return ret
+      else
+        return Leads::FlLead.merge_simple_descritor(h)
+      end
+    end
+
     # return a hash descriptor for the data.
     def to_h
       ret = { 
