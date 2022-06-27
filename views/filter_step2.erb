@@ -1,0 +1,31 @@
+<%
+  # map params key-values to session key-values
+  params_to_session
+
+  # map some params who are specific for for the filter
+  redirect_on_success = session['redirect_on_success']
+  redirect_on_error = session['redirect_on_error']
+
+  # setup default values
+  redirect_on_error = "/leads/step2" if redirect_on_error.to_s.size == 0
+  redirect_on_success = "/leads/tripwire" if redirect_on_success.to_s.size == 0
+
+
+
+  begin
+    selected_industry = Leads::FlIndustry.where(name: params[:industry_name]).first
+    @login.user.preference('settings.users.industry', '', selected_industry.id)
+  rescue => e
+    # libero recursos
+    DB.disconnect
+    GC.start
+    # redirect
+    redirect "#{redirect_on_error}?err="+ CGI::escape(e.message)
+  end
+
+  # blanquo la variable de sesion de redirect
+  session['redirect_on_success'] = nil
+
+  # redirect
+  redirect redirect_on_success
+%>

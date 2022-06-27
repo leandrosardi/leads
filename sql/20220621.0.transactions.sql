@@ -119,4 +119,4 @@ CREATE TABLE IF NOT EXISTS fl_data (
     value varchar(8000) not null,
     PRIMARY KEY (id),
     FOREIGN KEY (id_lead) REFERENCES fl_lead(id)
-)
+);

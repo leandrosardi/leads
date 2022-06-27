@@ -1,3 +1,26 @@
+<%
+	msgerr = params[:msgerr]
+	err = params[:err]
+	msg = params[:msg]
+%>
+<% if msgerr!=nil %>
+	<div class="alert alert-error">
+		<a href="#" class="close" data-dismiss="alert"><i class='icon-remove-sign'></i></a><%=msgerr.to_s.encode_html%>
+	</div>
+<% end # err %>
+
+<% if err!=nil %>
+	<div class="alert alert-error">
+		<%=err.to_s.encode_html%>
+	</div>
+<% end # err %>
+
+<% if msg!=nil %>
+	<div class="alert alert-info">
+		<a href="#" class="close" data-dismiss="alert"><i class='icon-remove-sign'></i></a><%=msg.encode_html%>
+	</div>
+<% end # msg %>
+
 <section class="box" height='500px' align='center' valign='middle'>
 	<br/>
 	<section class='row-fluid'>
@@ -8,11 +31,11 @@
 		<p style='font-size:14pt'>Choose One Or More Of The Available Job Positions.</p>
 	</section>
 	<br/>
-	<form method='get' action='./filter_step1'>
+	<form method='post' action='/leads/filter_step1'>
 		<section class='row-fluid'>
 			<table align='center' valign='middle' cellspacing="1px" cellpadding="5px">
 			<%
-				arPositions = BlackStack::Leads::JOBPOSITIONS
+				arPositions = Leads::JOBPOSITIONS
 				arPositions.uniq!
 				n = 0
 				while (n<arPositions.size)
@@ -40,7 +63,7 @@
 					<td width='50px'></td>
 					<%
 					end
-				
+
 					n=n+1
 					if (n<arPositions.size)
 						checked=""
@@ -70,7 +93,35 @@
 		</section>	
 		<br/>
 		<section class='row-fluid'>
-			<button class="btn btn-primary btn-large">Next <i class="icon-long-arrow-right"></i></a>&nbsp;&nbsp;
+			<button class="btn btn-primary btn-large" id="step1-next" disabled>Next <i class="icon-long-arrow-right"></i></button>&nbsp;&nbsp;
 		</section>
 	</form>
 </section>
+
+<script type="text/javascript" charset="utf-8">
+
+	$(document).ready(function() {
+
+		set_button_state();
+		$("input[type='checkbox']").on('change', function() {
+			set_button_state();
+		});
+
+	});
+
+	function validate_checkbox(){
+		return $('input[type="checkbox"]:checked').length > 0;
+	}
+
+	function set_button_state(){
+		if (validate_checkbox() === true)
+		{
+			$("#step1-next").removeAttr("disabled");
+		}
+		else
+		{
+			$("#step1-next").attr("disabled","disabled");
+		}
+	}
+	
+</script>
