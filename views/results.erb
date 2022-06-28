@@ -8,23 +8,32 @@
     </section>
 	</section>
 
-  <section class="row-fluid box">
-    <div class=''>
-      <div id='job_title'></div>
-<!--      <div id='location'></div>-->
-<!--      <div id='industry'></div>-->
-    </div>
-  </section>
+  <form action="/leads/filter_results" method="post">
+    <section class="row-fluid box">
+      <div class=''>
+        <div id='job_title'></div>
+        <div id='location'></div>
+              <div id='industry'></div>
+      </div>
+    </section>
+  </form>
+
 
 </section>
 
 <script>
     var job_title = document.getElementById('job_title');
-    // var location = document.getElementById('location');
+    var location = document.getElementById('location');
     // var industry = document.getElementById('industry');
 
 
     filtersJs.draw(job_title, {
+        allowed_positive_keywords: true,
+        allowed_negative_keywords: true,
+    });
+
+
+    filtersJs.draw(location, {
         allowed_positive_keywords: true,
         allowed_negative_keywords: true,
     });
