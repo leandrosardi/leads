@@ -1,1 +1,1 @@
-ALTER TABLE fl_company ADD COLUMN IF NOT EXISTS "url" varchar(8000) not null;
+ALTER TABLE fl_company ADD COLUMN IF NOT EXISTS "url" varchar(8000) null;
