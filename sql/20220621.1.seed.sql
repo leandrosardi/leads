@@ -1,4 +1,3 @@
-TRUNCATE TABLE fl_industry;
 INSERT INTO fl_industry (id, code, name) VALUES ('C9849E61-F2D8-4F99-8B64-0004DE0C8A5A', '90' ,'Civic & Social Organization') ON CONFLICT DO NOTHING;
 INSERT INTO fl_industry (id, code, name) VALUES ('F3515F80-0AF8-4337-B304-0224966E23E4', '76' ,'Executive Office') ON CONFLICT DO NOTHING;
 INSERT INTO fl_industry (id, code, name) VALUES ('F31B52DA-C117-460B-91AF-031A0AC7BCE7', '26' ,'Furniture') ON CONFLICT DO NOTHING;
