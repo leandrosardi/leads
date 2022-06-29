@@ -90,13 +90,24 @@ module Leads
       self.position = h[:position]
 
       # if exsits a company with the same url, then use it.
-      self.fl_company = Leads::FlCompany.merge(h[:company]) if h[:company].is_a?(Hash)
+      if h[:company].is_a?(Hash)
+        self.fl_company = Leads::FlCompany.merge(h[:company]) 
+        self.stat_company_name = self.fl_company.type_name
+      end
 
       # map the FlIndustry to the model.
-      self.fl_industry = Leads::FlIndustry.where(:name=>h[:industry]).first if h[:industry].is_a?(String)
+      if h[:industry].is_a?(String)
+        self.fl_industry = Leads::FlIndustry.where(:name=>h[:industry]).first 
+        self.stat_industry_name = h[:industry]
+      end # if h[:industry].is_a?(String)
 
       # map the FlLocation to the model.
-      self.fl_location = Leads::FlLocation.where(:name=>h[:location]).first if h[:location].is_a?(String)
+      # reference: https://github.com/leandrosardi/leads/issues/33
+      if h[:location].is_a?(String)
+        o = Leads::FlLocation.where(:name=>h[:location]).first
+        self.fl_location = o if !o.nil?
+        self.stat_location_name = h[:location]
+      end
 
       # if :data is an array, then add each data which value does not exist in the existing ones.
       if h[:datas].is_a?(Array)
@@ -105,6 +116,12 @@ module Leads
           self.fl_datas << Leads::FlData.new(d) unless self.fl_datas.select{ |dd| dd.value==d[:value] }.size>0
         end
       end
+
+      # activate this flag if the lead has a data with type==TYPE_EMAIL
+      self.stat_has_email = self.fl_datas.select{ |dd| dd.type==Leads::FlData::TYPE_EMAIL }.size>0
+
+      # activate this flag if the lead has a data with type==TYPE_PHONE
+      self.stat_has_phone = self.fl_datas.select{ |dd| dd.type==Leads::FlData::TYPE_PHONE }.size>0
     end
 
     # build an array of exisiting lead ids, with one or more of the emails in the descriptor.

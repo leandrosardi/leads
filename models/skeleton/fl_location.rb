@@ -12,9 +12,12 @@ module Leads
       # validate: if :company is a hash, then it must have :name
       errors << "Descriptor :location must have :name" if h.is_a?(Hash) && !h.has_key?(:name)
 
+# TODO: enable this validation just once we have a normalzed database of locations. - https://github.com/leandrosardi/leads/issues/33
+=begin
       if !Leads::FlLocation.where(:name=>h[:name]).first
         errors << "Descriptor :location :name #{h[:name]} not valid"
       end
+=end
 
       # return the errors found.
       errors
