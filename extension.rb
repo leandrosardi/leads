@@ -3,6 +3,10 @@ BlackStack::Extensions::add ({
     :name => 'Leads',
     :description => 'Leads is a mySaaS extension to add a marketplace of B2B contacts.',
 
+    # setup the url of the repository for installation and updates
+    :repo_url => 'https://github.com/leandrosardi/leads',
+    :repo_branch => 'main',
+
     # define version with format <mayor>.<minor>.<revision>
     :version => '0.0.1',
 
