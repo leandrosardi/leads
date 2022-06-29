@@ -161,7 +161,7 @@ module Leads
     #
     def self.merge_many(h)
       if h.has_key?(:leads)
-        raise ":leads must be an array" if !h[:leads].is_a?(Array)
+        raise ":leads must be an array. Received: #{h.to_s}" if !h[:leads].is_a?(Array)
         ret = []
         h[:leads].each { |l| ret << Leads::FlLead.merge_simple_descritor(l) }
         return ret
