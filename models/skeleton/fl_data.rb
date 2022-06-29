@@ -44,9 +44,8 @@ module Leads
         # refernece: https://stackoverflow.com/questions/10410523/removing-a-part-of-a-url-with-ruby
         parsed = URI::parse(v)
         parsed.fragment = parsed.query = nil
-        self.value = parsed.to_s
         # validate the format of the linkedin url.
-        return v =~ MATCH_LINKEDIN_USER_URL
+        return parsed.to_s =~ MATCH_LINKEDIN_USER_URL
       else
         false
       end
