@@ -101,7 +101,7 @@ module Leads
       if self.type == Leads::FlData::TYPE_LINKEDIN
         # remove query string from the url.
         # refernece: https://stackoverflow.com/questions/10410523/removing-a-part-of-a-url-with-ruby
-        parsed = URI::parse(self.value)
+        parsed = URI::parse(h[:value])
         parsed.fragment = parsed.query = nil
         self.value = parsed.to_s
       else
