@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS fl_search (
     no_of_results int,
     no_of_companies int,
     description varchar (8000),
-    saved bit not null,
-    temp bit null,
+    saved boolean not null,
+    temp boolean null,
     PRIMARY KEY (id),
     FOREIGN KEY (id_user) REFERENCES "user"(id)
 );
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS fl_search_industry (
     id uuid not null,
     id_industry uuid,
     id_search uuid,
-    positive bit,
+    positive boolean,
     PRIMARY KEY (id),
     FOREIGN KEY (id_industry) REFERENCES fl_industry(id),
     FOREIGN KEY (id_search) REFERENCES fl_search(id)
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS fl_search_location (
     id uuid not null,
     id_location uuid,
     id_search uuid,
-    positive bit,
+    positive boolean,
     PRIMARY KEY (id),
     FOREIGN KEY (id_location) REFERENCES fl_location(id),
     FOREIGN KEY (id_search) REFERENCES fl_search(id)
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS fl_search_location (
 CREATE TABLE IF NOT EXISTS fl_search_position (
     id uuid not null,
     id_search uuid,
-    positive bit,
+    positive boolean,
     value varchar (8000) not null,
     PRIMARY KEY (id),
     FOREIGN KEY (id_search) REFERENCES fl_search(id)
@@ -92,8 +92,8 @@ CREATE TABLE IF NOT EXISTS fl_lead (
     id_company uuid,
     id_industry uuid,
     id_location uuid,
-    stat_has_email bit null,
-    stat_has_phone bit null,
+    stat_has_email boolean null,
+    stat_has_phone boolean null,
     stat_company_name varchar(8000) null,
     stat_industry_name varchar(8000) null,
     stat_location_name varchar(8000) null,
