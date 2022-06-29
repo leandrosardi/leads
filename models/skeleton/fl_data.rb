@@ -40,6 +40,11 @@ module Leads
         # validate the format of the email.
         return v.to_s.email?
       elsif t == Leads::FlData::TYPE_LINKEDIN
+        # remove query string from the url.
+        # refernece: https://stackoverflow.com/questions/10410523/removing-a-part-of-a-url-with-ruby
+        parsed = URI::parse(v)
+        parsed.fragment = parsed.query = nil
+        self.value = parsed.to_s
         # validate the format of the linkedin url.
         return v =~ MATCH_LINKEDIN_USER_URL
       else
@@ -94,7 +99,15 @@ module Leads
       # map the hash to the attributes of the model.
       self.id = guid
       self.type = h[:type]
-      self.value = h[:value]
+      if self.type == Leads::FlData::TYPE_LINKEDIN
+        # remove query string from the url.
+        # refernece: https://stackoverflow.com/questions/10410523/removing-a-part-of-a-url-with-ruby
+        parsed = URI::parse(self.value)
+        parsed.fragment = parsed.query = nil
+        self.value = parsed.to_s
+      else
+        self.value = h[:value]
+      end
     end
 
     # return a hash descriptor for the data.
