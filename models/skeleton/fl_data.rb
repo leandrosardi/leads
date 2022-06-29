@@ -2,14 +2,18 @@ module Leads
   class FlData < Sequel::Model(:fl_data)
     many_to_one :fl_lead, :class=>:'Leads::FlLead', :key=>:id_lead
 
+    MATCH_LINKEDIN_USER_URL = /((https?:\/\/)?(www\.)?linkedin\.com\/in\/)(([-A-Za-z0-9](\/?))+$)/
+
     TYPE_PHONE = 10
     TYPE_EMAIL = 20
+    TYPE_LINKEDIN = 90
 
     # return an array of possibly valid types.
     def self.types
       [
         Leads::FlData::TYPE_PHONE,
         Leads::FlData::TYPE_EMAIL,
+        Leads::FlData::TYPE_LINKEDIN,
       ]
     end
 
@@ -20,6 +24,8 @@ module Leads
         'Phone'
       elsif n == Leads::FlData::TYPE_EMAIL
         'Email'
+      elsif n == Leads::FlData::TYPE_LINKEDIN
+        'LinkedIn'
       else
         nil
       end
@@ -33,6 +39,9 @@ module Leads
       elsif t == Leads::FlData::TYPE_EMAIL
         # validate the format of the email.
         return v.to_s.email?
+      elsif t == Leads::FlData::TYPE_LINKEDIN
+        # validate the format of the linkedin url.
+        return v =~ MATCH_LINKEDIN_USER_URL
       else
         false
       end
