@@ -46,7 +46,7 @@ module Leads
         errors << "Descriptor :datas must be an array of hashes" if h['datas'].is_a?(Array) && h['datas'].select{|d| !d.is_a?(Hash)}.size>0
 
         # validate: :datas must have at least 1 email
-        errors << "Descriptor :datas must have at least 1 email (#{h['datas'].to_s})" if h['datas'].is_a?(Array) && h['datas'].select{|d| d[:type]==Leads::FlData::TYPE_EMAIL}.size==0
+        errors << "Descriptor :datas must have at least 1 email (#{h['datas'].to_s})" if h['datas'].is_a?(Array) && h['datas'].select{|d| d['type']==Leads::FlData::TYPE_EMAIL}.size==0
 
         # validate: if :datas is an array, then validate each element of the array
         if h.has_key?('datas') && h['datas'].is_a?(Array)
@@ -113,7 +113,7 @@ module Leads
       if h['datas'].is_a?(Array)
         h['datas'].each do |d|
           d['value'].downcase!
-          self.fl_datas << Leads::FlData.new(d) unless self.fl_datas.select{ |dd| dd.value==d[:value] }.size>0
+          self.fl_datas << Leads::FlData.new(d) unless self.fl_datas.select{ |dd| dd.value==d['value'] }.size>0
         end
       end
 
@@ -135,8 +135,8 @@ module Leads
         ids = Leads::FlData.where(
           :type => Leads::FlData::TYPE_EMAIL,
           :value => h['datas'].select { |d| 
-            d[:type] == Leads::FlData::TYPE_EMAIL 
-          }.map { |d| d[:value].downcase }
+            d['type'] == Leads::FlData::TYPE_EMAIL 
+          }.map { |d| d['value'].downcase }
         ).all.map{ |d| 
           d.id_lead
         }.uniq
