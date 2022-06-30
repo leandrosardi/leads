@@ -10,7 +10,7 @@ module Leads
       errors << "Descriptor must be a hash" if !h.is_a?(Hash)
 
       # validate: if :company is a hash, then it must have :name
-      errors << "Descriptor :industry must have :name" if h.is_a?(Hash) && !h.has_key?('name')
+      errors << "Descriptor :industry must have :name (#{h.to_s})" if h.is_a?(Hash) && !h.has_key?('name')
 
       if h['industry'].is_a?(String)
         if !Leads::FlIndustry.where(:name=>h['name']).first

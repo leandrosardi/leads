@@ -46,7 +46,7 @@ module Leads
         errors << "Descriptor :datas must be an array of hashes" if h['datas'].is_a?(Array) && h['datas'].select{|d| !d.is_a?(Hash)}.size>0
 
         # validate: :datas must have at least 1 email
-        errors << "Descriptor :datas must have at least 1 email" if h['datas'].is_a?(Array) && h['datas'].select{|d| d[:type]==Leads::FlData::TYPE_EMAIL}.size==0
+        errors << "Descriptor :datas must have at least 1 email (#{h['datas'].to_s})" if h['datas'].is_a?(Array) && h['datas'].select{|d| d[:type]==Leads::FlData::TYPE_EMAIL}.size==0
 
         # validate: if :datas is an array, then validate each element of the array
         if h.has_key?('datas') && h['datas'].is_a?(Array)
