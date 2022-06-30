@@ -11,7 +11,7 @@ module Leads
       errors = []
 
       # validate: h must be a hash
-      errors << "Descriptor must be a hash" if !h.is_a?(Hash)
+      errors << "Descriptor must be a hash. Received: #{h.to_s}" if !h.is_a?(Hash)
 
       if h.is_a?(Hash)
         # validate: :name is required
