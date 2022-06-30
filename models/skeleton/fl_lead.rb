@@ -15,20 +15,20 @@ module Leads
 
       if h.is_a?(Hash)
         # validate: :name is required
-        errors += "Descriptor must have a :name" if !h.has_key?(:name)
+        errors << "Descriptor must have a :name" if !h.has_key?(:name)
 
         # validate: :name is a string
-        errors += "Descriptor :name must be a string" if h.has_key?(:name) && !h[:name].is_a?(String)
+        errors << "Descriptor :name must be a string" if h.has_key?(:name) && !h[:name].is_a?(String)
 
         # validate: if :company is a hash, validate it
-        errors += Leads::FlCompany::validate_descriptor(h[:company]) if h.has_key?(:company) && h[:company].is_a?(Hash)
+        errors << Leads::FlCompany::validate_descriptor(h[:company]) if h.has_key?(:company) && h[:company].is_a?(Hash)
 
         # validate: :industry is string or is nil
         errors << "Descriptor :industry must be a string or nil" if !h[:industry].is_a?(String) && !h[:industry].nil?
 
         # validate: if :industry is a string, validate it
         if h.has_key?(:industry) && h[:industry].is_a?(String)
-          errors += Leads::FlIndustry::validate_descriptor({ :name => h[:industry] })
+          errors << Leads::FlIndustry::validate_descriptor({ :name => h[:industry] })
         end
 
         # validate: :location is string or is nil
@@ -36,7 +36,7 @@ module Leads
 
         # validate: if :location is a string, validate it
         if h.has_key?(:location) && h[:location].is_a?(String)
-          errors += Leads::FlLocation::validate_descriptor({ :name => h[:location] })
+          errors << Leads::FlLocation::validate_descriptor({ :name => h[:location] })
         end
 
         # validate: :datas is required
