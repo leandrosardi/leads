@@ -79,7 +79,7 @@ module Leads
 
     # return a hash descriptor for the data.
     def to_h
-      { :name => name, :url => url }
+      { 'name' => name, 'url' => url }
     end
 
   end

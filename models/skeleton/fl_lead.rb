@@ -173,13 +173,13 @@ module Leads
     # return a hash descriptor for the data.
     def to_h
       ret = { 
-        :name => name, 
-        :position => position, 
+        'name' => name, 
+        'position' => position, 
       }
-      ret[:company] = self.fl_company.nil? ? nil : self.fl_company.to_hash
-      ret[:industry] = self.fl_industry.nil? ? nil : self.fl_industry.name
-      ret[:location] = self.fl_location.nil? ? nil : self.fl_location.name
-      ret[:datas] = self.fl_datas.map{|d| d.to_hash}
+      ret['company'] = self.fl_company.nil? ? nil : self.fl_company.to_hash
+      ret['industry'] = self.fl_industry.nil? ? nil : self.fl_industry.name
+      ret['location'] = self.fl_location.nil? ? nil : self.fl_location.name
+      ret['datas'] = self.fl_datas.map{|d| d.to_hash}
       # return
       ret
     end
