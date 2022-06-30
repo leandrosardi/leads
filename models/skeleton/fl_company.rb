@@ -11,20 +11,20 @@ module Leads
       errors << "Descriptor must be a hash" if !h.is_a?(Hash)
 
       # validate: if it has :url, then :url must be a valid URL
-      if h.is_a?(Hash) && h.has_key?(:url)
+      if h.is_a?(Hash) && h.has_key?('url')
         begin
-          URI.parse(h[:url])
+          URI.parse(h['url'])
         rescue URI::InvalidURIError
           errors << "Descriptor :company :url must be a valid URL"
         end
       end
 
       # validate: if :company is a hash, then it must have :name
-      errors << "Descriptor :company must have :name" if h.is_a?(Hash) && !h.has_key?(:name)
+      errors << "Descriptor :company must have :name" if h.is_a?(Hash) && !h.has_key?('name')
 
       # validate: if the key :url exists, its value is a valid url
-      if h.is_a?(Hash) && h.has_key?(:url)
-        errors << "Descriptor :company :url must be a valid URL" if !h[:url].to_s.url?
+      if h.is_a?(Hash) && h.has_key?('url')
+        errors << "Descriptor :company :url must be a valid URL" if !h['url'].to_s.url?
       end
 
       # return the errors found.
@@ -47,14 +47,14 @@ module Leads
       raise "Compny descriptor must be a hash" if !h.is_a?(Hash)
 
       # initialize :url
-      h[:url] = nil if !h.has_key?(:url)
+      h['url'] = nil if !h.has_key?('url')
 
       # normalize the url in the hash descriptor.
-      h[:url] = Leads::FlCompany.normalize_url(h[:url]) if !h[:url].nil?
+      h['url'] = Leads::FlCompany.normalize_url(h['url']) if !h['url'].nil?
 
-      if !h[:url].nil?
+      if !h['url'].nil?
         # if exsits a company with the same normalized url, then return it.
-        company = Leads::FlCompany.where(:url => h[:url]).first
+        company = Leads::FlCompany.where(:url => h['url']).first
         if !company.nil?
           return company
         else
@@ -73,8 +73,8 @@ module Leads
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
       # map the hash to the attributes of the model.
       self.id = guid
-      self.name = h[:name]
-      self.url = Leads::FlCompany.normalize_url(h[:url])
+      self.name = h['name']
+      self.url = Leads::FlCompany.normalize_url(h['url'])
     end
 
     # return a hash descriptor for the data.

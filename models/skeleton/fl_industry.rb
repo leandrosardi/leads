@@ -10,11 +10,11 @@ module Leads
       errors << "Descriptor must be a hash" if !h.is_a?(Hash)
 
       # validate: if :company is a hash, then it must have :name
-      errors << "Descriptor :industry must have :name" if h.is_a?(Hash) && !h.has_key?(:name)
+      errors << "Descriptor :industry must have :name" if h.is_a?(Hash) && !h.has_key?('name')
 
-      if h[:industry].is_a?(String)
-        if !Leads::FlIndustry.where(:name=>h[:name]).first
-          errors << "Descriptor :industry :name #{h[:name]} not valid"
+      if h['industry'].is_a?(String)
+        if !Leads::FlIndustry.where(:name=>h['name']).first
+          errors << "Descriptor :industry :name #{h['name']} not valid"
         end
       end
 
@@ -29,7 +29,7 @@ module Leads
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
       # map the hash to the attributes of the model.
       self.id = guid
-      self.name = h[:name]
+      self.name = h['name']
     end
 
     # return a hash descriptor for the data.

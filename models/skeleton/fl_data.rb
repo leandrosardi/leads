@@ -60,29 +60,29 @@ module Leads
       errors << "Descriptor must be a hash" if !h.is_a?(Hash)
 
       # validate: if h is a hash, then it must have :type
-      errors << "Descriptor :data must have :type" if h.is_a?(Hash) && !h.has_key?(:type)
+      errors << "Descriptor :data must have :type" if h.is_a?(Hash) && !h.has_key?('type')
 
       # validate: if h is a hash, and it has a :type key, then it must have a valid value.
-      if h.is_a?(Hash) && h.has_key?(:type)
-        if !Leads::FlData.types.include?(h[:type])
-          errors << "Descriptor :data :type #{h[:type]} not valid"
+      if h.is_a?(Hash) && h.has_key?('type')
+        if !Leads::FlData.types.include?(h['type'])
+          errors << "Descriptor :data :type #{h['type']} not valid"
         end
       end
 
       # validate: if h is a hash, and it must have a :value
-      errors << "Descriptor :data must have :value" if h.is_a?(Hash) && !h.has_key?(:value)
+      errors << "Descriptor :data must have :value" if h.is_a?(Hash) && !h.has_key?('value')
 
       # validate: if h is a hash, and it has a :value, then the :value must be a string.
-      if h.is_a?(Hash) && h.has_key?(:value)
-        if !h[:value].is_a?(String)
+      if h.is_a?(Hash) && h.has_key?('value')
+        if !h['value'].is_a?(String)
           errors << "Descriptor :data :value must be a string"
         end
       end
 
       # validate: if h is a hash, and it has a :type, and it has a :value, then the :value must valid
-      if h.is_a?(Hash) && h.has_key?(:type) && h.has_key?(:value)
-        if !Leads::FlData.validate_value(h[:type], h[:value])
-          errors << "Descriptor :data :value #{h[:value]} not valid"
+      if h.is_a?(Hash) && h.has_key?('type') && h.has_key?('value')
+        if !Leads::FlData.validate_value(h['type'], h['value'])
+          errors << "Descriptor :data :value #{h['value']} not valid"
         end
       end
       
@@ -97,15 +97,15 @@ module Leads
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
       # map the hash to the attributes of the model.
       self.id = guid
-      self.type = h[:type]
+      self.type = h['type']
       if self.type == Leads::FlData::TYPE_LINKEDIN
         # remove query string from the url.
         # refernece: https://stackoverflow.com/questions/10410523/removing-a-part-of-a-url-with-ruby
-        parsed = URI::parse(h[:value])
+        parsed = URI::parse(h['value'])
         parsed.fragment = parsed.query = nil
         self.value = parsed.to_s
       else
-        self.value = h[:value]
+        self.value = h['value']
       end
     end
 
