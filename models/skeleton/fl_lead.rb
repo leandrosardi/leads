@@ -40,7 +40,7 @@ module Leads
         end
 
         # validate: :datas is required
-        errors << "Descriptor must have a :datas" if !h.has_key?(:datas)
+        errors << "Descriptor must have a :datas (#{h})" if !h.has_key?(:datas)
 
         # validate: :datas is an array of hashes
         errors << "Descriptor :datas must be an array of hashes" if h[:datas].is_a?(Array) && h[:datas].select{|d| !d.is_a?(Hash)}.size>0
