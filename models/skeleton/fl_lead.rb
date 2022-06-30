@@ -163,10 +163,10 @@ module Leads
       if h.has_key?(:leads)
         raise ":leads must be an array. Received: #{h.to_s}" if !h[:leads].is_a?(Array)
         ret = []
-        h[:leads].each { |l| ret << Leads::FlLead.merge_simple_descritor(l) }
+        h[:leads].each { |l| ret << Leads::FlLead.merge(l) }
         return ret
       else
-        return Leads::FlLead.merge_simple_descritor(h)
+        return Leads::FlLead.merge(h)
       end
     end
 

@@ -43,15 +43,25 @@ module Leads
     # normalize the url in the hash descriptor.
     # if exsits a company with the same normalized url, then return it. otherwise, create a new company.
     def self.merge(h)
-      if h.is_a?(Hash) && h.has_key?(:url)
-        # normalize the url in the hash descriptor.
-        h[:url] = Leads::FlCompany.normalize_url(h[:url]) 
+      # validate h is a hash
+      raise "Compny descriptor must be a hash" if !h.is_a?(Hash)
+
+      # initialize :url
+      h[:url] = nil if !h.has_key?(:url)
+
+      # normalize the url in the hash descriptor.
+      h[:url] = Leads::FlCompany.normalize_url(h[:url]) if !h[:url].nil?
+
+      if !h[:url].nil?
         # if exsits a company with the same normalized url, then return it.
         company = Leads::FlCompany.where(:url => h[:url]).first
-        if company
+        if !company.nil?
           return company
+        else
+          # otherwise, create a new company.
+          return self.new(h)
         end
-        # otherwise, create a new company.
+      else # if :url is nil, then match the company name.
         return self.new(h)
       end
     end
