@@ -10,12 +10,12 @@ module Leads
       errors << "Descriptor must be a hash" if !h.is_a?(Hash)
 
       # validate: if :company is a hash, then it must have :name
-      errors << "Descriptor :location must have :name" if h.is_a?(Hash) && !h.has_key?(:name)
+      errors << "Descriptor :location must have :name (#{h.to_s})" if h.is_a?(Hash) && !h.has_key?('name')
 
 # TODO: enable this validation just once we have a normalzed database of locations. - https://github.com/leandrosardi/leads/issues/33
 =begin
-      if !Leads::FlLocation.where(:name=>h[:name]).first
-        errors << "Descriptor :location :name #{h[:name]} not valid"
+      if !Leads::FlLocation.where(:name=>h['name']).first
+        errors << "Descriptor :location :name #{h['name']} not valid"
       end
 =end
 
@@ -30,12 +30,12 @@ module Leads
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
       # map the hash to the attributes of the model.
       self.id = guid
-      self.name = h[:name]
+      self.name = h['name']
     end
 
     # return a hash descriptor for the data.
     def to_h
-      { :name => name }
+      { 'name' => name }
     end
 
   end
