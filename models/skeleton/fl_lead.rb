@@ -15,7 +15,7 @@ module Leads
 
       if h.is_a?(Hash)
         # validate: :name is required
-        errors << "Descriptor must have a :name" if !h.has_key?(:name)
+        errors << "Descriptor must have a :name (#{h})" if !h.has_key?(:name)
 
         # validate: :name is a string
         errors << "Descriptor :name must be a string" if h.has_key?(:name) && !h[:name].is_a?(String)
