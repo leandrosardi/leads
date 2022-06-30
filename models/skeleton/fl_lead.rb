@@ -184,5 +184,15 @@ module Leads
       ret
     end
 
+    def self.map_array_to_str(arr)
+      str = ""
+      arr.each_with_index do |elem, index|
+        puts elem
+        puts elem.strip
+        str += index == arr.size - 1 ? "'#{elem.strip}'" : "'#{elem.strip}', "
+      end
+      str
+    end
+
   end
 end

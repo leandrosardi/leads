@@ -58,6 +58,14 @@ post "/leads/filter_tripwire", :auth => true do
     erb :"/extensions/leads/views/filter_tripwire"
 end
 
+post "/leads/search", :auth => true do
+    erb :"/extensions/leads/views/search"
+end
+
+post "/leads/filter_results", :auth => true do
+    erb :"/extensions/leads/views/filter_results"
+end
+
 # TODO: add remaining filters about internal screens (searches, results, etc.)
 
 # API
