@@ -127,7 +127,7 @@ module Leads
     # build an array of exisiting lead ids, with one or more of the emails in the descriptor.
     def self.merge(h)
       errors = Leads::FlLead.validate_descriptor(h)
-      raise "Errors found (#{errors.size.to_s}):\n- #{errors.join("\n")}." if errors.size>0
+      raise "Errors found (#{errors.size.to_s}):\n#{errors.join("\n")}" if errors.size>0
 
       # build an array of exisiting lead ids, with one or more of the emails in the descriptor.
       ids = []
