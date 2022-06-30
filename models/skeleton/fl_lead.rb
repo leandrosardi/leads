@@ -28,7 +28,7 @@ module Leads
 
         # validate: if :industry is a string, validate it
         if h.has_key?('industry') && h['industry'].is_a?(String)
-          errors << Leads::FlIndustry::validate_descriptor({ :name => h['industry'] })
+          errors << Leads::FlIndustry::validate_descriptor({ 'name' => h['industry'] })
         end
 
         # validate: :location is string or is nil
@@ -36,7 +36,7 @@ module Leads
 
         # validate: if :location is a string, validate it
         if h.has_key?('location') && h['location'].is_a?(String)
-          errors << Leads::FlLocation::validate_descriptor({ :name => h['location'] })
+          errors << Leads::FlLocation::validate_descriptor({ 'name' => h['location'] })
         end
 
         # validate: :datas is required
