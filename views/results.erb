@@ -62,7 +62,7 @@
         <div id='locations'></div>
       </section>
       <section class='span8' style="padding-left: 5%">
-        <h3> <span style="background: black; color: white">500</span> No. of Results </h3>
+        <h3> <span id="total-results" style="background: black; color: white">500</span> No. of Results </h3>
         <h3> <span style="background: black; color: white">500</span> No. of Companies </h3>
       </section>
     </section>
@@ -152,16 +152,23 @@
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>Save this search</h3>
   </div>
-  <div class="modal-body">
-    <p>Enter description for saved search</p>
-    <div class="span12">
-      <textarea class="span11" rows="3" id="textarea-limit"></textarea>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a href="#" data-dismiss="modal" class="btn">Close</a>
-    <a href="#" class="btn btn-primary">Save</a>
-  </div>
+  <form action="/leads/filter_save_search" method="post"></form>
+      <div class="modal-body">
+        <p>Enter description for saved search</p>
+        <div class="span12">
+          <input type="hidden" id="search-id" name="search-id">
+          <input class="span11" placeholder="Name" name="search-name" rows="3" id="search-name"/>
+        </div>
+        <br>
+        <div class="span12">
+          <textarea class="span11" placeholder="Description" name="description" rows="3" id="description"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" data-dismiss="modal" class="btn">Close</a>
+        <button type="submit" id="save-search" class="btn btn-primary">Save</button>
+      </div>
+  </form>
 </div>
 
 <script type="text/javascript" charset="utf-8">
@@ -239,7 +246,6 @@
                 industries_positive: industries_positive,
                 industries_negative: industries_negative,
             };
-            console.log(formData);
             $.ajax({
                 type: "POST",
                 url: "/leads/filter_results",
@@ -247,11 +253,11 @@
                 dataType: "json",
                 encode: true,
             }).done(function (data) {
-                console.log(data);
                 if (data) {
+                    $("#search-id").val(data["search_id"]);
+                    $("#total-results").html(`${data["leads"].length}`)
                     $("#results-table > tbody").empty();
                     data["leads"].forEach(function (item) {
-                        console.log(item);
                         let row = $('<tr>');
                         row.append($('<td>').text(item.name));
                         row.append($('<td>').text(item.position));
@@ -264,12 +270,32 @@
             });
 
         });
+        $("#save-search").on('click', function () {
+
+            let formData = {
+                name: $('#search-name').val(),
+                description: $('#description').val(),
+                search_id: $('#search-id').val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/leads/filter_save_search",
+                data: formData,
+                dataType: "json",
+                encode: true,
+            }).done(function (data) {
+                console.log(data);
+                $('.save_modal').modal('hide');
+            });
+
+        });
+
     });
 
     $('#reset-filters').on('click', function () {
        window.location.reload();
     });
-
 
     // draw pagination
     function drawPagination(o, current_page, total_pages) {
