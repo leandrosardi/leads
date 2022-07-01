@@ -21,14 +21,14 @@ module Leads
         errors << "Descriptor :name must be a string" if h.has_key?('name') && !h['name'].is_a?(String)
 
         # validate: if :company is a hash, validate it
-        errors << Leads::FlCompany::validate_descriptor(h['company']) if h.has_key?('company') && h['company'].is_a?(Hash)
+        errors += Leads::FlCompany::validate_descriptor(h['company']) if h.has_key?('company') && h['company'].is_a?(Hash)
 
         # validate: :industry is string or is nil
         errors << "Descriptor :industry must be a string or nil" if !h['industry'].is_a?(String) && !h['industry'].nil?
 
         # validate: if :industry is a string, validate it
         if h.has_key?('industry') && h['industry'].is_a?(String)
-          errors << Leads::FlIndustry::validate_descriptor({ 'name' => h['industry'] })
+          errors += Leads::FlIndustry::validate_descriptor({ 'name' => h['industry'] })
         end
 
         # validate: :location is string or is nil
@@ -36,7 +36,7 @@ module Leads
 
         # validate: if :location is a string, validate it
         if h.has_key?('location') && h['location'].is_a?(String)
-          errors << Leads::FlLocation::validate_descriptor({ 'name' => h['location'] })
+          errors += Leads::FlLocation::validate_descriptor({ 'name' => h['location'] })
         end
 
         # validate: :datas is required
@@ -92,7 +92,7 @@ module Leads
       # if exsits a company with the same url, then use it.
       if h['company'].is_a?(Hash)
         self.fl_company = Leads::FlCompany.merge(h['company']) 
-        self.stat_company_name = self.fl_company.type_name
+        self.stat_company_name = self.fl_company.name
       end
 
       # map the FlIndustry to the model.
@@ -154,6 +154,7 @@ module Leads
 
       # if there is no lead with the same email, create a new one and return it.
       return Leads::FlLead.new(h)
+
     end
 
     # receive a hash descritor or an array of hash-descriptors
