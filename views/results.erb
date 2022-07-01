@@ -39,8 +39,8 @@
     </section>
     <section class='span6' style='text-align:right;'>
       <!-- TODO: add buttons here -->
-      <button>Get Free Credits</button>
-      <button>Search</button>
+      <button class="btn btn-success">Get Free Credits</button>
+      <button class="btn btn-primary">Search</button>
     </section>
 	</section>
 
@@ -53,7 +53,7 @@
         <div id='job_title'></div>
       </section>
       <section class='span8' style='text-align:right;'>
-        <button>Export Leads</button>
+        <button type="button" class="btn btn-cyan" data-toggle="modal" data-target=".export_leads">Exports Leads</button>
       </section>
     </section>
 
@@ -61,21 +61,21 @@
       <section class="span4">
         <div id='locations'></div>
       </section>
-      <section class='span8'>
-
+      <section class='span8' style="padding-left: 5%">
+        <h3> <span style="background: black; color: white">500</span> No. of Results </h3>
+        <h3> <span style="background: black; color: white">500</span> No. of Companies </h3>
       </section>
     </section>
 
     <section class="row-fluid">
       <section class="span4">
         <div id='industry'></div>
-        <button>Clear Filter</button>
-        <button onclick="" type="submit">Search</button>
+        <button id="reset-filters" class="btn btn-danger">Clear Filter</button>
+        <button id="search-btn" class="btn btn-primary" type="submit">Search</button>
       </section>
       <section class='span8' style='text-align:right;'>
-        <table class="table table-bordered">
+        <table id="results-table" class="table table-bordered">
           <thead>
-
           <tr>
             <div class="pull-right">
               <div class="span8">
@@ -87,7 +87,6 @@
               </button>
             </div>
           </tr>
-
           <tr>
             <th>Name <i class="icon-sort-up"></i></th>
             <th>Position </th>
@@ -95,10 +94,8 @@
             <th>Email</th>
             <th>Phone No.</th>
           </tr>
-
           </thead>
           <tbody>
-
           <tr>
             <td>10 Jun 2019 12:30pm</td>
             <td>this is some description</td>
@@ -106,45 +103,66 @@
             <td>this is some description</td>
             <td>this is some description</td>
           </tr>
-
-          <tr>
-            <td>10 Jun 2012 11:30pm</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-          </tr>
-
-          <tr>
-            <td>10 Jun 2019 12:31pm</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-          </tr>
-
           </tbody>
         </table>
         <div class="pagination"></div>
         <br>
-        <button>Save Search</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".save_modal">Save Search</button>
       </section>
     </section>
 
-<!--    <section class="row-fluid">-->
-<!--      <section class="span4">-->
-<!--        <button>Clear Filter</button>-->
-<!--        <button type="submit">Search</button>-->
-<!--      </section>-->
-<!--      <section class='span8' style='text-align:right;'>-->
-<!--        <button>Save Search</button>-->
-<!--      </section>-->
-<!--    </section>-->
-
   </form>
-
-
 </section>
+
+
+<!-- Modal Exports Leads-->
+<div class="modal fade export_leads" >
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Exports Contacts</h3>
+  </div>
+  <div class="modal-body">
+    <div class="row-fluid">Contacts per Company</div>
+    <div class="radio">
+      <label><input type="radio" name="optradio" checked>Multiple (Recommended)</label>
+    </div>
+    <div class="radio">
+      <label><input type="radio" name="optradio" >One</label>
+    </div>
+    <div style="margin-top: 5px;">Total Contacts </div>
+    <div>
+      <div class="radio">
+        <label><input type="radio" name="optradio1">Export only first <input type="text" name="no_of_contacts" placeholder="102">
+          contacts</label>
+      </div>
+    </div>
+    <div class="row-fluid">Name your file
+      <input type="text" name="file_name" placeholder="sample">
+      .csv
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">Close</a>
+    <a href="#" class="btn btn-primary">Save</a>
+  </div>
+</div>
+<!-- Modal Save Search-->
+<div class="modal fade save_modal" >
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Save this search</h3>
+  </div>
+  <div class="modal-body">
+    <p>Enter description for saved search</p>
+    <div class="span12">
+      <textarea class="span11" rows="3" id="textarea-limit"></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">Close</a>
+    <a href="#" class="btn btn-primary">Save</a>
+  </div>
+</div>
 
 <script type="text/javascript" charset="utf-8">
 
@@ -184,6 +202,12 @@
         allowed_values: Object.keys(industries_hash),
     });
 
+    // $(job_title).find('#keyword').on('change', function() {
+    //     console.log('yeah');
+    //     if (filtersJs.getPositiveValues(job_title).length > 0) {
+    //         $("#search-btn").removeAttr("disabled");
+    //     }
+    // });
 
     $(document).ready(function () {
         $("#search-form").submit(function (event) {
@@ -215,9 +239,7 @@
                 industries_positive: industries_positive,
                 industries_negative: industries_negative,
             };
-
             console.log(formData);
-
             $.ajax({
                 type: "POST",
                 url: "/leads/filter_results",
@@ -226,15 +248,30 @@
                 encode: true,
             }).done(function (data) {
                 console.log(data);
+                if (data) {
+                    $("#results-table > tbody").empty();
+                    data["leads"].forEach(function (item) {
+                        console.log(item);
+                        let row = $('<tr>');
+                        row.append($('<td>').text(item.name));
+                        row.append($('<td>').text(item.position));
+                        row.append($('<td>').text(item.stat_location_name));
+                        row.append($('<td>').text('test@gmail.com'));
+                        row.append($('<td>').text('+923234454565'));
+                        $('#results-table').append(row);
+                    });
+                }
             });
 
         });
     });
 
+    $('#reset-filters').on('click', function () {
+       window.location.reload();
+    });
 
 
     // draw pagination
-
     function drawPagination(o, current_page, total_pages) {
         url = '?number='; // url to get the next page
 
@@ -278,5 +315,4 @@
     }
 
 <!--    drawPagination($(".pagination"), <%#=page_number%>, <%#=1%>);-->
-
 </script>

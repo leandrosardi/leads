@@ -28,8 +28,8 @@
 
 
     q0 = "
-    SELECT l.id as id FROM \"fl_lead\" l "
-    q0 += "where l.position IN (#{positions_positive}) " unless positions_positive.empty?
+    SELECT l.id as id FROM \"fl_lead\" l where l.name IS NOT NULL "
+    q0 += "AND l.position IN (#{positions_positive}) " unless positions_positive.empty?
     q0 += "AND l.position NOT IN (#{positions_negative}) " unless positions_negative.empty?
     q0 += "AND l.id_industry IN (#{industries_positive}) " unless industries_positive.empty?
     q0 += "AND l.id_industry NOT IN (#{industries_negative}) " unless industries_negative.empty?
@@ -45,18 +45,19 @@
     # LIMIT #{page_number*page_size}
     # OFFSET #{(page_number.to_i - 1) * page_size.to_i}
     # "
+
     # build the array of objects
     leads = []
 
-    DB[q0].each { |row|
+    DB["#{q0}"].all.each { |row|
       lead = Leads::FlLead.where(:id=>row[:id]).first
       raise "Lead `#{row[:id]}` not found" if lead.nil?
-      leads << lead
+      leads << lead.values
       # release resources on each iteration
       GC.start
       DB.disconnect
     }
-    
-    return leads
+
+    return { leads: leads }.to_json
 
 %>
