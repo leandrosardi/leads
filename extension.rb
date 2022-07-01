@@ -1,7 +1,7 @@
 BlackStack::Extensions::add ({
     # descriptive name and descriptor
     :name => 'Leads',
-    :description => 'Leads is a mySaaS extension to add a marketplace of B2B contacts.',
+    :description => 'B2B Contacts, with Emails & Phone Numbers.',
 
     # setup the url of the repository for installation and updates
     :repo_url => 'https://github.com/leandrosardi/leads',
@@ -14,7 +14,7 @@ BlackStack::Extensions::add ({
     :author => 'leandrosardi',
 
     # what is the section to add this extension in either the top-bar, the footer, the dashboard.
-    :apps_section => 'Marketplace',
+    :services_section => 'Services for Marketers',
     # show this extension as a service in the top bar?
     :show_in_top_bar => true,
     # show this extension as a service in the footer?
@@ -25,9 +25,9 @@ BlackStack::Extensions::add ({
     # what are the screens to add in the leftbar
     :leftbar_icons => [
         # add an icon with the label "dashboard`, with the icon `icon-dashboard`, and poiting to the scren `helpdesk/dashboard`. 
-        { :label => 'search', :icon => :'icon-search', :screen => :search, },
+        { :label => 'results', :icon => :search, :screen => :results, },
         # add an icon with the label "tickets`, with the icon `icon-envelope`, and poiting to the scren `helpdesk/tickets`. 
-        { :label => 'exports', :icon => :'icon-download-cloud', :screen => :exports, },
+        { :label => 'exports', :icon => :'cloud-download', :screen => :exports, },
     ],
  
     # add a folder to the storage from where user can download the exports.

@@ -1,3 +1,16 @@
+# helper to redirect with the params
+def redirect2(url, params)
+    redirect url + '?' + params.reject { |key, value| key=='agent' }.map{|key, value| "#{key}=#{value}"}.join("&")
+end
+
+# default screen
+get "/leads", :auth => true, :agent => /(.*)/ do
+    redirect2 "/leads/results", params
+end
+get "/leads/", :auth => true, :agent => /(.*)/ do
+    redirect2 "/leads/results", params
+end
+
 # public screens (landing page)
 get "/leads/landing", :agent => /(.*)/ do
     erb :"/extensions/leads/views/landing", :layout => :"/views/layouts/public"
