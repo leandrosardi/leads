@@ -11,21 +11,16 @@ module Leads
       errors << "Descriptor must be a hash" if !h.is_a?(Hash)
 
       # validate: if it has :url, then :url must be a valid URL
-      if h.is_a?(Hash) && h.has_key?('url')
+      if h.is_a?(Hash) && h.has_key?('url') && !h['url'].nil?
         begin
           URI.parse(h['url'])
         rescue URI::InvalidURIError
-          errors << "Descriptor :company :url must be a valid URL"
+          errors << "Descriptor :company :url must be a valid URL (#{h['url']})"
         end
       end
 
       # validate: if :company is a hash, then it must have :name
       errors << "Descriptor :company must have :name" if h.is_a?(Hash) && !h.has_key?('name')
-
-      # validate: if the key :url exists, its value is a valid url
-      if h.is_a?(Hash) && h.has_key?('url')
-        errors << "Descriptor :company :url must be a valid URL" if !h['url'].to_s.url?
-      end
 
       # return the errors found.
       errors

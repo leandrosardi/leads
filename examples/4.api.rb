@@ -6,7 +6,7 @@ require 'version'
 
 res = nil
 
-url = "#{CS_HOME_WEBSITE}/api1.0/leads/merge.json"
+url = "#{CS_HOME_WEBSITE}/api1.0/leads/merge_many.json"
 
 leads = [
     {
@@ -14,7 +14,7 @@ leads = [
         'position' => 'Founder and CEO',
         'company' => {
             'name' => "ConnectionSphere",
-            'url' => "https://connectionsphere.com",
+#            'url' => "https://connectionsphere.com",
         },
         'industry' => "Internet",
         'location' => "Argentina",
@@ -32,8 +32,8 @@ leads = [
         'name' => 'Juan Pablo Sardi',
         'position' => 'CTO',
         'company' => {
-            'name' => "FreeLeadsData",
-            'url' => "https://freeleadsdata.com",
+            'name' => "ConnectionSphere",
+#            'url' => "https://freeleadsdata.com",
         },
         'industry' => "Internet",
         'location' => "Argentina",
@@ -47,12 +47,35 @@ leads = [
                 'value' => "freeleads@expandedventure.com",
             },
         ],
+=begin
+    }, {
+        'name' => 'Maria Sardi',
+        'position' => 'CFO',
+        'company' => {
+            'name' => "ConnectionSphere",
+            'url' => "https://freeleadsdata.com",
+        },
+        'industry' => "Internet",
+        'location' => "Argentina",
+        'datas' => [
+            {
+                'type' => 10,
+                'value' => "+54 9 11 5555-5555",
+            },
+            {
+                'type' => 20,
+                'value' => "cfo@expandedventure.com",
+            },
+        ],
+=end
     },
 ]
 
 begin
-    params = leads[1]
-    params['api_key'] = BlackStack::API.api_key
+    params = {
+        'api_key' => BlackStack::API.api_key,
+        'leads' => leads
+    }
     res = BlackStack::Netting::call_post(url, params)
     parsed = JSON.parse(res.body)
     raise parsed['status'] if parsed['status']!='success'

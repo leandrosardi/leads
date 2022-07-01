@@ -157,18 +157,14 @@ module Leads
 
     end
 
-    # receive a hash descritor or an array of hash-descriptors
+    # receive an array of hash-descriptors
     # return an array of Leads::FlLead objects.
     #
     def self.merge_many(h)
-      if h.has_key?('leads')
-        raise ":leads must be an array. Received: #{h.to_s}" if !h['leads'].is_a?(Array)
-        ret = []
-        h['leads'].each { |l| ret << Leads::FlLead.merge(l) }
-        return ret
-      else
-        return Leads::FlLead.merge(h)
-      end
+      raise ":leads must be an array. Received: #{h.to_s}" if !h['leads'].is_a?(Array)
+      ret = []
+      h['leads'].each { |l| ret << Leads::FlLead.merge(l) }
+      ret
     end
 
     # return a hash descriptor for the data.
@@ -184,6 +180,5 @@ module Leads
       # return
       ret
     end
-
   end
 end
