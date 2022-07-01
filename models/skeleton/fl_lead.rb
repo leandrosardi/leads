@@ -91,7 +91,7 @@ module Leads
 
       # if exsits a company with the same url, then use it.
       if h['company'].is_a?(Hash)
-        self.fl_company = Leads::FlCompany.merge(h['company']) 
+        self.fl_company = Leads::FlCompany.merge(h['company'])
         self.stat_company_name = self.fl_company.name
       end
 

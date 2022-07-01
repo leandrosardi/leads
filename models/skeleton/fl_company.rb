@@ -38,27 +38,41 @@ module Leads
     # normalize the url in the hash descriptor.
     # if exsits a company with the same normalized url, then return it. otherwise, create a new company.
     def self.merge(h)
+      company = nil
       # validate h is a hash
-      raise "Compny descriptor must be a hash" if !h.is_a?(Hash)
-
+      raise "Company descriptor must be a hash" if !h.is_a?(Hash)
       # initialize :url
       h['url'] = nil if !h.has_key?('url')
-
-      # normalize the url in the hash descriptor.
-      h['url'] = Leads::FlCompany.normalize_url(h['url']) if !h['url'].nil?
-
+      # merging based on URL
       if !h['url'].nil?
+        # normalize the url in the hash descriptor.
+        h['url'] = Leads::FlCompany.normalize_url(h['url'])
         # if exsits a company with the same normalized url, then return it.
         company = Leads::FlCompany.where(:url => h['url']).first
-        if !company.nil?
-          return company
-        else
-          # otherwise, create a new company.
-          return self.new(h)
+        if company.nil?
+          # otherwise, look for a company with no URL, and the same name
+          company = Leads::FlCompany.where(:url => nil, :name => h['name']).first
+          if !company.nil?
+            # update the URL of such a company
+            company.url = h['url'] 
+          else
+            # create a new company
+            company = self.new(h)
+          end
         end
-      else # if :url is nil, then match the company name.
-        return self.new(h)
+      # merging based on name
+      else # if :url is nil
+        # if exsits a company with the same name
+        company = Leads::FlCompany.where(:name => h['name']).first
+        if company.nil?
+          # create a new company
+          company = self.new(h)
+        end
       end
+      # update company
+      company.save if !company.nil?
+      # return the company
+      company
     end
 
     # constructor
