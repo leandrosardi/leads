@@ -1,0 +1,63 @@
+<%
+    # user preferences regarding the sorting
+    order_column = @login.user.preference('settings.users.order.column', 'name', params[:column])
+    order_direction = @login.user.preference('settings.users.order.direction', 'asc', params[:direction])
+
+
+    # user preferences regarding the pagination
+    #raise "`#{params[:number]}`"
+    page_number = @login.user.preference('settings.users.pagination.page', 1, params[:number].nil? ? nil : params[:number].to_i)
+    page_size = @login.user.preference('settings.users.pagination.size', 25, params[:size].nil? ? nil : params[:size].to_i)
+
+
+
+    positions_positive = params["job_positions_positive"].class == Array ?
+                           Leads::FlLead.map_array_to_str(params["job_positions_positive"]) : ''
+    positions_negative = params["job_positions_negative"].class == Array ?
+                           Leads::FlLead.map_array_to_str(params["job_positions_negative"]) : ''
+
+    locations_positive = params["locations_positive"].class == Array ?
+                           Leads::FlLead.map_array_to_str(params["locations_positive"]) : ''
+    locations_negative = params["locations_negative"].class == Array ?
+                           Leads::FlLead.map_array_to_str(params["locations_negative"]) : ''
+
+    industries_positive = params["industries_positive"].class == Array ?
+                            Leads::FlLead.map_array_to_str(params["industries_positive"]) : ''
+    industries_negative = params["industries_negative"].class == Array ?
+                            Leads::FlLead.map_array_to_str(params["industries_negative"]) : ''
+
+
+    q0 = "
+    SELECT l.id as id FROM \"fl_lead\" l where l.name IS NOT NULL "
+    q0 += "AND l.position IN (#{positions_positive}) " unless positions_positive.empty?
+    q0 += "AND l.position NOT IN (#{positions_negative}) " unless positions_negative.empty?
+    q0 += "AND l.id_industry IN (#{industries_positive}) " unless industries_positive.empty?
+    q0 += "AND l.id_industry NOT IN (#{industries_negative}) " unless industries_negative.empty?
+    q0 += "AND l.id_location IN (#{locations_positive}) " unless locations_positive.empty?
+    q0 += "AND l.id_location NOT IN (#{locations_negative}) " unless locations_negative.empty?
+
+    puts q0
+
+    # query to bring page rows
+    # q = "
+    # #{q0}
+    # ORDER BY #{order_column} #{order_direction}
+    # LIMIT #{page_number*page_size}
+    # OFFSET #{(page_number.to_i - 1) * page_size.to_i}
+    # "
+
+    # build the array of objects
+    leads = []
+
+    DB["#{q0}"].all.each { |row|
+      lead = Leads::FlLead.where(:id=>row[:id]).first
+      raise "Lead `#{row[:id]}` not found" if lead.nil?
+      leads << lead.values
+      # release resources on each iteration
+      GC.start
+      DB.disconnect
+    }
+
+    return { leads: leads }.to_json
+
+%>
