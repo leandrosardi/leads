@@ -1,7 +1,7 @@
 <%
 return_message = {}
 begin
-    Leads::FlLead.merge_many(@body).save
+    Leads::FlLead.merge_many(@body).each { |lead| lead.save }
     return_message[:status] = 'success'
 rescue => e
     return_message[:status] = e.to_console

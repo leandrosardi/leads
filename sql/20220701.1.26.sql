@@ -1,0 +1,1 @@
+ALTER TABLE fl_company ALTER COLUMN url DROP NOT NULL;
