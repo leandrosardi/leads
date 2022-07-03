@@ -11,14 +11,6 @@
         order_column = @login.user.preference('settings.users.order.column', 'name', params[:column])
         order_direction = @login.user.preference('settings.users.order.direction', 'asc', params[:direction])
 
-
-        # user preferences regarding the pagination
-        #raise "`#{params[:number]}`"
-        page_number = @login.user.preference('settings.users.pagination.page', 1, params[:number].nil? ? nil : params[:number].to_i)
-        page_size = @login.user.preference('settings.users.pagination.size', 25, params[:size].nil? ? nil : params[:size].to_i)
-
-
-
         positions_positive = params["job_positions_positive"].class == Array ?
                                Leads::FlLead.map_array_to_str(params["job_positions_positive"]) : ''
         positions_negative = params["job_positions_negative"].class == Array ?
@@ -43,7 +35,8 @@
         @login.user.preference('settings.users.industries_negative', '', industries_negative)
 
         q0 = "
-    SELECT l.id as id FROM \"fl_lead\" l where l.name IS NOT NULL "
+    SELECT l.name, l.position, l.stat_company_name, l.stat_industry_name, l.stat_location_name,
+            l.id as id FROM \"fl_lead\" l where l.name IS NOT NULL "
         q0 += "AND l.position IN (#{positions_positive}) " unless positions_positive.empty?
         q0 += "AND l.position NOT IN (#{positions_negative}) " unless positions_negative.empty?
         q0 += "AND l.id_industry IN (#{industries_positive}) " unless industries_positive.empty?
@@ -51,27 +44,39 @@
         q0 += "AND l.id_location IN (#{locations_positive}) " unless locations_positive.empty?
         q0 += "AND l.id_location NOT IN (#{locations_negative}) " unless locations_negative.empty?
 
-        puts q0
 
-        # query to bring page rows
-        # q = "
-        # #{q0}
-        # ORDER BY #{order_column} #{order_direction}
-        # LIMIT #{page_number*page_size}
-        # OFFSET #{(page_number.to_i - 1) * page_size.to_i}
-        # "
+        page_size = 3
+        total_rows = DB[q0].count
+        total_pages = (total_rows.to_f/page_size.to_f).ceil
+        # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
+        # then, get user preferences regarding the page number on this screen
+        page_number = @login.user.preference("developers.tables.basics.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
+        # pagination correction to prevent glitches
+        page_number = 1 if page_number < 1
+        page_number = total_pages if page_number > total_pages
+        # calculate info for showing at the bottom of the table
+        from_row = (page_number.to_i-1) * page_size.to_i + 1
+        to_row = [page_number*page_size, total_rows].min
+
+        q = "
+        "+q0+"
+	LIMIT "+(page_number*page_size).to_label+"
+	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_label+"
+        "
+
+
+        puts q
+
 
         # build the array of objects
         leads = []
 
-        DB["#{q0}"].all.each { |row|
-          lead = Leads::FlLead.where(:id=>row[:id]).first
-          raise "Lead `#{row[:id]}` not found" if lead.nil?
-          leads << lead.values
+        DB["#{q}"].all do |row|
+          leads << row
           # release resources on each iteration
           GC.start
           DB.disconnect
-        }
+      end
 
         s = nil
         DB.transaction do
@@ -80,7 +85,8 @@
             s.save
         end # transaction
 
-        return { status: :ok, leads: leads, search_id: s.id }.to_json
+        return { status: :ok, leads: leads, from_row: from_row, to_row: to_row, page_number: page_number,
+                 total_pages: total_pages, total_rows: total_rows, search_id: s.id }.to_json
 
     rescue => e
         # libero recursos

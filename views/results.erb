@@ -1,35 +1,119 @@
-<%#
+<%
+    # map some params who are specific for for the filter
+    redirect_on_error = session['redirect_on_error']
 
-  # q0 = "
-	# SELECT l.id as id
-	# FROM \"fl_lead\" l
-	# WHERE l.delete_time IS NULL
-	# AND u.name LIKE '%#{"h".to_s.to_sql}%'
-	# AND u.email LIKE '%#{"h".to_s.to_sql}%'
-	# AND COALESCE(u.phone, '') LIKE '%#{"0".to_s.to_sql}%'
-  # "
+    # setup default values
+    redirect_on_error = "/leads/results" if redirect_on_error.to_s.size == 0
 
-  # # query to bring page rows
-  # q = "
-  # #{q0}
-	# ORDER BY #{order_column} #{order_direction}
-	# LIMIT #{page_number*page_size}
-	# OFFSET #{(page_number.to_i - 1) * page_size.to_i}
-  # "
+    begin
 
-  # # build the array of objects
-  # leads = []
-  # DB[q].each { |row|
-  #   lead = Leads::FlLead.where(:id=>row[:id]).first
-  #   raise "Lead `#{row[:id]}` not found" if lead.nil?
-  #   leads << lead
-  #   # release resources on each iteration
-  #   GC.start
-  #   DB.disconnect
-  # }
+      puts 'yayy params'
+      puts params.inspect
+      puts 'yayy params'
 
+
+      # user preferences regarding the sorting
+        order_column = @login.user.preference('settings.users.order.column', 'name', params[:column])
+        order_direction = @login.user.preference('settings.users.order.direction', 'asc', params[:direction])
+
+        positions_positive = params["job_positions_positive"].class == Array ?
+                               Leads::FlLead.map_array_to_str(params["job_positions_positive"]) : ''
+        positions_negative = params["job_positions_negative"].class == Array ?
+                               Leads::FlLead.map_array_to_str(params["job_positions_negative"]) : ''
+
+        locations_positive = params["locations_positive"].class == Array ?
+                               Leads::FlLead.map_array_to_str(params["locations_positive"]) : ''
+        locations_negative = params["locations_negative"].class == Array ?
+                               Leads::FlLead.map_array_to_str(params["locations_negative"]) : ''
+
+        industries_positive = params["industries_positive"].class == Array ?
+                                Leads::FlLead.map_array_to_str(params["industries_positive"]) : ''
+        industries_negative = params["industries_negative"].class == Array ?
+                                Leads::FlLead.map_array_to_str(params["industries_negative"]) : ''
+
+
+        @login.user.preference('settings.users.positions_positive', '', positions_positive)
+        @login.user.preference('settings.users.positions_negative', '', positions_negative)
+        @login.user.preference('settings.users.locations_positive', '', locations_positive)
+        @login.user.preference('settings.users.locations_negative', '', locations_negative)
+        @login.user.preference('settings.users.industries_positive', '', industries_positive)
+        @login.user.preference('settings.users.industries_negative', '', industries_negative)
+
+        q0 = "
+    SELECT l.name, l.position, l.stat_company_name, l.stat_industry_name, l.stat_location_name,
+            l.id as id FROM \"fl_lead\" l where l.name IS NOT NULL "
+        q0 += "AND l.position IN (#{positions_positive}) " unless positions_positive.empty?
+        q0 += "AND l.position NOT IN (#{positions_negative}) " unless positions_negative.empty?
+        q0 += "AND l.id_industry IN (#{industries_positive}) " unless industries_positive.empty?
+        q0 += "AND l.id_industry NOT IN (#{industries_negative}) " unless industries_negative.empty?
+        q0 += "AND l.id_location IN (#{locations_positive}) " unless locations_positive.empty?
+        q0 += "AND l.id_location NOT IN (#{locations_negative}) " unless locations_negative.empty?
+
+        filter_name = @login.user.preference("developers.tables.basics.filter.name", "", params[:name])
+        filter_company = @login.user.preference("developers.tables.basics.filter.company", "", params[:company])
+
+
+        q0 += "
+          AND l.name LIKE '%"+filter_name.to_s.to_sql+"%'
+        " if filter_name.to_s.length > 0
+
+        q0 += "
+          AND l.stat_company_name LIKE '%"+filter_company.to_s.to_sql+"%'
+        " if filter_company.to_s.length > 0
+
+
+
+        page_size = 3
+        total_rows = DB[q0].count
+        total_pages = (total_rows.to_f/page_size.to_f).ceil
+        # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
+        # then, get user preferences regarding the page number on this screen
+        page_number = @login.user.preference("developers.tables.basics.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
+        # pagination correction to prevent glitches
+        page_number = 1 if page_number < 1
+        page_number = total_pages if page_number > total_pages
+        # calculate info for showing at the bottom of the table
+        from_row = (page_number.to_i-1) * page_size.to_i + 1
+        to_row = [page_number*page_size, total_rows].min
+
+        q = "
+        "+q0+"
+	LIMIT "+(page_number*page_size).to_label+"
+	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_label+"
+        "
+
+
+        puts q
+
+
+        # build the array of objects
+        leads = []
+
+        DB["#{q}"].all do |row|
+          leads << row
+          # release resources on each iteration
+          GC.start
+          DB.disconnect
+        end
+
+        s = nil
+        DB.transaction do
+            # crear el cliente
+            s = Leads::FlSearch.new({:saved => false, :id_user=>@login.user.id, :no_of_results => leads.size})
+            s.save
+        end # transaction
+
+        # return { status: :ok, leads: leads, from_row: from_row, to_row: to_row, page_number: page_number,
+        #          total_pages: total_pages, total_rows: total_rows, search_id: s.id }.to_json
+
+    rescue => e
+        # libero recursos
+        DB.disconnect
+        GC.start
+        # return errors
+        return { status: :error, errors: CGI::escape(e.message) }.to_json
+    end
 %>
-
 
 
 <section class="container box">
@@ -73,7 +157,7 @@
         <button id="reset-filters" class="btn btn-danger">Clear Filter</button>
         <button id="search-btn" class="btn btn-primary" type="submit">Search</button>
       </section>
-      <section class='span8' style='text-align:right;'>
+      <section class='span8'>
         <table id="results-table" class="table table-bordered">
           <thead>
           <tr>
@@ -96,18 +180,42 @@
           </tr>
           </thead>
           <tbody>
-          <tr>
-            <td>10 Jun 2019 12:30pm</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-            <td>this is some description</td>
-          </tr>
+
+          <form id="filters-form" action="/leads/results" method="get">
+            <tr>
+              <th><input class="input input-block-level" id="name-filter" name="name" value="<%=filter_name.to_s.encode_html%>" /></th>
+              <th></th>
+              <th><input class="input input-block-level" id="company-filter" name="company" value="<%=filter_company.to_s.encode_html%>" /></th>
+              <th></th>
+              <th></th>
+              <th><button type="submit" class="btn btn-link">Search</button></th>
+            </tr>
+          </form>
+
+
+          <%
+              leads.each do |row|
+          %>
+            <tr>
+              <td><%=row[:name]%></td>
+              <td><%=row[:position]%></td>
+              <td><%=row[:stat_company_name]%></td>
+              <td><%=row[:stat_industry_name]%></td>
+              <td><%=row[:stat_location_name]%></td>
+            </tr>
+          <%
+              end
+          %>
+
           </tbody>
         </table>
+        <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
         <div class="pagination"></div>
+        <script>
+            drawPagination($(".pagination"), <%=page_number%>, <%=total_pages%>);
+        </script>
         <br>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".save_modal">Save Search</button>
+        <button type="button" style="float: right" class="btn btn-primary" data-toggle="modal" data-target=".save_modal">Save Search</button>
       </section>
     </section>
 
@@ -217,59 +325,18 @@
     // });
 
     $(document).ready(function () {
-        $("#search-form").submit(function (event) {
 
+
+        $("#filters-form").submit(function (event) {
             event.preventDefault();
-
-            let job_positions_positive = filtersJs.getPositiveValues(job_title);
-            let job_positions_negative = filtersJs.getNegativeValues(job_title);
-
-            let locations_positive = jQuery.map( filtersJs.getPositiveValues(locations), function( a ) {
-                return locations_hash[a.trim()];
-            });
-            let locations_negative = jQuery.map( filtersJs.getNegativeValues(locations), function( a ) {
-                return locations_hash[a.trim()];
-            });
-
-            let industries_positive = jQuery.map( filtersJs.getPositiveValues(industry), function( a ) {
-                return industries_hash[a.trim()];
-            });
-            let industries_negative = jQuery.map( filtersJs.getNegativeValues(industry), function( a ) {
-                return industries_hash[a.trim()];
-            });
-
-            let formData = {
-                job_positions_positive: job_positions_positive,
-                job_positions_negative: job_positions_negative,
-                locations_positive: locations_positive,
-                locations_negative: locations_negative,
-                industries_positive: industries_positive,
-                industries_negative: industries_negative,
-            };
-            $.ajax({
-                type: "POST",
-                url: "/leads/filter_results",
-                data: formData,
-                dataType: "json",
-                encode: true,
-            }).done(function (data) {
-                if (data) {
-                    $("#search-id").val(data["search_id"]);
-                    $("#total-results").html(`${data["leads"].length}`)
-                    $("#results-table > tbody").empty();
-                    data["leads"].forEach(function (item) {
-                        let row = $('<tr>');
-                        row.append($('<td>').text(item.name));
-                        row.append($('<td>').text(item.position));
-                        row.append($('<td>').text(item.stat_location_name));
-                        row.append($('<td>').text('test@gmail.com'));
-                        row.append($('<td>').text('+923234454565'));
-                        $('#results-table').append(row);
-                    });
-                }
-            });
-
+            process_and_submit();
         });
+
+        $("#search-form").submit(function (event) {
+            event.preventDefault();
+            process_and_submit();
+        });
+
         $("#save-search").on('click', function () {
 
             let formData = {
@@ -293,52 +360,66 @@
 
     });
 
+    function process_and_submit(){
+        let job_positions_positive = filtersJs.getPositiveValues(job_title);
+        let job_positions_negative = filtersJs.getNegativeValues(job_title);
+
+        let locations_positive = jQuery.map( filtersJs.getPositiveValues(locations), function( a ) {
+            return locations_hash[a.trim()];
+        });
+        let locations_negative = jQuery.map( filtersJs.getNegativeValues(locations), function( a ) {
+            return locations_hash[a.trim()];
+        });
+
+        let industries_positive = jQuery.map( filtersJs.getPositiveValues(industry), function( a ) {
+            return industries_hash[a.trim()];
+        });
+        let industries_negative = jQuery.map( filtersJs.getNegativeValues(industry), function( a ) {
+            return industries_hash[a.trim()];
+        });
+
+        let name_filter = $('#name-filter').val();
+        let company_filter = $('#company-filter').val();
+
+        let formData = {
+            job_positions_positive: job_positions_positive,
+            job_positions_negative: job_positions_negative,
+            locations_positive: locations_positive,
+            locations_negative: locations_negative,
+            industries_positive: industries_positive,
+            industries_negative: industries_negative,
+        };
+
+        // if (name_filter !== null || company_filter !== null){
+        //     formData.name = name_filter;
+        //     formData.company = company_filter
+        // }
+
+        $.ajax({
+            type: "GET",
+            url: `/leads/results?name=${name_filter}&company=${company_filter}`,
+            data: formData,
+            dataType: "json",
+            encode: true,
+        }).done(function () {
+            $("#results-table > tbody").empty();
+        });
+    }
+
     $('#reset-filters').on('click', function () {
        window.location.reload();
     });
 
-    // draw pagination
-    function drawPagination(o, current_page, total_pages) {
-        url = '?number='; // url to get the next page
-
-        o.html("");
-        u = $("<ul></ul>");
-        o.append(u);
-
-        if (current_page>1) {
-            li = $('<li><a href="'+url+(current_page-1).toString()+'">Prev</a></li>');
-        } else {
-            li = $('<li class="disabled"><a href="#">Prev</a></li>')
-        }
-        u.append(li);
-
-        i=1
-        i_prev = 1
-        while (i<=total_pages) {
-            if (i==current_page) {
-                sClassActive="class='active'"
-            } else {
-                sClassActive=""
-            }
-            if ( i==1 || i==total_pages || (i>=current_page-2 && i<=current_page+2) ) {
-                if (i>i_prev+1) {
-                    li = $('<li><span>...</span></li>')
-                    u.append(li)
-                }
-                li = $('<li '+sClassActive+'><a href="'+url+i.toString()+'">'+i.toString()+'</a></li>')
-                u.append(li)
-                i_prev=i
-            }
-            i=i+1
-        }
-
-        if (current_page<total_pages) {
-            i = $('<li><a href="./'+url+(current_page+1).toString()+'">Next</a></li>');
-        } else {
-            i = $('<li class="disabled"><a href="#">Next</a></li>')
-        }
-        u.append(i);
-    }
-
-<!--    drawPagination($(".pagination"), <%#=page_number%>, <%#=1%>);-->
 </script>
+<script>
+</script>
+
+
+
+
+
+
+
+
+
+
