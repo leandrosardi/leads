@@ -1,0 +1,239 @@
+<%
+    # map some params who are specific for for the filter
+    redirect_on_error = session['redirect_on_error']
+
+    # setup default values
+    redirect_on_error = "/leads/results" if redirect_on_error.to_s.size == 0
+
+    begin
+        q0 = "
+           SELECT l.name, l.position, l.stat_company_name, l.stat_industry_name, l.stat_location_name, COUNT(DISTINCT d1.id) AS emails, COUNT(DISTINCT d2.id) AS phones
+	         FROM fl_lead l
+	         LEFT JOIN fl_data d1 ON (l.id = d1.id_lead AND d1.\"type\" = 20) -- emails
+	         LEFT JOIN fl_data d2 ON (l.id = d2.id_lead AND d2.\"type\" = 10) -- phones
+	         where 1=1 "
+
+        filter_name = @login.user.preference("developers.tables.basics.filter.name", "", params[:name])
+        filter_company = @login.user.preference("developers.tables.basics.filter.company", "", params[:company])
+        filter_search = @login.user.preference("developers.tables.basics.filter.search_filter", "", params[:search_filter])
+
+
+        q0 += "
+          AND l.name LIKE '%"+filter_name.to_s.to_sql+"%'
+        " if filter_name.to_s.length > 0
+
+        q0 += "
+          AND l.stat_company_name LIKE '%"+filter_company.to_s.to_sql+"%'
+        " if filter_company.to_s.length > 0
+
+        q0 += "
+            AND l.stat_company_name LIKE '%"+filter_search.to_s.to_sql+"%' OR l.name LIKE '%"+filter_search.to_s.to_sql+"%'
+          " if filter_search.to_s.length > 0
+
+        q0 += "GROUP BY l.name, l.position, l.stat_company_name, l.stat_industry_name, l.stat_location_name"
+
+
+      puts q0
+
+
+
+        page_size = 3
+        total_rows = DB[q0].count
+        total_pages = (total_rows.to_f/page_size.to_f).ceil
+        # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
+        # then, get user preferences regarding the page number on this screen
+        page_number = @login.user.preference("developers.tables.basics.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
+        # pagination correction to prevent glitches
+        page_number = 1 if page_number < 1
+        page_number = total_pages if page_number > total_pages
+        # calculate info for showing at the bottom of the table
+        from_row = (page_number.to_i-1) * page_size.to_i + 1
+        to_row = [page_number*page_size, total_rows].min
+
+        q = "
+        "+q0+"
+	LIMIT "+(page_number*page_size).to_label+"
+	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_label+"
+        "
+
+        # build the array of objects
+        leads = []
+
+        DB["#{q}"].all do |row|
+          leads << row
+          # release resources on each iteration
+          GC.start
+          DB.disconnect
+        end
+
+    rescue => e
+      puts params["locations_positive"] == nil
+        # libero recursos
+        DB.disconnect
+        GC.start
+        # return errors
+      redirect "#{redirect_on_error}?err="+ CGI::escape(e.message)
+    end
+%>
+
+<div class="mynavbar mysticky">
+  <section class="row-fluid">
+    <div class="span6">
+      <%=nav2("Leads", "/leads/landing", "Results")%>
+    </div>
+  </section>
+</div>
+
+
+<section class="container box">
+  <form id="search-form" action="/leads/results" onsubmit="process_and_submit()" method="get">
+    <section class="row-fluid">
+      <section class='span12' style='text-align:right;'>
+        <button class="btn btn-success">Get Free Credits</button>
+        <button class="btn btn-primary">Search</button>
+        <br> <br>
+        <button type="button" class="btn btn-cyan" data-toggle="modal" data-target=".export_leads">Exports Leads</button>
+      </section>
+    </section>
+
+    <section class="row-fluid">
+      <section class='span12'>
+        <h3> <span id="total-results" style="background: black; color: white">500</span> No. of Results </h3>
+        <h3> <span style="background: black; color: white">500</span> No. of Companies </h3>
+      </section>
+    </section>
+
+    <section class="row-fluid">
+      <section class='span12'>
+        <table id="results-table" class="table table-bordered">
+          <thead>
+          <tr>
+            <div class="pull-right">
+              <form id="filters-form" action="/leads/results" method="get">
+                <div class="span8">
+                  <input type='text' class='input-block-level select-all-on-focus' id='search_filter' name='search_filter'/>
+                </div>
+
+                <button class="btn btn-blue btn-medium btn-submit" style="margin-left: 2px;" type="submit" onclick="">
+                  <i class='icon-search'></i> Search
+                </button>
+              </form>
+            </div>
+          </tr>
+          <tr>
+
+            <th>Name <i class="icon-sort-up"></i></th>
+            <th>Position </th>
+            <th>Location</th>
+            <th>Email</th>
+            <th>Phone No.</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+
+          <form id="filters-form" action="/leads/results" method="get">
+            <tr>
+              <th><input class="input input-block-level" id="name-filter" name="name" value="<%=filter_name.to_s.encode_html%>" /></th>
+              <th></th>
+              <th><input class="input input-block-level" id="company-filter" name="company" value="<%=filter_company.to_s.encode_html%>" /></th>
+              <th></th>
+              <th></th>
+              <th><button type="submit" style="display: none" class="btn btn-link">Search</button></th>
+            </tr>
+          </form>
+
+
+          <%
+            leads.each do |row|
+          %>
+            <tr>
+              <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
+              <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
+              <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
+              <td class="fix" title="<%=row[:emails].to_s.encode_html%>" style="text-align:right;"><%=row[:emails].to_label%></td>
+              <td class="fix" title="<%=row[:phones].to_s.encode_html%>" style="text-align:right;"><%=row[:phones].to_label%></td>
+              <td></td>
+            </tr>
+          <%
+            end
+          %>
+
+          </tbody>
+        </table>
+        <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
+        <div class="pagination"></div>
+        <script>
+            drawPagination($(".pagination"), <%=page_number%>, <%=total_pages%>);
+        </script>
+        <br>
+        <button type="button" style="float: right" class="btn btn-primary" data-toggle="modal" data-target=".save_modal">Save Search</button>
+      </section>
+    </section>
+  </form>
+</section>
+
+
+<!-- Modal Exports Leads-->
+<div class="modal fade export_leads" >
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Exports Contacts</h3>
+  </div>
+  <form action="/leads/filter_export_contacts" method="post">
+    <div class="modal-body">
+      <div class="row-fluid">Contacts per Company</div>
+      <div class="radio">
+        <label><input type="radio" name="optradio" checked>Multiple (Recommended)</label>
+      </div>
+      <div class="radio">
+        <label><input type="radio" name="optradio" >One</label>
+      </div>
+      <div style="margin-top: 5px;">Total Contacts </div>
+      <div>
+        <div class="radio">
+          <label><input type="radio" name="optradio1">Export only first <input type="text" name="no_of_contacts" placeholder="102">
+            contacts</label>
+        </div>
+      </div>
+      <div class="row-fluid">Name your file
+        <input type="text" name="file_name" placeholder="sample">
+        .csv
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" data-dismiss="modal" class="btn">Close</a>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+</div>
+<!-- Modal Save Search-->
+<div class="modal fade save_modal" >
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Save this search</h3>
+  </div>
+  <form action="/leads/filter_save_search" method="post">
+      <div class="modal-body">
+        <p>Enter description for saved search</p>
+        <div class="span12">
+          <input type="hidden" id="search-id" name="search-id">
+          <input class="span11" placeholder="Name" name="search-name" rows="3" id="search-name"/>
+        </div>
+        <br>
+        <div class="span12">
+          <textarea class="span11" placeholder="Description" name="description" rows="3" id="description"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" data-dismiss="modal" class="btn">Close</a>
+        <button type="submit" id="save-search" class="btn btn-primary">Save</button>
+      </div>
+  </form>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+    $('#reset-filters').on('click', function () {
+       window.location.reload();
+    });
+</script>

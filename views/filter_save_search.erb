@@ -4,24 +4,26 @@
   redirect_on_error = session['redirect_on_error']
   # setup default values
   redirect_on_error = "/leads/results" if redirect_on_error.to_s.size == 0
+  redirect_on_success = "/leads/results" if redirect_on_success.to_s.size == 0
 
 
   begin
-    saved_search = Leads::FlSearch.where(id: params[:search_id]).first
+    puts params
     s = nil
     DB.transaction do
       # crear el cliente
-      s = Leads::FlSearch.new({:saved => true, :id_user=>@login.user.id, :no_of_results => saved_search.no_of_results})
+      s = Leads::FlSearch.new({:saved => true, :id_user=>@login.user.id})
       s.save
     end # transaction
-    return { status: :ok }.to_json
   rescue => e
     # libero recursos
     DB.disconnect
     GC.start
     # return errors
-    return { status: :error, errors: CGI::escape(e.message) }.to_json
+    redirect "#{redirect_on_error}?err="+ CGI::escape(e.message)
 
   end
+
+  redirect redirect_on_success
 
 %>
