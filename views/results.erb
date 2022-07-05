@@ -108,38 +108,10 @@
 <section class="container box">
   <form id="search-form" action="/leads/results" onsubmit="process_and_submit()" method="get">
     <section class="row-fluid">
-      <section class='span12' style='text-align:right;'>
-<!--        <button class="btn btn-success">Get Free Credits</button>-->
-        <br> <br>
-      </section>
-    </section>
-
-    <section class="row-fluid">
       <section class='span12'>
-        <h3> <span id="total-results" style="background: black; color: white">500</span> No. of Results </h3>
-        <h3> <span style="background: black; color: white">500</span> No. of Companies </h3>
-      </section>
-    </section>
-
-    <section class="row-fluid">
-      <section class='span12'>
-        <table id="results-table" class="table table-bordered">
+        <table id="results-table" style="table-layout: fixed; width: 100%;" class="table table-bordered">
           <thead>
           <tr>
-            <div class="pull-right">
-              <form id="filters-form" action="/leads/results" method="get">
-                <div class="span8">
-                  <input type='text' class='input-block-level select-all-on-focus' id='search_filter' name='search_filter'/>
-                </div>
-
-                <button class="btn btn-blue btn-medium btn-submit" style="margin-left: 2px;" type="submit" onclick="">
-                  <i class='icon-search'></i> Search
-                </button>
-              </form>
-            </div>
-          </tr>
-          <tr>
-
             <th style="width:90px;">Name</th>
             <th style="width:auto;">Position</th>
             <th style="width:90px;">Industry</th>
@@ -189,7 +161,6 @@
             drawPagination($(".pagination"), <%=page_number%>, <%=total_pages%>);
         </script>
         <br>
-        <button type="button" style="float: right" class="btn btn-primary" data-toggle="modal" data-target=".save_modal">Save Search</button>
       </section>
     </section>
   </form>
