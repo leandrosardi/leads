@@ -75,10 +75,6 @@ post "/leads/search", :auth => true do
     erb :"/extensions/leads/views/search"
 end
 
-post "/leads/filter_results", :auth => true do
-    erb :"/extensions/leads/views/filter_results"
-end
-
 post "/leads/filter_save_search", :auth => true do
     erb :"/extensions/leads/views/filter_save_search"
 end
