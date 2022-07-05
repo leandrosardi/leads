@@ -53,7 +53,7 @@
 
 
 
-        page_size = 3
+        page_size = 25
         total_rows = DB[q0].count
         total_pages = (total_rows.to_f/page_size.to_f).ceil
         # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
@@ -71,6 +71,8 @@
 	LIMIT "+(page_number*page_size).to_label+"
 	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_label+"
         "
+
+        puts q
 
         # build the array of objects
         leads = []
@@ -109,7 +111,8 @@
   <form id="search-form" action="/leads/results" onsubmit="process_and_submit()" method="get">
     <section class="row-fluid">
       <section class='span12'>
-        <table id="results-table" style="table-layout: fixed; width: 100%;" class="table table-bordered">
+        <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
+        <table id="results-table" style="table-layout: fixed; width: 100%;" class="table table-striped">
           <thead>
           <tr>
             <th style="width:90px;">Name</th>
@@ -118,23 +121,28 @@
             <th style="width:90px;">Location</th>
             <th style="width:32px;text-align:right;">Emails</th>
             <th style="width:32px;text-align:right;">Phones</th>
-            <th></th>
 
           </tr>
           </thead>
           <tbody>
-
-          <form id="filters-form" action="/leads/results" method="get">
+           <form id="filters-form" action="/leads/results" method="get">
             <tr>
               <th><input class="input input-block-level" id="name-filter" name="name" value="<%=filter_name.to_s.encode_html%>" /></th>
               <th><input class="input input-block-level" id="position-filter" name="position" value="<%= filter_position.to_s.encode_html%>" /></th>
-              <th><input class="input input-block-level" id="industry-filter" name="industry" value="<%=filter_industry.to_s.encode_html%>" /></th>
+              <th>
+                <input  style='width: 100%' type="text" class="awesomplete" name="industry" id="industry_name" list="industries_list" autocomplete="false" value="" tabindex="6">
+                <datalist id="industries_list">
+                  <!-- TODO: iterate of table of industries industries here -->
+                  <% Leads::FlIndustry.all.each do |industry| %>
+                    <option value="<%= industry.name %>"> <%= industry.name %> </option>
+                  <% end %>
+                </datalist>
+
+              </th>
               <th><input class="input input-block-level" id="location-filter" name="location" value="<%=filter_location.to_s.encode_html%>" /></th>
               <th></th>
               <th></th>
-              <th><button type="submit" class="btn btn-link">Search</button></th>
             </tr>
-          </form>
 
 
           <%
@@ -147,15 +155,23 @@
               <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:emails].to_s.encode_html%>" style="text-align:right;"><%=row[:emails].to_label%></td>
               <td class="fix" title="<%=row[:phones].to_s.encode_html%>" style="text-align:right;"><%=row[:phones].to_label%></td>
-              <td></td>
             </tr>
           <%
             end
           %>
 
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td colspan="2">
+                  <button type="submit" class="btn btn-link">Search</button>
+                </td>
+              </tr>
+            </form>
           </tbody>
         </table>
-        <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
         <div class="pagination"></div>
         <script>
             drawPagination($(".pagination"), <%=page_number%>, <%=total_pages%>);
