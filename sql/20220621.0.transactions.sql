@@ -40,11 +40,12 @@ CREATE TABLE IF NOT EXISTS fl_search_industry (
 
 CREATE TABLE IF NOT EXISTS fl_search_location (
     id uuid not null,
-    id_location uuid,
+    --id_location uuid, -- the table fl_location is not ready yet. To filter by location, we'll match any string with the field fl_lead.stat_location_name
+    value varchar (8000) not null,
     id_search uuid,
     positive boolean,
     PRIMARY KEY (id),
-    FOREIGN KEY (id_location) REFERENCES fl_location(id),
+    --FOREIGN KEY (id_location) REFERENCES fl_location(id),
     FOREIGN KEY (id_search) REFERENCES fl_search(id)
 );
 
