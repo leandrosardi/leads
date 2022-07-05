@@ -16,6 +16,9 @@
         filter_name = @login.user.preference("developers.tables.basics.filter.name", "", params[:name])
         filter_company = @login.user.preference("developers.tables.basics.filter.company", "", params[:company])
         filter_search = @login.user.preference("developers.tables.basics.filter.search_filter", "", params[:search_filter])
+        filter_position = @login.user.preference("developers.tables.basics.filter.filter_position", "", params[:position])
+        filter_industry = @login.user.preference("developers.tables.basics.filter.filter_industry", "", params[:industry])
+        filter_location = @login.user.preference("developers.tables.basics.filter.filter_location", "", params[:location])
 
 
         q0 += "
@@ -25,6 +28,19 @@
         q0 += "
           AND l.stat_company_name LIKE '%"+filter_company.to_s.to_sql+"%'
         " if filter_company.to_s.length > 0
+
+        q0 += "
+          AND l.position LIKE '%"+filter_position.to_s.to_sql+"%'
+        " if filter_position.to_s.length > 0
+
+        q0 += "
+          AND l.stat_industry_name LIKE '%"+filter_industry.to_s.to_sql+"%'
+        " if filter_industry.to_s.length > 0
+
+        q0 += "
+          AND l.stat_location_name LIKE '%"+filter_location.to_s.to_sql+"%'
+        " if filter_location.to_s.length > 0
+
 
         q0 += "
             AND l.stat_company_name LIKE '%"+filter_search.to_s.to_sql+"%' OR l.name LIKE '%"+filter_search.to_s.to_sql+"%'
@@ -81,6 +97,10 @@
     <div class="span6">
       <%=nav2("Leads", "/leads/landing", "Results")%>
     </div>
+    <div class="span6" align="right" style="text-align: right;alignment-adjust: right; margin-left: 0;">
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".save_modal">Save Search</button>
+      <button type="button" class="btn btn-cyan" data-toggle="modal" data-target=".export_leads">Exports Leads</button>
+    </div>
   </section>
 </div>
 
@@ -89,10 +109,8 @@
   <form id="search-form" action="/leads/results" onsubmit="process_and_submit()" method="get">
     <section class="row-fluid">
       <section class='span12' style='text-align:right;'>
-        <button class="btn btn-success">Get Free Credits</button>
-        <button class="btn btn-primary">Search</button>
+<!--        <button class="btn btn-success">Get Free Credits</button>-->
         <br> <br>
-        <button type="button" class="btn btn-cyan" data-toggle="modal" data-target=".export_leads">Exports Leads</button>
       </section>
     </section>
 
@@ -122,12 +140,14 @@
           </tr>
           <tr>
 
-            <th>Name <i class="icon-sort-up"></i></th>
-            <th>Position </th>
-            <th>Location</th>
-            <th>Email</th>
-            <th>Phone No.</th>
+            <th style="width:90px;">Name</th>
+            <th style="width:auto;">Position</th>
+            <th style="width:90px;">Industry</th>
+            <th style="width:90px;">Location</th>
+            <th style="width:32px;text-align:right;">Emails</th>
+            <th style="width:32px;text-align:right;">Phones</th>
             <th></th>
+
           </tr>
           </thead>
           <tbody>
@@ -135,11 +155,12 @@
           <form id="filters-form" action="/leads/results" method="get">
             <tr>
               <th><input class="input input-block-level" id="name-filter" name="name" value="<%=filter_name.to_s.encode_html%>" /></th>
+              <th><input class="input input-block-level" id="position-filter" name="position" value="<%= filter_position.to_s.encode_html%>" /></th>
+              <th><input class="input input-block-level" id="industry-filter" name="industry" value="<%=filter_industry.to_s.encode_html%>" /></th>
+              <th><input class="input input-block-level" id="location-filter" name="location" value="<%=filter_location.to_s.encode_html%>" /></th>
               <th></th>
-              <th><input class="input input-block-level" id="company-filter" name="company" value="<%=filter_company.to_s.encode_html%>" /></th>
               <th></th>
-              <th></th>
-              <th><button type="submit" style="display: none" class="btn btn-link">Search</button></th>
+              <th><button type="submit" class="btn btn-link">Search</button></th>
             </tr>
           </form>
 
@@ -150,6 +171,7 @@
             <tr>
               <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
+              <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:emails].to_s.encode_html%>" style="text-align:right;"><%=row[:emails].to_label%></td>
               <td class="fix" title="<%=row[:phones].to_s.encode_html%>" style="text-align:right;"><%=row[:phones].to_label%></td>
