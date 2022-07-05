@@ -47,7 +47,6 @@ leads = [
                 'value' => "freeleads@expandedventure.com",
             },
         ],
-=begin
     }, {
         'name' => 'Maria Sardi',
         'position' => 'CFO',
@@ -67,7 +66,6 @@ leads = [
                 'value' => "cfo@expandedventure.com",
             },
         ],
-=end
     },
 ]
 
