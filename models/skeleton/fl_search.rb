@@ -19,7 +19,7 @@ module Leads
         errors << "name is mandatory" if h['name'].to_s.size == 0
 
         # validate: the value of :id_user must be a valid guid
-        errors << "id_user must be a valid guid" if !h['id_user'].is_a?(String) || h['id_user'].guid?
+        errors << "id_user must be a valid guid" if h['id_user'].to_s.size > 0 && !h['id_user'].guid?
 
         # validate: the value of :name must be a valid string
         errors << "name must be a valid string" if !h['name'].is_a?(String)
@@ -77,9 +77,10 @@ module Leads
     def update(h)
       self.name = h['name']
       self.description = h['description']
+      self.id_user = h['id_user']
       self.saved = h['saved']
       self.no_of_results = h['no_of_results']
-      self.no_of_companies = h['no_of_results']
+      self.no_of_companies = h['no_of_companies']
 =begin # a saved search shouldn't be updated never
       # remove all positions
       self.positions.each do |p|
@@ -111,9 +112,18 @@ module Leads
     # save this object, and all the objects of the associations
     def save
       super
-      self.positions.each { |p| p.save }
-      self.locations.each { |l| l.save }
-      self.industries.each { |i| i.save }
+      self.positions.each { |p| 
+        p.id_search=self.id
+        p.save 
+      }
+      self.locations.each { |l| 
+        l.id_search=self.id
+        l.save
+      }
+      self.industries.each { |i| 
+        i.id_search=self.id
+        i.save
+      }
     end
 
     # constructor
@@ -125,18 +135,6 @@ module Leads
       self.id = guid
       self.create_time = now
       self.update(h)
-    end
-
-    # validate the strucutre of the hash descritpor.
-    # return an arrow of strings with the errors found.
-    def self.validate_descriptor(h)
-      errors = []
-
-      # validate: h must be a hash
-      errors << "Descriptor must be a hash" if !h.is_a?(Hash)
-
-      # return the errors found.
-      errors
     end
   end
 end
