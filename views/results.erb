@@ -224,19 +224,30 @@
   </div>
   <form action="/leads/filter_save_search" method="post">
       <div class="modal-body">
-        <p>Enter description for saved search</p>
-        <div class="span12">
-          <input type="hidden" id="search-id" name="search-id">
-          <input class="span11" placeholder="Name" name="search-name" rows="3" id="search-name"/>
-        </div>
-        <br>
-        <div class="span12">
-          <textarea class="span11" placeholder="Description" name="description" rows="3" id="description"></textarea>
-        </div>
+        <form class="form-horizontal">
+          <div class="control-group">
+            <label class="control-label" for="inputName">Name</label>
+            <div class="controls">
+              <input type="text" style="width: 97%" required id="inputName" name="search-name" placeholder="Name">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="inputDescription">Description</label>
+            <div class="controls">
+              <textarea name="search-description" style="width: 97%" placeholder="Description" id="inputPassword" cols="30" rows="10"></textarea>
+              <input type="hidden" name="total-rows" value="<%= total_rows %>">
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn">Save</button>
+            </div>
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
         <a href="#" data-dismiss="modal" class="btn">Close</a>
-        <button type="submit" id="save-search" class="btn btn-primary">Save</button>
+<!--        <button type="submit" id="save-search" class="btn btn-primary">Save</button>-->
       </div>
   </form>
 </div>

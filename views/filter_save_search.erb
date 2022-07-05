@@ -9,11 +9,16 @@
 
   begin
     puts params
+    name = params["search-name"]
+    description = params["search-description"]
+    total_rows = params["total-rows"]
     s = nil
     DB.transaction do
       # crear el cliente
-      s = Leads::FlSearch.new({:saved => true, :id_user=>@login.user.id})
+      s = Leads::FlSearch.new({saved: true, id_user: @login.user.id, name: name, description: description,
+                               no_of_results: total_rows})
       s.save
+      puts s.inspect
     end # transaction
   rescue => e
     # libero recursos
@@ -24,6 +29,5 @@
 
   end
 
-  redirect redirect_on_success
-
+  redirect "#{redirect_on_success}?msg=Search+Saved+Successfully"
 %>
