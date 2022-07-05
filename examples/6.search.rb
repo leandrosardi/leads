@@ -7,31 +7,21 @@ DB = BlackStack::CRDB::connect
 require 'lib/skeletons'
 require 'extensions/leads/lib/skeletons'
 
-o = Leads::FlSearch.merge ({
-    :name => 'Leandro Sardi',
-    :position => 'Founder and CEO',
-    :company => {
-        :name => "ConnectionSphere",
-        :url => "https://connectionsphere.com",
-    },
-    :industry => "Internet",
-    :location => "Argentina",
-    :datas => [
-        {
-            :type => Leads::FlData::TYPE_PHONE,
-            :value => "+54 9 11 5555-5555",
-        },
-        {
-            :type => Leads::FlData::TYPE_EMAIL,
-            :value => "leandro.sardi@expandedventure.com",
-        },
-        {
-            :type => Leads::FlData::TYPE_EMAIL,
-            :value => "tickets@expandedventure.com",
-        },
+o = Leads::FlSearch.new ({
+    'name' => 'New first search',
+    'description' => 'Looking for Financial Advisors in New York City',
+    'saved' => true,
+    'no_of_results' => 10,
+    'no_of_companies' => 10,
+    'positions' => [ 
+        { 'value' => 'Financial Advisor', 'positive' => true },
+    ],
+    'locations' => [
+        { 'value' => 'New York City', 'positive' => true },
+    ],
+    'industries' => [
+        { 'name' => 'Financial Services', 'positive' => true },
     ],
 })
 
 o.save
-
-puts "o: #{o.to_h}"
