@@ -2,6 +2,7 @@
 	msgerr = params[:msgerr]
 	err = params[:err]
 	msg = params[:msg]
+	industries_list = []
 %>
 <% if msgerr!=nil %>
 	<div class="alert alert-error">
@@ -39,7 +40,8 @@
 			<datalist id="industries_list">
 				<!-- TODO: iterate of table of industries industries here -->
 				<% Leads::FlIndustry.all.each do |industry| %>
-					<option value="<%= industry.name %>"> <%= industry.name %> </option>
+					<% industries_list.push(industry) %>
+					<option onclick="set_button_state()" value="<%= industry.name %>"> <%= industry.name %> </option>
 				<% end %>
 			</datalist>
 		</div>
@@ -58,14 +60,27 @@
 	$(document).ready(function() {
 
 		set_button_state();
-		$("#industry_name").on('change', function() {
+		$("#industry_name").on('awesomplete-selectcomplete', function() {
+			set_button_state();
+		});
+		$("#industry_name").on('input', function() {
 			set_button_state();
 		});
 
 	});
 
 	function valid_industry(){
-		return $('#industry_name').val() !== '';
+		const options = $('#industries_list option');
+
+		const values = $.map(options ,function(option) {
+			return option.value;
+		});
+
+		let selected_value = $('#industry_name').val()
+
+		console.log(selected_value)
+
+		return values.indexOf(selected_value) !== -1;
 	}
 
 	function set_button_state(){
