@@ -11,7 +11,7 @@ module Leads
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
       # map the hash to the attributes of the model.
       self.id = guid
-      self.creation_time = now
+      self.create_time = now
     end
 
     # validate the strucutre of the hash descritpor.

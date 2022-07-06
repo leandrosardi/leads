@@ -20,12 +20,11 @@
     DB.transaction do
       # sace search
       s = Leads::FlSearch.new({saved: true, id_user: @login.user.id, name: name, description: description,
-                               no_of_results: total_rows})
+                               no_of_results: total_rows, no_of_companies: nil})
       s.save
 
       # save search industry
-      industry = Leads::FlIndustry.where(:name => industry).first
-      search_industry = Leads::FlSearchIndustry.new({id_search: s.id, id_industry: industry.id, positive: true})
+      search_industry = Leads::FlSearchIndustry.new({id_search: s.id, name: industry, positive: true})
       search_industry.save
 
       # save search location
