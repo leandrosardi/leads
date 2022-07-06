@@ -120,3 +120,14 @@ CREATE TABLE IF NOT EXISTS fl_data (
     PRIMARY KEY (id),
     FOREIGN KEY (id_lead) REFERENCES fl_lead(id)
 );
+
+drop table fl_search_location;
+
+CREATE TABLE IF NOT EXISTS fl_search_location (
+    id uuid not null,
+    value varchar (8000) not null,
+    id_search uuid,
+    positive boolean,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_search) REFERENCES fl_search(id)
+    );

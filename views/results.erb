@@ -20,7 +20,6 @@
         filter_industry = @login.user.preference("developers.tables.basics.filter.filter_industry", "", params[:industry])
         filter_location = @login.user.preference("developers.tables.basics.filter.filter_location", "", params[:location])
 
-
         q0 += "
           AND l.name LIKE '%"+filter_name.to_s.to_sql+"%'
         " if filter_name.to_s.length > 0
@@ -49,10 +48,6 @@
         q0 += "GROUP BY l.name, l.position, l.stat_company_name, l.stat_industry_name, l.stat_location_name"
 
 
-      puts q0
-
-
-
         page_size = 25
         total_rows = DB[q0].count
         total_pages = (total_rows.to_f/page_size.to_f).ceil
@@ -71,8 +66,6 @@
 	LIMIT "+(page_number*page_size).to_label+"
 	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_label+"
         "
-
-        puts q
 
         # build the array of objects
         leads = []
@@ -117,6 +110,7 @@
           <tr>
             <th style="width:90px;">Name</th>
             <th style="width:auto;">Position</th>
+            <th style="width:auto;">Company</th>
             <th style="width:90px;">Industry</th>
             <th style="width:90px;">Location</th>
             <th style="width:32px;text-align:right;">Emails</th>
@@ -129,8 +123,9 @@
             <tr>
               <th><input class="input input-block-level" id="name-filter" name="name" value="<%=filter_name.to_s.encode_html%>" /></th>
               <th><input class="input input-block-level" id="position-filter" name="position" value="<%= filter_position.to_s.encode_html%>" /></th>
+              <th><input class="input input-block-level" id="company-filter" name="company" value="<%= filter_company.to_s.encode_html%>" /></th>
               <th>
-                <input  style='width: 100%' type="text" class="awesomplete" name="industry" id="industry_name" list="industries_list" autocomplete="false" value="" tabindex="6">
+                <input  style='width: 100%' type="text" class="awesomplete" name="industry" id="industry_name" list="industries_list" autocomplete="false" value="<%= filter_industry.to_s.encode_html%>" tabindex="6">
                 <datalist id="industries_list">
                   <!-- TODO: iterate of table of industries industries here -->
                   <% Leads::FlIndustry.all.each do |industry| %>
@@ -140,8 +135,9 @@
 
               </th>
               <th><input class="input input-block-level" id="location-filter" name="location" value="<%=filter_location.to_s.encode_html%>" /></th>
-              <th></th>
-              <th></th>
+              <th colspan="2">
+                <button type="submit" class="btn btn-link">Search</button>
+              </th>
             </tr>
 
 
@@ -151,6 +147,7 @@
             <tr>
               <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
+              <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:emails].to_s.encode_html%>" style="text-align:right;"><%=row[:emails].to_label%></td>
@@ -159,16 +156,6 @@
           <%
             end
           %>
-
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td colspan="2">
-                  <button type="submit" class="btn btn-link">Search</button>
-                </td>
-              </tr>
             </form>
           </tbody>
         </table>
@@ -216,43 +203,46 @@
     </div>
   </form>
 </div>
-<!-- Modal Save Search-->
+ Modal Save Search
 <div class="modal fade save_modal" >
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>Save this search</h3>
   </div>
-  <form action="/leads/filter_save_search" method="post">
+  <form action="/leads/filter_save_search" id="search-form" method="post" class="form-horizontal">
       <div class="modal-body">
-        <form class="form-horizontal">
-          <div class="control-group">
-            <label class="control-label" for="inputName">Name</label>
-            <div class="controls">
-              <input type="text" style="width: 97%" required id="inputName" name="search-name" placeholder="Name">
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="inputDescription">Description</label>
-            <div class="controls">
-              <textarea name="search-description" style="width: 97%" placeholder="Description" id="inputPassword" cols="30" rows="10"></textarea>
-              <input type="hidden" name="total-rows" value="<%= total_rows %>">
-            </div>
-          </div>
-          <div class="control-group">
-            <div class="controls">
-              <button type="submit" class="btn">Save</button>
-            </div>
-          </div>
-        </form>
+          <label  for="inputName">Name <i>(required)</i></label>
+          <input type="text" style="width: 97%" required id="inputName" maxlength="255" name="search-name" placeholder="Name">
+        <br><br>
+          <label for="inputDescription">Description</label>
+          <textarea name="search-description" style="width: 97%" placeholder="Description" maxlength="2000" id="inputPassword" cols="30" rows="10"></textarea>
+          <input type="hidden" name="total-rows" value="<%= total_rows %>">
+          <input type="hidden" name="position" id="f-position">
+          <input type="hidden" name="industry" id="f-industry">
+          <input type="hidden" name="location" id="f-location">
       </div>
       <div class="modal-footer">
         <a href="#" data-dismiss="modal" class="btn">Close</a>
-<!--        <button type="submit" id="save-search" class="btn btn-primary">Save</button>-->
+        <button type="submit" id="save-search" disabled class="btn btn-primary">Save</button>
       </div>
   </form>
 </div>
 
 <script type="text/javascript" charset="utf-8">
+    $(document).ready(function (){
+        $('.save_modal').hide();
+        $('.export_leads').hide();
+        $('#inputName').on('input', function(){
+            if($(this).val() !== ''){
+                $('#f-position').val($('#position-filter').val())
+                $('#f-location').val($('#location-filter').val())
+                $('#f-industry').val($('#industry_name').val())
+                $('#save-search').removeAttr('disabled');
+            }else{
+                $('#save-search').attr('disabled', 'disabled');
+            }
+        });
+    })
     $('#reset-filters').on('click', function () {
        window.location.reload();
     });

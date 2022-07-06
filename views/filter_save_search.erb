@@ -8,17 +8,39 @@
 
 
   begin
-    puts params
+    puts params.inspect
     name = params["search-name"]
     description = params["search-description"]
     total_rows = params["total-rows"]
+    position = params["position"]
+    industry = params["industry"]
+    location = params["location"]
+
     s = nil
     DB.transaction do
-      # crear el cliente
+      # sace search
       s = Leads::FlSearch.new({saved: true, id_user: @login.user.id, name: name, description: description,
                                no_of_results: total_rows})
       s.save
-      puts s.inspect
+
+      # save search industry
+      industry = Leads::FlIndustry.where(:name => industry).first
+      search_industry = Leads::FlSearchIndustry.new({id_search: s.id, id_industry: industry.id, positive: true})
+      search_industry.save
+
+      # save search location
+      search_location = Leads::FlSearchLocation.new({id_search: s.id, value: location, positive: true})
+      search_location.save
+
+      # save search position
+      search_position = Leads::FlSearchPosition.new({id_search: s.id, value: position, positive: true})
+      search_position.save
+
+
+      puts industry.inspect
+      puts search_location.inspect
+      puts search_position.inspect
+      # puts s.inspect
     end # transaction
   rescue => e
     # libero recursos
