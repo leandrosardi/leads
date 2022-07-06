@@ -49,10 +49,6 @@
         q0 += "GROUP BY l.name, l.position, l.stat_company_name, l.stat_industry_name, l.stat_location_name"
 
 
-      puts q0
-
-
-
         page_size = 25
         total_rows = DB[q0].count
         total_pages = (total_rows.to_f/page_size.to_f).ceil
