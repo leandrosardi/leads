@@ -9,7 +9,7 @@ require 'extensions/leads/lib/skeletons'
 
 o = Leads::FlSearch.new ({
     'name' => 'New first search',
-    'description' => 'Looking for Financial Advisors in New York City',
+    'description' => 'Looking for Financial Advisors in New York, except New York City',
     'id_user' => BlackStack::MySaaS::User.first.id,
     'saved' => false,
     'no_of_results' => 14,
