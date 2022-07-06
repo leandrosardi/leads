@@ -363,7 +363,7 @@ module Leads
         -- sorting
         ORDER BY l.#{h['sortcolumn']} #{h['sortorder']}
         -- pagination
-        LIMIT #{p['row_to']}
+        LIMIT #{h['pagesize']}
         OFFSET #{p['row_from']}
       "
       DB[q].all

@@ -32,10 +32,10 @@ s = Leads::FlSearch.new ({
 })
 
 puts s.rows({
-    'page' => 1,
-    'pagesize' => 25,
+    'page' => 2,
+    'pagesize' => 5,
     'sortcolumn' => 'name',
     'sortorder' => 'asc',
-})
+}).to_s
 
 
