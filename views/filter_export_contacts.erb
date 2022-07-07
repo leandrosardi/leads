@@ -10,27 +10,33 @@
   begin
 
     contact_per_company = params["optradio"] if params["optradio"] != nil
-    export_only_first = params["optradio1"] if params["optradio1"] != nil
+    export_only_first = params["export_only"] if params["export_only"] != nil
     no_of_contacts = params["no_of_contacts"] if params["no_of_contacts"] != nil
     file_name = params["file_name"] if params["file_name"] != nil
+    total_rows = params["total-rows"]
 
 
-    @login.user.preference('settings.users.contact_per_company', '', contact_per_company)
-    @login.user.preference('settings.users.export_only_first', '', export_only_first)
-    @login.user.preference('settings.users.no_of_contacts', '', no_of_contacts)
-    @login.user.preference('settings.users.file_name', '', file_name)
+    @login.user.preference('leads.exports.settings.contact_per_company', '', contact_per_company)
+    @login.user.preference('leads.exports.settings.export_only_first', '', export_only_first)
+    @login.user.preference('leads.exports.settings.no_of_contacts', '', no_of_contacts)
+    @login.user.preference('leads.exports.settings.file_name', '', file_name)
 
+    filter_position = @login.user.preference("leads.exports.filter.filter_position", "", params[:position])
+    filter_industry = @login.user.preference("leads.exports.filter.filter_industry", "", params[:industry])
+    filter_location = @login.user.preference("leads.exports.filter.filter_location", "", params[:location])
 
 
     s = nil
     DB.transaction do
-      # crear el cliente
-      s = Leads::FlSearch.new({:saved => false, :id_user=>@login.user.id})
+      # sace search
+      s = Leads::FlSearch.new({saved: false, id_user: @login.user.id, name: file_name, description: nil,
+                               no_of_results: total_rows.to_i, no_of_companies: nil,
+                               positions: [{"value": filter_position, "positive": true}],
+                               locations: [{"value": filter_location, "positive": true}],
+                               industries: [{"name": filter_industry, "positive": true}] })
       s.save
 
-      export = Leads::FlExport.new({:allow_multiple_contacts_per_company => contact_per_company,
-                                    :id_user=>@login.user.id, :id_search => s.id,
-                                    :number_of_records => no_of_contacts, :filename => file_name})
+      export = Leads::FlExport.new(id_user: @login.user.id, id_search: s.id)
       export.save
     end # transaction
 
@@ -44,8 +50,7 @@
   end
 
 
-  # blanquo la variable de sesion de r
-  session['redirect_on_success'] = nil
+
   # redirect
-  redirect redirect_on_success
+  redirect "#{redirect_on_success}?msg=Export+Job+Created"
 %>
