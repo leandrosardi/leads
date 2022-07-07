@@ -46,6 +46,10 @@ get "/leads/results", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/results", :layout => :"/views/layouts/core"
 end
 
+get "/leads/results/:sid", :auth => true, :agent => /(.*)/ do
+    erb :"/extensions/leads/views/results", :layout => :"/views/layouts/core"
+end
+
 get "/leads/exports", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/exports", :layout => :"/views/layouts/core"
 end
@@ -65,6 +69,10 @@ end
 
 post "/leads/filter_tripwire", :auth => true do
     erb :"/extensions/leads/views/filter_tripwire"
+end
+
+post "/leads/filter_results", :auth => true do
+    erb :"/extensions/leads/views/filter_results"
 end
 
 post "/leads/filter_save_search", :auth => true do
