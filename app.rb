@@ -38,10 +38,6 @@ get "/leads/welcome", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/welcome", :layout => :"/views/layouts/core"
 end
 
-get "/leads/search", :auth => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/search", :layout => :"/views/layouts/core"
-end
-
 get "/leads/saved_searches", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/saved_searches", :layout => :"/views/layouts/core"
 end
@@ -69,10 +65,6 @@ end
 
 post "/leads/filter_tripwire", :auth => true do
     erb :"/extensions/leads/views/filter_tripwire"
-end
-
-post "/leads/search", :auth => true do
-    erb :"/extensions/leads/views/search"
 end
 
 post "/leads/filter_save_search", :auth => true do
