@@ -8,20 +8,20 @@ module Leads
       errors << "Descriptor must be a hash" if !h.is_a?(Hash)
       # hash validations
       if h.is_a?(Hash)
-        # validation: key 'value' is mandatory
-        errors << "Key 'value' is mandatory" if !h.has_key?('value')
+        # validation: key :value is mandatory
+        errors << "Key :value is mandatory" if !h.has_key?(:value)
 
-        # validation: key 'positive' is mandatory
-        errors << "Key 'positive' is mandatory" if !h.has_key?('positive')
+        # validation: key :positive is mandatory
+        errors << "Key :positive is mandatory" if !h.has_key?(:positive)
 
-        # validation: value 'value' must be a string
-        if h.has_key?('value')
-          errors << "Value 'value' must be a string" if !h['value'].is_a?(String)
+        # validation: value :value must be a string
+        if h.has_key?(:value)
+          errors << "Value :value must be a string" if !h[:value].is_a?(String)
         end
 
-        # validation: value 'positive' must be a boolean
-        if h.has_key?('positive')
-          errors << "Value 'positive' must be a boolean" if !h['positive'].is_a?(TrueClass) && !h['positive'].is_a?(FalseClass)
+        # validation: value :positive must be a boolean
+        if h.has_key?(:positive)
+          errors << "Value :positive must be a boolean" if !h[:positive].is_a?(TrueClass) && !h[:positive].is_a?(FalseClass)
         end
       end
       # return
@@ -30,9 +30,9 @@ module Leads
 
     # map a hash descriptor to the attributes of the object
     def update(h)
-      self.value = h['value']
-      self.positive = h['positive']
-      self.id_search = h['id_search']
+      self.value = h[:value]
+      self.positive = h[:positive]
+      self.id_search = h[:id_search]
     end
 
     # constructor

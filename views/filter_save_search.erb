@@ -20,26 +20,11 @@
     DB.transaction do
       # sace search
       s = Leads::FlSearch.new({saved: true, id_user: @login.user.id, name: name, description: description,
-                               no_of_results: total_rows, no_of_companies: nil})
+                               no_of_results: total_rows.to_i, no_of_companies: nil,
+                               positions: [{"value": position, "positive": true}],
+                               locations: [{"value": location, "positive": true}],
+                               industries: [{"name": industry, "positive": true}] })
       s.save
-
-      # save search industry
-      search_industry = Leads::FlSearchIndustry.new({id_search: s.id, name: industry, positive: true})
-      search_industry.save
-
-      # save search location
-      search_location = Leads::FlSearchLocation.new({id_search: s.id, value: location, positive: true})
-      search_location.save
-
-      # save search position
-      search_position = Leads::FlSearchPosition.new({id_search: s.id, value: position, positive: true})
-      search_position.save
-
-
-      puts industry.inspect
-      puts search_location.inspect
-      puts search_position.inspect
-      # puts s.inspect
     end # transaction
   rescue => e
     # libero recursos
