@@ -1,90 +1,46 @@
 <%
-    # map some params who are specific for for the filter
-    redirect_on_error = session['redirect_on_error']
+# creating a dummy search, in case that user has not any preference yet.
+# such a dummy search won't never be saved in the database.
+s = Leads::FlSearch.new ({
+    'name' => 'dummy',
+    'description' => 'This search should never be saved in the database.',
+    'id_user' => @login.id_user,
+    'saved' => false,
+    'no_of_results' => -1, # unknown - no matters
+    'no_of_companies' => -1, # unknown - no matters
+    'positions' => [],
+    'locations' => [],
+    'industries' => [],
+})
 
-    # setup default values
-    redirect_on_error = "/leads/results" if redirect_on_error.to_s.size == 0
+# getting the search 
+sid = @login.user.preference("leads.results.filter.filter_position", '', params[:sid])
 
-    begin
-        q0 = "
-           SELECT l.name, l.position, l.stat_company_name, l.stat_industry_name, l.stat_location_name, COUNT(DISTINCT d1.id) AS emails, COUNT(DISTINCT d2.id) AS phones
-	         FROM fl_lead l
-	         LEFT JOIN fl_data d1 ON (l.id = d1.id_lead AND d1.\"type\" = 20) -- emails
-	         LEFT JOIN fl_data d2 ON (l.id = d2.id_lead AND d2.\"type\" = 10) -- phones
-	         where 1=1 "
+# if the user has preference for any past search, then I use such a search
+# if the user has not preference for any past search, then I keep the dummy search defined above.
+s = Leads::FlSearch.where(:id=>sid).first if sid.to_s.guid?
 
-        filter_name = @login.user.preference("developers.tables.basics.filter.name", "", params[:name])
-        filter_company = @login.user.preference("developers.tables.basics.filter.company", "", params[:company])
-        filter_search = @login.user.preference("developers.tables.basics.filter.search_filter", "", params[:search_filter])
-        filter_position = @login.user.preference("developers.tables.basics.filter.filter_position", "", params[:position])
-        filter_industry = @login.user.preference("developers.tables.basics.filter.filter_industry", "", params[:industry])
-        filter_location = @login.user.preference("developers.tables.basics.filter.filter_location", "", params[:location])
+# defining search parameters, to show in the textfields
+filter_position = s.positions.select { |p| p.positive }.map { |p| p.value }.join(',') # only many positive positions are supported by now
+filter_industry = s.industries.select { |p| p.positive }.map { |i| i.fl_industry.name }.first # only one positive industry is supported by now
+filter_location = s.locations.select { |p| p.positive }.map { |l| l.value }.first # only one positive location is supported by now
 
-        q0 += "
-          AND l.name LIKE '%"+filter_name.to_s.to_sql+"%'
-        " if filter_name.to_s.length > 0
+# getting the page number
+page_number = @login.user.preference("leads.results.filter.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
 
-        q0 += "
-          AND l.stat_company_name LIKE '%"+filter_company.to_s.to_sql+"%'
-        " if filter_company.to_s.length > 0
+# define the pagination setting
+i = {
+  'page' => page_number,
+  'pagesize' => 25,
+  'sortcolumn' => 'id',
+  'sortorder' => 'asc',
+}
 
-        q0 += "
-          AND l.position LIKE '%"+filter_position.to_s.to_sql+"%'
-        " if filter_position.to_s.length > 0
+# getting rows
+rows = s.rows(i)
 
-        q0 += "
-          AND l.stat_industry_name LIKE '%"+filter_industry.to_s.to_sql+"%'
-        " if filter_industry.to_s.length > 0
-
-        q0 += "
-          AND l.stat_location_name LIKE '%"+filter_location.to_s.to_sql+"%'
-        " if filter_location.to_s.length > 0
-
-
-        q0 += "
-            AND l.stat_company_name LIKE '%"+filter_search.to_s.to_sql+"%' OR l.name LIKE '%"+filter_search.to_s.to_sql+"%'
-          " if filter_search.to_s.length > 0
-
-        q0 += "GROUP BY l.name, l.position, l.stat_company_name, l.stat_industry_name, l.stat_location_name"
-
-
-        page_size = 25
-        total_rows = DB[q0].count
-        total_pages = (total_rows.to_f/page_size.to_f).ceil
-        # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
-        # then, get user preferences regarding the page number on this screen
-        page_number = @login.user.preference("developers.tables.basics.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
-        # pagination correction to prevent glitches
-        page_number = 1 if page_number < 1
-        page_number = total_pages if page_number > total_pages
-        # calculate info for showing at the bottom of the table
-        from_row = (page_number.to_i-1) * page_size.to_i + 1
-        to_row = [page_number*page_size, total_rows].min
-
-        q = "
-        "+q0+"
-	LIMIT "+(page_number*page_size).to_label+"
-	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_label+"
-        "
-
-        # build the array of objects
-        leads = []
-
-        DB["#{q}"].all do |row|
-          leads << row
-          # release resources on each iteration
-          GC.start
-          DB.disconnect
-        end
-
-    rescue => e
-      puts params["locations_positive"] == nil
-        # libero recursos
-        DB.disconnect
-        GC.start
-        # return errors
-      redirect "#{redirect_on_error}?err="+ CGI::escape(e.message)
-    end
+# getting pagination status
+status = s.status(i)
 %>
 
 <div class="mynavbar mysticky">
@@ -101,10 +57,10 @@
 
 
 <section class="container box">
-  <form id="search-form" action="/leads/results" onsubmit="process_and_submit()" method="get">
+  <form id="search-form" action="/leads/filter_results" onsubmit="process_and_submit()" method="post">
     <section class="row-fluid">
       <section class='span12'>
-        <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
+        <p><b>Records:</b> <%=status['from_row'].to_label%> to <%=status['to_row'].to_label%> <b>of</b> <%=status['total_rows'].to_label%></p>
         <table id="results-table" style="table-layout: fixed; width: 100%;" class="table table-striped">
           <thead>
           <tr>
@@ -121,9 +77,9 @@
           <tbody>
            <form id="filters-form" action="/leads/results" method="get">
             <tr>
-              <th><input class="input input-block-level" id="name-filter" name="name" value="<%=filter_name.to_s.encode_html%>" /></th>
+              <th></th>
               <th><input class="input input-block-level" id="position-filter" name="position" value="<%= filter_position.to_s.encode_html%>" /></th>
-              <th><input class="input input-block-level" id="company-filter" name="company" value="<%= filter_company.to_s.encode_html%>" /></th>
+              <th></th>
               <th>
                 <input  style='width: 100%' type="text" class="awesomplete" name="industry" id="industry_name" list="industries_list" autocomplete="false" value="<%= filter_industry.to_s.encode_html%>" tabindex="6">
                 <datalist id="industries_list">
@@ -142,7 +98,7 @@
 
 
           <%
-            leads.each do |row|
+          rows.each do |row|
           %>
             <tr>
               <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
@@ -150,8 +106,8 @@
               <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
               <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
-              <td class="fix" title="<%=row[:emails].to_s.encode_html%>" style="text-align:right;"><%=row[:emails].to_label%></td>
-              <td class="fix" title="<%=row[:phones].to_s.encode_html%>" style="text-align:right;"><%=row[:phones].to_label%></td>
+              <td class="fix" title="<%=row[:stat_has_email].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_email].to_s%></td>
+              <td class="fix" title="<%=row[:stat_has_phone].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_phone].to_s%></td>
             </tr>
           <%
             end
@@ -161,7 +117,7 @@
         </table>
         <div class="pagination"></div>
         <script>
-            drawPagination($(".pagination"), <%=page_number%>, <%=total_pages%>);
+            drawPagination($(".pagination"), <%=page_number%>, <%=status['total_pages']%>);
         </script>
         <br>
       </section>
@@ -216,7 +172,7 @@
         <br><br>
           <label for="inputDescription">Description</label>
           <textarea name="search-description" style="width: 97%" placeholder="Description" maxlength="2000" id="inputPassword" cols="30" rows="10"></textarea>
-          <input type="hidden" name="total-rows" value="<%= total_rows %>">
+          <input type="hidden" name="total-rows" value="<%=status['total_rows']%>">
           <input type="hidden" name="position" id="f-position">
           <input type="hidden" name="industry" id="f-industry">
           <input type="hidden" name="location" id="f-location">

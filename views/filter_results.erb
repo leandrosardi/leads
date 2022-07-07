@@ -1,0 +1,47 @@
+<%
+begin
+    # getting the search parameters
+    filter_position = @login.user.preference("leads.results.filter.filter_position", "", params[:position])
+    filter_industry = @login.user.preference("leads.results.filter.filter_industry", "", params[:industry])
+    filter_location = @login.user.preference("leads.results.filter.filter_location", "", params[:location])
+    
+    # the wizard allow the user to search by many different job positions.
+    # adding support for searching by many positive job positions, as is supported in the wizard (leads/step1).
+    filter_positions = filter_position.to_s.split(",")
+
+    # writing the hash descriptor for the new search
+    h = {
+        'name' => "shadow.#{now}",
+        'description' => 'Ghost search for user profiling.',
+        'id_user' => @login.id_user,
+        'saved' => false,
+        'no_of_results' => -1, # unknown - no matters
+        'no_of_companies' => -1, # unknown - no matters
+        'positions' => [],
+        'locations' => [],
+        'industries' => [],
+    }
+
+    filter_positions.each { |p| 
+        h['positions'] << { 'value' => p.strip, 'positive' => true } if p.strip.length > 0
+    }
+
+    h['locations'] << { 'value' => filter_location, 'positive' => true } if filter_location.to_s.size > 0
+
+    h['industries'] << { 'name' => filter_industry, 'positive' => true } if filter_industry.to_s.size > 0
+
+    # register the search performed by the user, even it the user didn't request to save the search.
+    # we do this in order to profile each user, to know his/her preferences, and offer more data later.
+    s = Leads::FlSearch.new(h)
+    s.save
+
+    # return 
+    # on a new search, return the paginatin to the page 1.
+    # don't show any success message in this case. Just the results of the search.
+    redirect "/leads/results/#{s.id.to_guid}?number=1" 
+    
+rescue => e
+    # return errors
+    redirect "/leads/results?err=#{CGI::escape(e.message)}"
+end
+%>
