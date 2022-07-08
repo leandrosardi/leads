@@ -29,11 +29,12 @@
     s = nil
     DB.transaction do
       # sace search
-      s = Leads::FlSearch.new({saved: false, id_user: @login.user.id, name: file_name, description: nil,
-                               no_of_results: total_rows.to_i, no_of_companies: nil,
-                               positions: [{"value": filter_position, "positive": true}],
-                               locations: [{"value": filter_location, "positive": true}],
-                               industries: [{"name": filter_industry, "positive": true}] })
+      s = Leads::FlSearch.new({'saved' =>  false, id_user =>  @login.user.id, 'name' =>  file_name,
+                               'description' =>  nil,
+                               'no_of_results' =>  total_rows.to_i, 'no_of_companies' =>  nil,
+                               'positions' =>  [{"value" =>  filter_position, "positive" =>  true}],
+                               'locations' =>  [{"value" =>  filter_location, "positive" =>  true}],
+                               'industries' =>  [{"name" =>  filter_industry, "positive" =>  true}] })
       s.save
 
       export = Leads::FlExport.new(id_user: @login.user.id, id_search: s.id)

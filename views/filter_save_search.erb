@@ -19,11 +19,12 @@
     s = nil
     DB.transaction do
       # sace search
-      s = Leads::FlSearch.new({saved: true, id_user: @login.user.id, name: name, description: description,
-                               no_of_results: total_rows.to_i, no_of_companies: nil,
-                               positions: [{"value": position, "positive": true}],
-                               locations: [{"value": location, "positive": true}],
-                               industries: [{"name": industry, "positive": true}] })
+      s = Leads::FlSearch.new({'saved' => true, 'id_user' => @login.user.id, 'name' => name,
+                               'description' => description,
+                               'no_of_results' => total_rows.to_i, 'no_of_companies' => nil,
+                               'positions' => [{"value" => position, "positive" => true}],
+                               'locations' => [{"value" => location, "positive" => true}],
+                               'industries' => [{"name" => industry, "positive" => true}] })
       s.save
     end # transaction
   rescue => e
