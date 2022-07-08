@@ -24,10 +24,9 @@ BlackStack::Extensions::add ({
 
     # what are the screens to add in the leftbar
     :leftbar_icons => [
-        # add an icon with the label "dashboard`, with the icon `icon-dashboard`, and poiting to the scren `helpdesk/dashboard`. 
         { :label => 'results', :icon => :search, :screen => :results, },
-        # add an icon with the label "tickets`, with the icon `icon-envelope`, and poiting to the scren `helpdesk/tickets`. 
         { :label => 'exports', :icon => :'cloud-download', :screen => :exports, },
+        { :label => 'searches', :icon => :'save', :screen => :'saved_searches', },
     ],
  
     # add a folder to the storage from where user can download the exports.
