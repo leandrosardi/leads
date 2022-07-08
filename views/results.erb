@@ -41,6 +41,12 @@ rows = s.rows(i)
 
 # getting pagination status
 status = s.status(i)
+
+puts
+puts
+puts
+puts status.to_s
+
 %>
 
 <div class="mynavbar mysticky">
@@ -60,7 +66,7 @@ status = s.status(i)
   <form id="search-form" action="/leads/filter_results" onsubmit="process_and_submit()" method="post">
     <section class="row-fluid">
       <section class='span12'>
-        <p><b>Records:</b> <%=status['from_row'].to_label%> to <%=status['to_row'].to_label%> <b>of</b> <%=status['total_rows'].to_label%></p>
+        <p><b>Records:</b> <%=status['row_from'].to_label%> to <%=status['row_to'].to_label%> <b>of</b> <%=status['total_rows'].to_label%></p>
         <table id="results-table" style="table-layout: fixed; width: 100%;" class="table table-striped">
           <thead>
           <tr>
