@@ -9,21 +9,21 @@ module Leads
       errors << "Descriptor must be a hash" if !h.is_a?(Hash)
       # hash validations
       if h.is_a?(Hash)
-        # validation: key :name is mandatory
-        errors << "Key :name is mandatory" if !h.has_key?(:name)
+        # validation: key 'name' is mandatory
+        errors << "Key 'name' is mandatory" if !h.has_key?('name')
 
-        # validation: key :positive is mandatory
-        errors << "Key :positive is mandatory" if !h.has_key?(:positive)
+        # validation: key 'positive' is mandatory
+        errors << "Key 'positive' is mandatory" if !h.has_key?('positive')
 
-        # validation: value :name must exists in the table fl_industry
-        if h.has_key?(:name)
-          industry = FlIndustry.where(:name=>h[:name]).first
-          errors << "Value :name must exists in the table fl_industry" if industry.nil?
+        # validation: value 'name' must exists in the table fl_industry
+        if h.has_key?('name')
+          industry = FlIndustry.where(:name=>h['name']).first
+          errors << "Value 'name' must exists in the table fl_industry" if industry.nil?
         end
 
-        # validation: value :positive must be a boolean
-        if h.has_key?(:positive)
-          errors << "Value :positive must be a boolean" if !h[:positive].is_a?(TrueClass) && !h[:positive].is_a?(FalseClass)
+        # validation: value 'positive' must be a boolean
+        if h.has_key?('positive')
+          errors << "Value 'positive' must be a boolean" if !h['positive'].is_a?(TrueClass) && !h['positive'].is_a?(FalseClass)
         end
       end
       # return
@@ -32,9 +32,9 @@ module Leads
 
     # map a hash descriptor to the attributes of the object
     def update(h)
-      self.id_industry = Leads::FlIndustry.where(:name=>h[:name]).first.id
-      self.positive = h[:positive]
-      self.id_search = h[:id_search]
+      self.id_industry = Leads::FlIndustry.where(:name=>h['name']).first.id
+      self.positive = h['positive']
+      self.id_search = h['id_search']
     end
 
     # constructor
