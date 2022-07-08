@@ -15,10 +15,10 @@ module Leads
 
       if h.is_a?(Hash)
         # validate: :id_user is mandatory
-        errors << "id_user is mandatory" if h[:id_user].to_s.size == 0
+        errors << "id_user is mandatory" if h['id_user'].to_s.size == 0
 
         # validate: :name is mandatory
-        errors << "name is mandatory" if h[:name].to_s.size == 0
+        errors << "name is mandatory" if h['name'].to_s.size == 0
 
         # validate: the value of :id_user must be a valid guid
         errors << "id_user must be a valid guid" if h['id_user'].to_s.size > 0 && !h['id_user'].guid?
