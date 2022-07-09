@@ -70,23 +70,159 @@ status = s.status(i)
     </div>
   </section>
 
+<style>
+div.lead-card {
+    position:relative;
+    height:115px;
+    overflow:hidden;
+    width:100%;
+    margin-bottom: 25px;
+}
+
+div.lead-card div.acronym {
+    position:absolute;
+    left:0;
+    top:0;
+    width:70px;
+    height:50px;
+    overflow:hidden;
+    border-radius:35px;
+    padding-top:20px;
+    font-size:32px;
+    text-align:center;
+    vertical-align:middle;
+    color:white;
+}
+
+div.lead-card div.acronym-color-0 {
+    background-color:rgb(0,128,192);
+}
+
+div.lead-card div.acronym-color-1 {
+    background-color:rgb(0,0,160);
+}
+
+div.lead-card div.acronym-color-2 {
+    background-color:rgb(0,128,64);
+}
+
+div.lead-card div.acronym-color-3 {
+    background-color:rgb(255,128,0);
+}
+
+div.lead-card div.acronym-color-4 {
+    background-color:rgb(128,0,128);
+}
+
+div.lead-card div.acronym-color-5 {
+    background-color:rgb(128,0,255);
+}
+
+div.lead-card div.acronym-color-6 {
+    background-color:rgb(255,0,128);
+}
+
+div.lead-card div.acronym-color-7 {
+    background-color:rgb(0,255,128);
+}
+
+div.lead-card div.acronym-color-8 {
+    background-color:rgb(0,128,255);
+}
+
+div.lead-card div.acronym-color-9 {
+    background-color:rgb(0,128,128);
+}
+
+div.lead-card div.acronym span {
+    //margin-top:20px;
+    text-align:center;
+    vertical-align:middle;
+}
+
+div.lead-card div.insights {
+    position:absolute;
+    left:125px;
+    top:0;
+    width:400px;
+    hright:50px;
+    overflow:hidden;
+    margin-left: 25px;
+}
+
+div.lead-card div.insights span.name {
+    font-size:24px;
+}
+
+div.lead-card div.insights span.headline {
+    font-size:12px;
+}
+
+div.lead-card div.data {
+    position:absolute;
+    right:5px;
+    top:0;
+    width:155px;
+    hright:50px;
+    overflow:hidden;
+}
+
+div.lead-card div.data span.headline {
+    font-size:12px;
+}
+</style>
+
   <section class='span8 box'>
     <p><b>Records:</b> <%=status['row_from'].to_label%> to <%=status['row_to'].to_label%> <b>of</b> <%=status['total_rows'].to_label%></p>
-    <table id="results-table" style="table-layout: fixed; width: 100%;" class="table table-striped">
-      <thead>
-        <th style="width:90px;">Name</th>
-        <th style="width:auto;">Position</th>
-        <th style="width:auto;">Company</th>
-        <th style="width:90px;">Industry</th>
-        <th style="width:90px;">Location</th>
-        <th style="width:32px;text-align:right;">Emails</th>
-        <th style="width:32px;text-align:right;">Phones</th>
-      </thead>
-      <tbody>
-        <%
-        rows.each do |row|
-        %>
-        <tr>
+
+    <%
+    rows.each do |row|
+      acronym = row[:name].to_s[0..1].capitalize
+      i = acronym.chr.ord.to_i % 10
+    %>
+    <div class='span12 lead-card' id='sample<%=i%>'>
+      <div class='acronym acronym-color-<%=i%>'>
+          <span><%=acronym.to_s.encode_html%></span>
+      </div>
+      <div class='insights'>
+          <span class='name'><%=row[:name].to_s.encode_html%></span>
+          <br/>
+          <span class='headline li-headline'><%=row[:position].to_s.encode_html%></span>
+          <br/>
+          <span class='headline'><b>location:</b> <span class='li-location'><%=row[:stat_location_name].to_s.encode_html%></span></span>
+          <br/>
+          <span class='headline'><b>industry:</b> <span class='li-industry'><%=row[:stat_industry_name].to_s.encode_html%></span></span>
+      </div>
+      <div class='data'>
+          <%
+          if row[:stat_company_name].to_s.size > 0
+          %>
+          <span class='headline'><i class='icon-briefcase'></i> <span class='li-company'><%=row[:stat_company_name].to_s.encode_html%></span></span>
+          <br/>
+          <%
+          end
+          %>
+
+          <%
+          if row[:stat_has_email]
+          %>
+          <span data='headline'><i class='icon-envelope'></i> <span class='email'>***@****.com</span></span>
+          <br/>
+          <%
+          end
+          %>
+
+          <%
+          if row[:stat_has_phone]
+            %>
+          <span data='headline'><i class='icon-phone'></i> <span class='phone'>***@****.com</span></span>
+          <%
+          end
+          %>
+      </div>
+  </div>
+
+<!--
           <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
           <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
           <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
@@ -94,12 +230,10 @@ status = s.status(i)
           <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
           <td class="fix" title="<%=row[:stat_has_email].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_email].to_s%></td>
           <td class="fix" title="<%=row[:stat_has_phone].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_phone].to_s%></td>
-        </tr>
-        <%
-        end
-        %>
-      </tbody>
-    </table>
+-->
+    <%
+    end
+    %>
     <div class="pagination"></div>
     <script>
       drawPagination($(".pagination"), <%=page_number%>, <%=status['total_pages']%>);
