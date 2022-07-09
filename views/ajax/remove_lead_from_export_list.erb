@@ -6,19 +6,9 @@ begin
 
     # find the lead already linked to the export
     o = Leads::FlExportLead.where(:id_export=>id_export, :id_lead=>id_lead).first
-    if o.nil?
-        # add the lead to the export
-        o = Leads::FlExportLead.new
-        o.id = guid
-        o.create_time = now
-        o.added_manually = true
-        o.id_user = @login.id_user
-        o.id_export = id_export
-        o.id_lead = id_lead
-        o.save
-    else
-        # clean the delete_time, incase the lead has been removed from the export
-        o.delete_time = nil
+    if !o.nil?
+        # remove the lead from the list
+        o.delete_time = now
         o.save
     end
 

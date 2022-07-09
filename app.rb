@@ -96,8 +96,8 @@ post "/ajax/leads/add_lead_to_export_list.json", :auth => true do
     erb :"/extensions/leads/views/ajax/add_lead_to_export_list"
 end
 
-post "/ajax/leads/remove_lead_to_export_list.json", :auth => true do
-    erb :"/extensions/leads/views/ajax/remove_lead_to_export_list"
+post "/ajax/leads/remove_lead_from_export_list.json", :auth => true do
+    erb :"/extensions/leads/views/ajax/remove_lead_from_export_list"
 end
 
 # API

@@ -15,6 +15,9 @@ begin
     # add the lead to the export
     o = Leads::FlExportLead.new
     o.id = guid
+    o.create_time = now
+    o.added_manually = true
+    o.id_user = @login.id_user
     o.id_export = e.id
     o.id_lead = id_lead
     o.save

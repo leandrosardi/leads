@@ -213,7 +213,7 @@ div.lead-card div.data span.headline {
             </div>
             <li class="divider"></li>
             <li>
-              <span>Create New List</span><br/>
+              <p>Create New List</p>
               <input class='input input-medium input-export-lists' /><br/> 
               <button class='btn btn-link btn-create-export-list' data-id-lead='<%=row[:id].to_guid%>'><i class='icon-plus'></i> Add</button>
             </li>
@@ -463,10 +463,13 @@ div.lead-card div.data span.headline {
   function add_export_list(id_lead, h) {
     // find the div
     let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
-    // create the li element
+    // create the li element, with hand cursor
     let li = document.createElement('li');
     li.setAttribute('data-id-export-list', h.id);
     li.setAttribute('data-id-lead', id_lead);
+    li.setAttribute('data-name', h.filename);
+    li.setAttribute('data-belonging', h.belonging);
+    li.style.cursor = 'pointer';
     // create an icon-ok element, with style green text color
     let icon = document.createElement('i');
     icon.setAttribute('class', 'icon-ok');
@@ -475,11 +478,43 @@ div.lead-card div.data span.headline {
     } else {
       icon.setAttribute('style', 'color: gray');
     }
-    // add the icon and the name of the list to the li
+    // add the icon and the name of the list to the anchor
     li.appendChild(icon);
+    li.appendChild(document.createTextNode(' '));
     li.appendChild(document.createTextNode(h.filename));
     // add the li to the ul
     $(div).append(li);
+    // on click on the li, call ajax to add/remove the lead from/to the export list
+    li.addEventListener('click', function(e) {
+      // decide the access point to call
+      if (h.belonging) {
+        // remove from the list
+        access_point = 'remove_lead_from_export_list';
+      } else {
+        // add to the list
+        access_point = 'add_lead_to_export_list';
+      }
+      // call the ajax
+      $.ajax({
+        url: '/ajax/leads/'+access_point+'.json',
+        type: 'POST',
+        data: {
+          id_lead: id_lead,
+          id_export: h.id
+        },
+        success: function(data) {
+          // get the json response
+          let response = JSON.parse(data);  
+console.log(response.status);
+        },
+        error: function(data) {
+console.log(data);
+        },
+      });
+      // JavaScript, stop additional event listeners
+      // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
+      e.stopImmediatePropagation();
+    });
   }
 
   // 
@@ -501,7 +536,7 @@ div.lead-card div.data span.headline {
     // 6. enable the textfield 
     // 7. call function to enable/disable the add button depending on the value of the textfield
     // 8. set focus on the textfield
-    $('button.btn-export-lists').mouseup(function() {
+    $('button.btn-export-lists').click(function() {
       let id_lead = $(this).data('id-lead');
       let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
       // 1. disable the textfield
@@ -545,7 +580,7 @@ div.lead-card div.data span.headline {
     // 1. call AJAX to create the new list
     // 2. add the new list to all the export list dropdown
     // 3. delete the content of the input box
-    $('button.btn-create-export-list').mouseup(function() {
+    $('button.btn-create-export-list').click(function(e) {
       let name = $(this).parent().find('input.input-export-lists').val();
       let id_lead = $(this).data('id-lead');
       // 1. call AJAX to create the new list
@@ -566,6 +601,10 @@ div.lead-card div.data span.headline {
           alert('Error: '+response);
         }
       });
+console.log('a');
+      // JavaScript, stop additional event listeners
+      // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
+      e.stopImmediatePropagation();
     });
 
     // draw filters
