@@ -473,6 +473,8 @@ div.lead-card div.data span.headline {
     // create an icon-ok element, with style green text color
     let icon = document.createElement('i');
     icon.setAttribute('class', 'icon-ok');
+    icon.setAttribute('data-id-export-list', h.id);
+    icon.setAttribute('data-id-lead', id_lead);
     if ( h.belonging ) { 
       icon.setAttribute('style', 'color: green');
     } else {
@@ -487,13 +489,15 @@ div.lead-card div.data span.headline {
     // on click on the li, call ajax to add/remove the lead from/to the export list
     li.addEventListener('click', function(e) {
       // decide the access point to call
-      if (h.belonging) {
+      if ($(li).attr('data-belonging') == 'true') {
         // remove from the list
         access_point = 'remove_lead_from_export_list';
       } else {
         // add to the list
         access_point = 'add_lead_to_export_list';
       }
+      // set the li with 50% opacity, to show that it is being processed
+      li.style.opacity = '0.5';
       // call the ajax
       $.ajax({
         url: '/ajax/leads/'+access_point+'.json',
@@ -504,13 +508,32 @@ div.lead-card div.data span.headline {
         },
         success: function(data) {
           // get the json response
-          let response = JSON.parse(data);  
-console.log(response.status);
+          let response = JSON.parse(data);
+          // if the response is ok, update the icon
+          if (response.status == 'success') {
+            // the titlt is updated immedaitelly after the ajax call. don't wait for response because of an ux matter. 
+            // update the li opacity, to show that is has been processed successfully
+            li.style.opacity = '1.0';
+
+          } else {
+            alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
+          }
         },
         error: function(data) {
-console.log(data);
+          alert('Unknown error occured while updating the list:' + h.filename + '.');
         },
       });
+      // find the icon about this export list and this lead
+      let icon = document.querySelector('i[data-id-export-list="'+h.id+'"][data-id-lead="'+id_lead+'"]');
+      // if the icon is green, change it to gray
+console.log($(li).attr('data-belonging'));
+      if ($(li).attr('data-belonging') == 'true') {
+        icon.setAttribute('style', 'color: gray');
+        li.setAttribute('data-belonging', 'false');
+      } else {
+        icon.setAttribute('style', 'color: green');
+        li.setAttribute('data-belonging', 'true');
+      }
       // JavaScript, stop additional event listeners
       // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
       e.stopImmediatePropagation();
@@ -553,25 +576,30 @@ console.log(data);
         success: function(data) {
           // get the json response
           let response = JSON.parse(data);
-          // 5. add the export lists to the div.div-export-lists          
-          // remove all the lists
-          div.innerHTML = '';
-          response.exports.forEach(function(h) { 
-            add_export_list(id_lead, h);
-          });
-          // 6. enable the textfield 
-          $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] input.input-export-lists').prop('disabled', false);
-          // 7. call function to enable/disable the add button depending on the value of the textfield
-          enable_add_button(id_lead);
-          // 8. set focus on the textfield
-          // becuase of any other javascript conflic, I have to  add a delay of 100ms before focus the inputbox.
-          setTimeout(function() {
-            $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] li input.input-export-lists').focus();
-          }, 100);    
+          if (response.status == 'success') {
+            // 5. add the export lists to the div.div-export-lists          
+            // remove all the lists
+            div.innerHTML = '';
+            response.exports.forEach(function(h) { 
+              add_export_list(id_lead, h);
+            });
+            // 6. enable the textfield 
+            $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] input.input-export-lists').prop('disabled', false);
+            // 7. call function to enable/disable the add button depending on the value of the textfield
+            enable_add_button(id_lead);
+            // 8. set focus on the textfield
+            // becuase of any other javascript conflic, I have to  add a delay of 100ms before focus the inputbox.
+            setTimeout(function() {
+              $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] li input.input-export-lists').focus();
+            }, 100);      
+          } else {
+            alert(response.status);
+            alert('An error occured trying to load the export lists. Error: ' + response.status);
+          }
         }, error: function(data) {
           // get the json response
           let response = JSON.parse(data);
-          alert('Error: '+response);
+          alert('Unknown error occured when loading the export lists.');
         }
       });
     });  
@@ -591,17 +619,20 @@ console.log(data);
         success: function(data) {
           // get the json response
           let response = JSON.parse(data);
-          // 2. add the new list to this the export list dropdown
-          add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
-          // 3. delete the content of the input box belinging the parent ul element
-          $('input.input-export-lists[data-id-lead="'+id_lead+'"]').val('');
-        }, error: function(data) {
-          // get the json response
-          let response = JSON.parse(data);
-          alert('Error: '+response);
+          if (response.status == 'success') {
+            // the new list is added immedaitelly after the ajax call. don't wait for response because of an ux matter. 
+          } else {
+            alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
+          }
+        },
+        error: function(data) {
+          alert('Unknown error occured while creating the new list:' + name);
         }
       });
-console.log('a');
+      // 2. add the new list to this the export list dropdown
+      add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
+      // 3. delete the content of the input box belinging the parent ul element
+      $('input.input-export-lists[data-id-lead="'+id_lead+'"]').val('');
       // JavaScript, stop additional event listeners
       // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
       e.stopImmediatePropagation();
