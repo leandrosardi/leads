@@ -1,4 +1,8 @@
 <%
+# get exports of current account
+a = BlackStack::Leads::Account.where(:id=>@login.user.id_account).first
+exports = a.exports
+
 # creating a dummy search, in case that user has not any preference yet.
 # such a dummy search won't never be saved in the database.
 s = Leads::FlSearch.new ({
@@ -162,7 +166,7 @@ div.lead-card div.insights {
   position:absolute;
   left:125px;
   top:0;
-  width:400px;
+  width:calc(100% - 70px - 155px - 65px);
   hright:50px;
   overflow:hidden;
 }
@@ -182,6 +186,7 @@ div.lead-card div.data {
   width:155px;
   hright:50px;
   overflow:hidden;
+  z-order: 99999999;
 }
 
 div.lead-card div.data span.headline {
@@ -202,18 +207,30 @@ div.lead-card div.data span.headline {
       <div class='acronym acronym-color-<%=i%>'>
         <span><%=acronym.to_s.encode_html%></span>
       </div>
-      
+
       <div class='buttons'>
         <div class="btn-group">
-          <button class="btn btn-link dropdown-toggle" data-toggle="dropdown">Export <span class="caret"></span></button>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
+          <button class="btn btn-link dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown">Export <span class="caret"></span></button>
+          <ul class="dropdown-menu ul-export-lists" data-id-lead='<%=row[:id].to_guid%>'>
+            <%
+            # write the list of export lists
+            exports.each do |ext|
+              %>
+              <li><a href="#"><%=ext.name.encode_html%></a></li>
+              <%
+            end
+            # if the account has not export lists
+            if exports.size == 0
+              %>
+              <li><center><i>No Export Lists</i></center></li>
+              <%
+            end
+            %>
+
             <li class="divider"></li>
             <li>
               <span>Create New List</span><br/>
-              <input class='input input-medium' /><br/> 
+              <input class='input input-medium input-export-lists' /><br/> 
               <button class='btn btn-link'><i class='icon-plus'></i> Add</button>
             </li>
           </ul>
@@ -422,6 +439,14 @@ div.lead-card div.data span.headline {
 
   // 
   $(document).ready(function () {
+    // better user experience: when click on any export button, set focus on the textfield
+    $('button.btn-export-lists').mouseup(function() {
+      var id_lead = $(this).data('id-lead');
+      // becuase of any other javascript conflic, I have to  add a delay of 100ms before focus the inputbox.
+      setTimeout(function() {
+        $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] li input.input-export-lists').focus();
+      }, 100);
+    });  
 
     // draw filters
     filtersJs.draw(positions, {
