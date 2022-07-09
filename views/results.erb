@@ -60,25 +60,14 @@ status = s.status(i)
   </section>
 </div>
 
-<section class='row-fluid'>
-  <form id="filters-form" action="/leads/filter_results" method="post">
-    <input class="input input-block-level" id="positive_positions" name="positive_positions" value="<%= positive_positions.to_s.encode_html%>" />
-    <input class="input input-block-level" id="positive_industries" name="positive_industries" value="<%= positive_industries.to_s.encode_html%>" />
-    <input class="input input-block-level" id="positive_locations" name="positive_locations" value="<%=positive_locations.to_s.encode_html%>" />
-
-    <input class="input input-block-level" id="negative_positions" name="negative_positions" value="<%= negative_positions.to_s.encode_html%>" />
-    <input class="input input-block-level" id="negative_industries" name="negative_industries" value="<%= negative_industries.to_s.encode_html%>" />
-    <input class="input input-block-level" id="negative_locations" name="negative_locations" value="<%=negative_locations.to_s.encode_html%>" />
-
-    <button type="submit" class="btn btn-link">Search</button>
-  </form>
-</section>
-
 <section class="row-fluid">
   <section class='span4 box'>
     <div id='positions'></div>
     <div id='industries'></div>
     <div id='locations'></div>
+    <div style='width:100%;'>
+        <button class='btn btn-blue btn-xlarge input-block-level' onclick="$('#search').click();"><i class='icon-search'></i> Search</button>
+    </div>
   </section>
 
   <section class='span8 box'>
@@ -160,7 +149,22 @@ status = s.status(i)
     </div>
   </form>
 </div>
- 
+
+<!-- hidden form with fitlers to submit -->
+<section class='row-fluid' style='visibility:hidden;width=0;height=0;'>
+  <form id="filters-form" action="/leads/filter_results" method="post">
+    <input class="input input-block-level" id="positive_positions" name="positive_positions" value="<%= positive_positions.to_s.encode_html%>" />
+    <input class="input input-block-level" id="positive_industries" name="positive_industries" value="<%= positive_industries.to_s.encode_html%>" />
+    <input class="input input-block-level" id="positive_locations" name="positive_locations" value="<%=positive_locations.to_s.encode_html%>" />
+
+    <input class="input input-block-level" id="negative_positions" name="negative_positions" value="<%= negative_positions.to_s.encode_html%>" />
+    <input class="input input-block-level" id="negative_industries" name="negative_industries" value="<%= negative_industries.to_s.encode_html%>" />
+    <input class="input input-block-level" id="negative_locations" name="negative_locations" value="<%=negative_locations.to_s.encode_html%>" />
+
+    <button type="submit" class="btn btn-link" id='search' name='search'>Search</button>
+  </form>
+</section>
+
 <!-- Modal Save Search -->
 <div class="modal fade save_modal" >
   <div class="modal-header">
@@ -200,9 +204,60 @@ status = s.status(i)
     let s = '';
     filtersJs.getPositiveValues(positions).forEach(function(value) {
       if (i>0) { s += ','; }
-      s += value;
+      s += value.trim();
+      i++;
     });
-    $('#f-position').val(s);
+    $('#positive_positions').val(s);
+
+    // negative positions
+    i = 0;
+    s = '';
+    filtersJs.getNegativeValues(positions).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#negative_positions').val(s);
+
+    // positive industries
+    i = 0;
+    s = '';
+    filtersJs.getPositiveValues(industries).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#positive_industries').val(s);
+
+    // negative industries
+    i = 0;
+    s = '';
+    filtersJs.getNegativeValues(industries).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#negative_industries').val(s);
+
+    // positive locations
+    i = 0;
+    s = '';
+    filtersJs.getPositiveValues(locations).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#positive_locations').val(s);
+
+    // negative locations
+    i = 0;
+    s = '';
+    filtersJs.getNegativeValues(locations).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#negative_locations').val(s);
   }
 
   // 
@@ -252,10 +307,26 @@ status = s.status(i)
       },
     });
 
-    // TODO: add filters
-    
-    // update hidden textfield when filter is changed
-    update_hidden_fields();
+    // add filters
+    <%
+    s.positions.each { |p| 
+      %>
+      filtersJs.addValue(positions, '<%=p.value.encode_html%>', <%=p.positive ? 'true' : 'false' %>)
+      <%
+    }
+
+    s.industries.each { |i|
+      %>
+      filtersJs.addValue(industries, '<%=i.fl_industry.name.encode_html%>', <%=i.positive ? 'true' : 'false' %>)
+      <%
+    }
+
+    s.locations.each { |l|
+      %>
+      filtersJs.addValue(locations, '<%=l.value.encode_html%>', <%=l.positive ? 'true' : 'false' %>)
+      <%
+    }
+    %>
 
     // modals
     $('.save_modal').hide();

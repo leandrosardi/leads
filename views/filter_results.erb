@@ -43,6 +43,8 @@ begin
     # register the search performed by the user, even it the user didn't request to save the search.
     # we do this in order to profile each user, to know his/her preferences, and offer more data later.
     s = Leads::FlSearch.new(h)
+    #s.no_of_results = s.count
+    #s.no_of_companies = s.count_companies
     s.save
 
     # return 
