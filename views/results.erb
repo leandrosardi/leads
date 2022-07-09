@@ -72,108 +72,126 @@ status = s.status(i)
 
 <style>
 div.lead-card {
-    position:relative;
-    height:115px;
-    overflow:hidden;
-    width:100%;
-    margin-bottom: 25px;
+  position:relative;
+  height:115px;
+  overflow:hidden;
+  width:100%;
+  margin-bottom: 25px;
+  overflow: visible;
 }
 
 div.lead-card div.acronym {
-    position:absolute;
-    left:0;
-    top:0;
-    width:70px;
-    height:50px;
-    overflow:hidden;
-    border-radius:35px;
-    padding-top:20px;
-    font-size:32px;
-    text-align:center;
-    vertical-align:middle;
-    color:white;
+  position:absolute;
+  left:0;
+  top:0;
+  width:70px;
+  height:50px;
+  overflow:hidden;
+  border-radius:35px;
+  padding-top:20px;
+  font-size:32px;
+  text-align:center;
+  vertical-align:middle;
+  color:white;
 }
 
 div.lead-card div.acronym-color-0 {
-    background-color:rgb(0,128,192);
+  background-color:rgb(0,128,192);
 }
 
 div.lead-card div.acronym-color-1 {
-    background-color:rgb(0,0,160);
+  background-color:rgb(0,0,160);
 }
 
 div.lead-card div.acronym-color-2 {
-    background-color:rgb(0,128,64);
+  background-color:rgb(0,128,64);
 }
 
 div.lead-card div.acronym-color-3 {
-    background-color:rgb(255,128,0);
+  background-color:rgb(255,128,0);
 }
 
 div.lead-card div.acronym-color-4 {
-    background-color:rgb(128,0,128);
+  background-color:rgb(128,0,128);
 }
 
 div.lead-card div.acronym-color-5 {
-    background-color:rgb(128,0,255);
+  background-color:rgb(128,0,255);
 }
 
 div.lead-card div.acronym-color-6 {
-    background-color:rgb(255,0,128);
+  background-color:rgb(255,0,128);
 }
 
 div.lead-card div.acronym-color-7 {
-    background-color:rgb(0,255,128);
+  background-color:rgb(0,255,128);
 }
 
 div.lead-card div.acronym-color-8 {
-    background-color:rgb(0,128,255);
+  background-color:rgb(0,128,255);
 }
 
 div.lead-card div.acronym-color-9 {
-    background-color:rgb(0,128,128);
+  background-color:rgb(0,128,128);
 }
 
 div.lead-card div.acronym span {
-    //margin-top:20px;
-    text-align:center;
-    vertical-align:middle;
+  text-align:center;
+  vertical-align:middle;
+}
+
+div.lead-card div.buttons {
+  position:absolute;
+  right:5px;
+  width:170px;
+  top:0;
+}
+
+div.lead-card div.buttons div.btn-group {
+  position:relative;
+}
+
+div.lead-card div.buttons div.btn-group ul.dropdown-menu {
+  position: absolute;
+  right:0px;
+  top:25px;
+  width:155px;
 }
 
 div.lead-card div.insights {
-    position:absolute;
-    left:125px;
-    top:0;
-    width:400px;
-    hright:50px;
-    overflow:hidden;
-    margin-left: 25px;
+  position:absolute;
+  left:125px;
+  top:0;
+  width:400px;
+  hright:50px;
+  overflow:hidden;
 }
 
 div.lead-card div.insights span.name {
-    font-size:24px;
+  font-size:24px;
 }
 
 div.lead-card div.insights span.headline {
-    font-size:12px;
+  font-size:12px;
 }
 
 div.lead-card div.data {
-    position:absolute;
-    right:5px;
-    top:0;
-    width:155px;
-    hright:50px;
-    overflow:hidden;
+  position:absolute;
+  right:5px;
+  top:25px;
+  width:155px;
+  hright:50px;
+  overflow:hidden;
 }
 
 div.lead-card div.data span.headline {
-    font-size:12px;
+  font-size:12px;
 }
 </style>
 
   <section class='span8 box'>
     <p><b>Records:</b> <%=status['row_from'].to_label%> to <%=status['row_to'].to_label%> <b>of</b> <%=status['total_rows'].to_label%></p>
+    <br/>
 
     <%
     rows.each do |row|
@@ -182,8 +200,26 @@ div.lead-card div.data span.headline {
     %>
     <div class='span12 lead-card' id='sample<%=i%>'>
       <div class='acronym acronym-color-<%=i%>'>
-          <span><%=acronym.to_s.encode_html%></span>
+        <span><%=acronym.to_s.encode_html%></span>
       </div>
+      
+      <div class='buttons'>
+        <div class="btn-group">
+          <button class="btn btn-link dropdown-toggle" data-toggle="dropdown">Export <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li>
+              <span>Create New List</span><br/>
+              <input class='input input-medium' /><br/> 
+              <button class='btn btn-link'><i class='icon-plus'></i> Add</button>
+            </li>
+          </ul>
+        </div>      
+      </div>
+
       <div class='insights'>
           <span class='name'><%=row[:name].to_s.encode_html%></span>
           <br/>
@@ -220,17 +256,7 @@ div.lead-card div.data span.headline {
           end
           %>
       </div>
-  </div>
-
-<!--
-          <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:stat_has_email].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_email].to_s%></td>
-          <td class="fix" title="<%=row[:stat_has_phone].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_phone].to_s%></td>
--->
+    </div>
     <%
     end
     %>

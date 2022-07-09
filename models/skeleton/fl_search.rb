@@ -214,6 +214,7 @@ module Leads
     # return an array of hashes with the columns of the table
     def columns
       [
+        { 'query_field' => 'l.id' }, 
         {
           'query_field' => 'l.name',
           # braninstorm a general-pourpose screen descriptor
