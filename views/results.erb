@@ -1,7 +1,6 @@
 <%
 # get exports of current account
-a = BlackStack::Leads::Account.where(:id=>@login.user.id_account).first
-exports = a.exports
+#exports = BlackStack::Leads::Account.where(:id=>@login.user.id_account).first.exports
 
 # creating a dummy search, in case that user has not any preference yet.
 # such a dummy search won't never be saved in the database.
@@ -212,21 +211,10 @@ div.lead-card div.data span.headline {
         <div class="btn-group">
           <button class="btn btn-link dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown">Export <span class="caret"></span></button>
           <ul class="dropdown-menu ul-export-lists" data-id-lead='<%=row[:id].to_guid%>'>
-            <%
-            # write the list of export lists
-            exports.each do |ext|
-              %>
-              <li><a href="#"><%=ext.name.encode_html%></a></li>
-              <%
-            end
-            # if the account has not export lists
-            if exports.size == 0
-              %>
-              <li><center><i>No Export Lists</i></center></li>
-              <%
-            end
-            %>
-
+            <div class='div-export-lists'>
+              <!-- fill the div by AJAX when the user clicks on the export button -->
+              <li><center><i>Loading...</i></center></li>              
+            </div>
             <li class="divider"></li>
             <li>
               <span>Create New List</span><br/>
@@ -437,10 +425,62 @@ div.lead-card div.data span.headline {
     $('#negative_locations').val(s);
   }
 
+  // enable/disable the add button depending on the value of the textfield
+  function enable_add_button(id_lead) {
+    // find the ul with this data-id-lead='id_lead'
+    let ul = document.querySelector('ul.ul-export-lists[data-id-lead="'+id_lead+'"]');
+    // find the button inside the ul
+    let button = ul.querySelector('button.btn-create-export-list');
+    // find the textfield inside the ul
+    let textfield = ul.querySelector('input.input-export-lists');
+    // if the textfield is empty, disable the button
+    if (textfield.value.trim() == '') {
+      // disable the button
+      button.disabled = true;
+      // remove any span just below the textfield
+      let span = ul.querySelector('span');
+      if (span) {
+        // remove span
+        span.remove();
+      }
+    } else {
+      // if the name already exists in the list, disabe the button
+      if (ul.querySelector('li[data-name="'+textfield.value.trim()+'"]')) {
+        // disable the button
+        button.disabled = true;
+        // show a red text 'Name already exists' just below the textfield
+        textfield.parentNode.insertBefore(document.createElement('span'), textfield.nextSibling).innerHTML = 'Name already exists';
+      } else {
+        // enable the button
+        button.disabled = false;
+        // remove any span just below the textfield
+        let span = ul.querySelector('span');
+        if (span) {
+          // remove span
+          span.remove();
+        }
+      }
+    }
+  }
+
   // 
   $(document).ready(function () {
 
-    // better user experience: when click on any export button, set focus on the textfield
+    // en endit any textfield inside a ul,
+    // enable/disable the add button depending on the value of the textfield
+    // by calling function enable_add_button(id_lead)
+    $('ul.ul-export-lists').on('keyup', 'input.input-export-lists', function() {
+      enable_add_button($(this).closest('ul').data('id-lead'));
+    });
+
+    // better user experience: when click on any export button, 
+    // 1. disable the textfield
+    // 2. disable the add button
+    // 3. call ajax to bring the full list of export lists
+    // 4. add the export lists to the div.div-export-lists
+    // 5. enable the textfield 
+    // 6. call function to enable/disable the add button depending on the value of the textfield
+    // set focus on the textfield
     $('button.btn-export-lists').mouseup(function() {
       var id_lead = $(this).data('id-lead');
       // becuase of any other javascript conflic, I have to  add a delay of 100ms before focus the inputbox.
@@ -458,14 +498,37 @@ div.lead-card div.data span.headline {
       var id_lead = $(this).data('id-lead');
       // 1. call AJAX to create the new list
       $.ajax({
-        url: '/leads/ajax_create_export_list_and_export_lead',
+        url: '/ajax/leads/create_export_list_and_add_lead.json',
         type: 'POST',
-        data: { id_lead: id_lead },
+        data: { id_lead: id_lead, name: name },
         success: function(data) {
+          // get the json response
+          var response = JSON.parse(data);
+console.log(response);
           // 2. add the new list to all the export list dropdown
-          // 3. delete the content of the input box
-          $('ul.ul-export-lists[data-id-lead="'+id_lead+'"]').append(data);
+          $('ul.ul-export-lists').each(function() {
+            let id_lead = $(this).data('id-lead');
+            let id_export_list = response.id_export_list;
+            // create the li element
+            let li = document.createElement('li');
+            li.setAttribute('data-id-export-list', id_export_list);
+            li.setAttribute('data-id-lead', id_lead);
+            // create an icon-ok element, with style green text color
+            let icon = document.createElement('i');
+            icon.setAttribute('class', 'icon-ok');
+            icon.setAttribute('style', 'color: green');
+            // add the icon and the name of the list to the li
+            li.appendChild(icon);
+            li.appendChild(document.createTextNode(name));
+            // add the li to the ul
+            $(this).append(li);
+          });
+          // 3. delete the content of the input box belinging the parent ul element
+          $('input.input-export-lists[data-id-lead="'+id_lead+'"]').val('');
         }, error: function(data) {
+// get the json response
+var response = JSON.parse(data);
+console.log(response);
           alert('Error: '+data.responseText);
         }
       });

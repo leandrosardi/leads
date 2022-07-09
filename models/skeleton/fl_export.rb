@@ -3,7 +3,7 @@ module Leads
     many_to_one :user, :class=>:'BlackStack::MySaaS::User', :key=>:id_user
     many_to_one :fl_search, :class=>:'Leads::FlSearch', :key=>:id_search
 
-
+=begin
     # constructor
     def initialize(h)
       super()
@@ -25,6 +25,6 @@ module Leads
       # return the errors found.
       errors
     end
-
+=end
   end
 end
