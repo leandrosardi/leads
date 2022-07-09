@@ -14,16 +14,21 @@ s = Leads::FlSearch.new ({
 })
 
 # getting the search
-sid = @login.user.preference("leads.results.filter.filter_position", '', params[:sid])
+sid = @login.user.preference("leads.results.filter.positive_positions", '', params[:sid])
 
 # if the user has preference for any past search, then I use such a search
 # if the user has not preference for any past search, then I keep the dummy search defined above.
 s = Leads::FlSearch.where(:id=>sid).first if sid.to_s.guid?
 
-# defining search parameters, to show in the textfields
-filter_position = s.positions.select { |p| p.positive }.map { |p| p.value }.join(',') # only many positive positions are supported by now
-filter_industry = s.industries.select { |p| p.positive }.map { |i| i.fl_industry.name }.first # only one positive industry is supported by now
-filter_location = s.locations.select { |p| p.positive }.map { |l| l.value }.first # only one positive location is supported by now
+# defining positive filters, to show in the hidden fields
+positive_positions = s.positions.select { |p| p.positive }.map { |p| p.value }.join(',') 
+positive_industries = s.industries.select { |p| p.positive }.map { |i| i.fl_industry.name }.join(',') 
+positive_locations = s.locations.select { |p| p.positive }.map { |l| l.value }.join(',') 
+
+# defining negative filters, to show in the hidden fields
+negative_positions = s.positions.select { |p| !p.positive }.map { |p| p.value }.join(',') 
+negative_industries = s.industries.select { |p| !p.positive }.map { |i| i.fl_industry.name }.join(',') 
+negative_locations = s.locations.select { |p| !p.positive }.map { |l| l.value }.join(',') 
 
 # getting the page number
 page_number = @login.user.preference("leads.results.filter.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
@@ -55,6 +60,19 @@ status = s.status(i)
   </section>
 </div>
 
+<section class='row-fluid'>
+  <form id="filters-form" action="/leads/filter_results" method="post">
+    <input class="input input-block-level" id="positive_positions" name="positive_positions" value="<%= positive_positions.to_s.encode_html%>" />
+    <input class="input input-block-level" id="positive_industries" name="positive_industries" value="<%= positive_industries.to_s.encode_html%>" />
+    <input class="input input-block-level" id="positive_locations" name="positive_locations" value="<%=positive_locations.to_s.encode_html%>" />
+
+    <input class="input input-block-level" id="negative_positions" name="negative_positions" value="<%= negative_positions.to_s.encode_html%>" />
+    <input class="input input-block-level" id="negative_industries" name="negative_industries" value="<%= negative_industries.to_s.encode_html%>" />
+    <input class="input input-block-level" id="negative_locations" name="negative_locations" value="<%=negative_locations.to_s.encode_html%>" />
+
+    <button type="submit" class="btn btn-link">Search</button>
+  </form>
+</section>
 
 <section class="row-fluid">
   <section class='span4 box'>
@@ -76,42 +94,21 @@ status = s.status(i)
         <th style="width:32px;text-align:right;">Phones</th>
       </thead>
       <tbody>
-        <form id="filters-form" action="/leads/filter_results" method="post">
-          <tr>
-            <th></th>
-            <th><input class="input input-block-level" id="position-filter" name="position" value="<%= filter_position.to_s.encode_html%>" /></th>
-            <th></th>
-            <th>
-              <input  style='width: 100%' type="text" class="awesomplete" name="industry" id="industry_name" list="industries_list" autocomplete="false" value="<%= filter_industry.to_s.encode_html%>" tabindex="6">
-              <datalist id="industries_list">
-                <!-- TODO: iterate of table of industries industries here -->
-                <% Leads::FlIndustry.all.each do |industry| %>
-                  <option value="<%= industry.name %>"> <%= industry.name %> </option>
-                <% end %>
-              </datalist>
-
-            </th>
-            <th><input class="input input-block-level" id="location-filter" name="location" value="<%=filter_location.to_s.encode_html%>" /></th>
-            <th colspan="2">
-              <button type="submit" class="btn btn-link">Search</button>
-            </th>
-          </tr>
-          <%
-          rows.each do |row|
-          %>
-          <tr>
-            <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
-            <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
-            <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
-            <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
-            <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
-            <td class="fix" title="<%=row[:stat_has_email].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_email].to_s%></td>
-            <td class="fix" title="<%=row[:stat_has_phone].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_phone].to_s%></td>
-          </tr>
-          <%
-          end
-          %>
-        </form>
+        <%
+        rows.each do |row|
+        %>
+        <tr>
+          <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:stat_has_email].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_email].to_s%></td>
+          <td class="fix" title="<%=row[:stat_has_phone].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_phone].to_s%></td>
+        </tr>
+        <%
+        end
+        %>
       </tbody>
     </table>
     <div class="pagination"></div>
@@ -191,38 +188,83 @@ status = s.status(i)
 
 <script type="text/javascript" charset="utf-8">
     
-  $(document).ready(function () {
-    var positions = document.getElementById('positions');
-    var industries = document.getElementById('industries');
-    var locations = document.getElementById('locations');
+  // filters
+  var positions = document.getElementById('positions');
+  var industries = document.getElementById('industries');
+  var locations = document.getElementById('locations');
 
-    // filters
+  // update the hidden textfields with the values of the filters
+  function update_hidden_fields() {
+    // positive positions
+    let i = 0;
+    let s = '';
+    filtersJs.getPositiveValues(positions).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value;
+    });
+    $('#f-position').val(s);
+  }
+
+  // 
+  $(document).ready(function () {
+
+    // draw filters
     filtersJs.draw(positions, {
       label: 'Positions',
       allowed_positive_keywords: true, // default value: true
       allowed_negative_keywords: true, // default value: false
+      // catch event: update hidden textfield when filter is changed    
+      on_add_value: function (value) {
+        update_hidden_fields();
+      },
+      // catch event: update hidden textfield when filter is changed    
+      on_remove_value: function (value) {
+        update_hidden_fields();
+      },
     });
 
     filtersJs.draw(industries, {
       label: 'Industries',
       allowed_positive_keywords: true, // default value: true
       allowed_negative_keywords: true, // default value: false
+      allowed_values: ['<%=Leads::FlIndustry.order(:name).all.map { |o| o.name.encode_html }.join("', '")%>'],      
+      // catch event: update hidden textfield when filter is changed    
+      on_add_value: function (value) {
+        update_hidden_fields();
+      },
+      // catch event: update hidden textfield when filter is changed    
+      on_remove_value: function (value) {
+        update_hidden_fields();
+      },
     });
 
     filtersJs.draw(locations, {
       label: 'Locations',
       allowed_positive_keywords: true, // default value: true
       allowed_negative_keywords: true, // default value: false
+      // catch event: update hidden textfield when filter is changed    
+      on_add_value: function (value) {
+        update_hidden_fields();
+      },
+      // catch event: update hidden textfield when filter is changed    
+      on_remove_value: function (value) {
+        update_hidden_fields();
+      },
     });
+
+    // TODO: add filters
+    
+    // update hidden textfield when filter is changed
+    update_hidden_fields();
 
     // modals
     $('.save_modal').hide();
     $('.export_leads').hide();
     $('#inputName').on('input', function(){
       if($(this).val() !== ''){
-        $('#f-position').val($('#position-filter').val())
-        $('#f-location').val($('#location-filter').val())
-        $('#f-industry').val($('#industry_name').val())
+        $('#f-position').val($('#positive_positions').val())
+        $('#f-location').val($('#positive_locations').val())
+        $('#f-industry').val($('#positive_industries').val())
         $('#save-search').removeAttr('disabled');
       }else{
         $('#save-search').attr('disabled', 'disabled');
@@ -259,9 +301,9 @@ status = s.status(i)
   });
   
   function validate_export_modal(){
-    $('#e-position').val($('#position-filter').val())
-    $('#e-location').val($('#location-filter').val())
-    $('#e-industry').val($('#industry_name').val())
+    $('#e-position').val($('#positive_positions').val())
+    $('#e-location').val($('#positive_locations').val())
+    $('#e-industry').val($('#positive_industries').val())
     $('#export_only').val($("#export_checkbox").is(':checked'))
 
     if ($('#file_name').val() !== '') {
