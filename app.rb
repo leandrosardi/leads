@@ -84,6 +84,10 @@ post "/leads/filter_export_contacts", :auth => true do
 end
 
 # AJAX 
+post "/ajax/leads/get_lists_linked_to_lead.json", :auth => true do
+    erb :"/extensions/leads/views/ajax/get_lists_linked_to_lead"
+end
+
 post "/ajax/leads/create_export_list_and_add_lead.json", :auth => true do
     erb :"/extensions/leads/views/ajax/create_export_list_and_add_lead"
 end

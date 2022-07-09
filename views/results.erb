@@ -1,7 +1,4 @@
 <%
-# get exports of current account
-#exports = BlackStack::Leads::Account.where(:id=>@login.user.id_account).first.exports
-
 # creating a dummy search, in case that user has not any preference yet.
 # such a dummy search won't never be saved in the database.
 s = Leads::FlSearch.new ({
@@ -181,7 +178,7 @@ div.lead-card div.insights span.headline {
 div.lead-card div.data {
   position:absolute;
   right:5px;
-  top:25px;
+  top:35px;
   width:155px;
   hright:50px;
   overflow:hidden;
@@ -209,11 +206,10 @@ div.lead-card div.data span.headline {
 
       <div class='buttons'>
         <div class="btn-group">
-          <button class="btn btn-link dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown">Export <span class="caret"></span></button>
+          <button class="btn btn-green dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown">Export <span class="caret"></span></button>
           <ul class="dropdown-menu ul-export-lists" data-id-lead='<%=row[:id].to_guid%>'>
-            <div class='div-export-lists'>
+            <div class='div-export-lists' data-id-lead='<%=row[:id].to_guid%>'>
               <!-- fill the div by AJAX when the user clicks on the export button -->
-              <li><center><i>Loading...</i></center></li>              
             </div>
             <li class="divider"></li>
             <li>
@@ -463,6 +459,29 @@ div.lead-card div.data span.headline {
     }
   }
 
+  // receive a hash descriptor of the export related with the lead { id:, filename:, belonging: }
+  function add_export_list(id_lead, h) {
+    // find the div
+    let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
+    // create the li element
+    let li = document.createElement('li');
+    li.setAttribute('data-id-export-list', h.id);
+    li.setAttribute('data-id-lead', id_lead);
+    // create an icon-ok element, with style green text color
+    let icon = document.createElement('i');
+    icon.setAttribute('class', 'icon-ok');
+    if ( h.belonging ) { 
+      icon.setAttribute('style', 'color: green');
+    } else {
+      icon.setAttribute('style', 'color: gray');
+    }
+    // add the icon and the name of the list to the li
+    li.appendChild(icon);
+    li.appendChild(document.createTextNode(h.filename));
+    // add the li to the ul
+    $(div).append(li);
+  }
+
   // 
   $(document).ready(function () {
 
@@ -476,17 +495,50 @@ div.lead-card div.data span.headline {
     // better user experience: when click on any export button, 
     // 1. disable the textfield
     // 2. disable the add button
-    // 3. call ajax to bring the full list of export lists
-    // 4. add the export lists to the div.div-export-lists
-    // 5. enable the textfield 
-    // 6. call function to enable/disable the add button depending on the value of the textfield
-    // set focus on the textfield
+    // 3. set '<center><i>Loading...</i></center>' as innerhtml of the div
+    // 4. call ajax to bring the full list of export lists, and wich are linked to this lead
+    // 5. add the export lists to the div.div-export-lists
+    // 6. enable the textfield 
+    // 7. call function to enable/disable the add button depending on the value of the textfield
+    // 8. set focus on the textfield
     $('button.btn-export-lists').mouseup(function() {
-      var id_lead = $(this).data('id-lead');
-      // becuase of any other javascript conflic, I have to  add a delay of 100ms before focus the inputbox.
-      setTimeout(function() {
-        $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] li input.input-export-lists').focus();
-      }, 100);
+      let id_lead = $(this).data('id-lead');
+      let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
+      // 1. disable the textfield
+      $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] input.input-export-lists').prop('disabled', true);
+      // 2. disable the add button
+      $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] button.btn-create-export-list').prop('disabled', true);
+      // 3. set '<center><i>Loading...</i></center>' as innerhtml of the div
+      div.innerHTML = '<center><i>Loading...</i></center>';
+      // 4. call ajax to bring the full list of export lists, and wich are linked to this lead
+      $.ajax({
+        url: '/ajax/leads/get_lists_linked_to_lead.json',
+        type: 'POST',
+        data: { id_lead: id_lead, name: name },
+        success: function(data) {
+          // get the json response
+          let response = JSON.parse(data);
+          // 5. add the export lists to the div.div-export-lists          
+          // remove all the lists
+          div.innerHTML = '';
+          response.exports.forEach(function(h) { 
+            add_export_list(id_lead, h);
+          });
+          // 6. enable the textfield 
+          $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] input.input-export-lists').prop('disabled', false);
+          // 7. call function to enable/disable the add button depending on the value of the textfield
+          enable_add_button(id_lead);
+          // 8. set focus on the textfield
+          // becuase of any other javascript conflic, I have to  add a delay of 100ms before focus the inputbox.
+          setTimeout(function() {
+            $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] li input.input-export-lists').focus();
+          }, 100);    
+        }, error: function(data) {
+          // get the json response
+          let response = JSON.parse(data);
+          alert('Error: '+response);
+        }
+      });
     });  
 
     // better user experience: when click on the '+ add' button, 
@@ -494,8 +546,8 @@ div.lead-card div.data span.headline {
     // 2. add the new list to all the export list dropdown
     // 3. delete the content of the input box
     $('button.btn-create-export-list').mouseup(function() {
-      var name = $(this).parent().find('input.input-export-lists').val();
-      var id_lead = $(this).data('id-lead');
+      let name = $(this).parent().find('input.input-export-lists').val();
+      let id_lead = $(this).data('id-lead');
       // 1. call AJAX to create the new list
       $.ajax({
         url: '/ajax/leads/create_export_list_and_add_lead.json',
@@ -503,33 +555,15 @@ div.lead-card div.data span.headline {
         data: { id_lead: id_lead, name: name },
         success: function(data) {
           // get the json response
-          var response = JSON.parse(data);
-console.log(response);
-          // 2. add the new list to all the export list dropdown
-          $('ul.ul-export-lists').each(function() {
-            let id_lead = $(this).data('id-lead');
-            let id_export_list = response.id_export_list;
-            // create the li element
-            let li = document.createElement('li');
-            li.setAttribute('data-id-export-list', id_export_list);
-            li.setAttribute('data-id-lead', id_lead);
-            // create an icon-ok element, with style green text color
-            let icon = document.createElement('i');
-            icon.setAttribute('class', 'icon-ok');
-            icon.setAttribute('style', 'color: green');
-            // add the icon and the name of the list to the li
-            li.appendChild(icon);
-            li.appendChild(document.createTextNode(name));
-            // add the li to the ul
-            $(this).append(li);
-          });
+          let response = JSON.parse(data);
+          // 2. add the new list to this the export list dropdown
+          add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
           // 3. delete the content of the input box belinging the parent ul element
           $('input.input-export-lists[data-id-lead="'+id_lead+'"]').val('');
         }, error: function(data) {
-// get the json response
-var response = JSON.parse(data);
-console.log(response);
-          alert('Error: '+data.responseText);
+          // get the json response
+          let response = JSON.parse(data);
+          alert('Error: '+response);
         }
       });
     });

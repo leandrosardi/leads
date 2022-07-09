@@ -1,0 +1,20 @@
+<%
+return_message = { :exports => [], }
+begin
+    # get exports of current account
+    BlackStack::Leads::Account.where(:id=>@login.user.id_account).first.exports.sort_by { |e| e.filename }.each do |e|
+        return_message[:exports] << {
+            :id => e.id.to_guid,
+            :filename => e.filename,
+            # :belonging is true if the lead belongs to the export
+            :belonging => Leads::FlExportLead.where(:id_export=>e.id, :id_lead=>params['id_lead'], :delete_time=>nil).first != nil,
+        }
+    end # end each export
+
+    # return
+    return_message[:status] = 'success'
+rescue => e
+    return_message[:status] = e.to_console
+end
+return return_message.to_json
+%>

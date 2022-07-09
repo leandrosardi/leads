@@ -1,0 +1,25 @@
+<%
+return_message = {}
+begin
+    id_lead = params['id_lead']
+    id_export = params['id_export']
+
+    
+    # add the lead to the export
+    o = Leads::FlExportLead.new
+    o.id = guid
+    o.id_export = e.id
+    o.id_lead = id_lead
+    o.save
+
+    # return
+    return_message[:id_export_list] = e.id.to_guid
+    return_message[:id_user] = @login.id_user
+    return_message[:id_lead] = id_lead
+    return_message[:name] = name
+    return_message[:status] = 'success'
+rescue => e
+    return_message[:status] = e.to_console
+end
+return return_message.to_json
+%>
