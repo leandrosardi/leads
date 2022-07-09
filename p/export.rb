@@ -10,7 +10,8 @@ while true
     rescue => e
       export.create_file_end_time = now
       export.create_file_success = false
-      export.create_file_error_description = e.message export.save;
+      export.create_file_error_description = e.message
+      export.save
     end
 
     export.create_file_end_time = now

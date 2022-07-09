@@ -6,7 +6,6 @@
   redirect_on_error = "/leads/results" if redirect_on_error.to_s.size == 0
   redirect_on_success = "/leads/results" if redirect_on_success.to_s.size == 0
 
-  puts params
   begin
 
     contact_per_company = params["optradio"] if params["optradio"] != nil
@@ -37,7 +36,11 @@
                                'industries' =>  [{"name" =>  filter_industry, "positive" =>  true}] })
       s.save
 
-      export = Leads::FlExport.new('id_user' =>  @login.user.id, 'id_search' => s.id)
+      export = Leads::FlExport.new
+      export.id_user = @login.user.id
+      export.id_search = s.id
+      export.id = guid
+      export.create_time = now
       export.save
     end # transaction
 
