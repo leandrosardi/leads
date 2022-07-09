@@ -14,16 +14,21 @@ s = Leads::FlSearch.new ({
 })
 
 # getting the search
-sid = @login.user.preference("leads.results.filter.filter_position", '', params[:sid])
+sid = @login.user.preference("leads.results.filter.positive_positions", '', params[:sid])
 
 # if the user has preference for any past search, then I use such a search
 # if the user has not preference for any past search, then I keep the dummy search defined above.
 s = Leads::FlSearch.where(:id=>sid).first if sid.to_s.guid?
 
-# defining search parameters, to show in the textfields
-filter_position = s.positions.select { |p| p.positive }.map { |p| p.value }.join(',') # only many positive positions are supported by now
-filter_industry = s.industries.select { |p| p.positive }.map { |i| i.fl_industry.name }.first # only one positive industry is supported by now
-filter_location = s.locations.select { |p| p.positive }.map { |l| l.value }.first # only one positive location is supported by now
+# defining positive filters, to show in the hidden fields
+positive_positions = s.positions.select { |p| p.positive }.map { |p| p.value }.join(',') 
+positive_industries = s.industries.select { |p| p.positive }.map { |i| i.fl_industry.name }.join(',') 
+positive_locations = s.locations.select { |p| p.positive }.map { |l| l.value }.join(',') 
+
+# defining negative filters, to show in the hidden fields
+negative_positions = s.positions.select { |p| !p.positive }.map { |p| p.value }.join(',') 
+negative_industries = s.industries.select { |p| !p.positive }.map { |i| i.fl_industry.name }.join(',') 
+negative_locations = s.locations.select { |p| !p.positive }.map { |l| l.value }.join(',') 
 
 # getting the page number
 page_number = @login.user.preference("leads.results.filter.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
@@ -41,12 +46,6 @@ rows = s.rows(i)
 
 # getting pagination status
 status = s.status(i)
-
-puts
-puts
-puts
-puts status.to_s
-
 %>
 
 <div class="mynavbar mysticky">
@@ -61,76 +60,187 @@ puts status.to_s
   </section>
 </div>
 
+<section class="row-fluid">
+  <section class='span4 box'>
+    <div id='positions'></div>
+    <div id='industries'></div>
+    <div id='locations'></div>
+    <div style='width:100%;'>
+        <button class='btn btn-blue btn-xlarge input-block-level' onclick="$('#search').click();"><i class='icon-search'></i> Search</button>
+    </div>
+  </section>
 
-<section class="container box">
-  <form id="search-form" action="/leads/filter_results" onsubmit="process_and_submit()" method="post">
-    <section class="row-fluid">
-      <section class='span12'>
-        <p><b>Records:</b> <%=status['row_from'].to_label%> to <%=status['row_to'].to_label%> <b>of</b> <%=status['total_rows'].to_label%></p>
-        <table id="results-table" style="table-layout: fixed; width: 100%;" class="table table-striped">
-          <thead>
-          <tr>
-            <th style="width:90px;">Name</th>
-            <th style="width:auto;">Position</th>
-            <th style="width:auto;">Company</th>
-            <th style="width:90px;">Industry</th>
-            <th style="width:90px;">Location</th>
-            <th style="width:32px;text-align:right;">Emails</th>
-            <th style="width:32px;text-align:right;">Phones</th>
+<style>
+div.lead-card {
+    position:relative;
+    height:115px;
+    overflow:hidden;
+    width:100%;
+    margin-bottom: 25px;
+}
 
-          </tr>
-          </thead>
-          <tbody>
-           <form id="filters-form" action="/leads/results" method="get">
-            <tr>
-              <th></th>
-              <th><input class="input input-block-level" id="position-filter" name="position" value="<%= filter_position.to_s.encode_html%>" /></th>
-              <th></th>
-              <th>
-                <input  style='width: 100%' type="text" class="awesomplete" name="industry" id="industry_name" list="industries_list" autocomplete="false" value="<%= filter_industry.to_s.encode_html%>" tabindex="6">
-                <datalist id="industries_list">
-                  <!-- TODO: iterate of table of industries industries here -->
-                  <% Leads::FlIndustry.all.each do |industry| %>
-                    <option value="<%= industry.name %>"> <%= industry.name %> </option>
-                  <% end %>
-                </datalist>
+div.lead-card div.acronym {
+    position:absolute;
+    left:0;
+    top:0;
+    width:70px;
+    height:50px;
+    overflow:hidden;
+    border-radius:35px;
+    padding-top:20px;
+    font-size:32px;
+    text-align:center;
+    vertical-align:middle;
+    color:white;
+}
 
-              </th>
-              <th><input class="input input-block-level" id="location-filter" name="location" value="<%=filter_location.to_s.encode_html%>" /></th>
-              <th colspan="2">
-                <button type="submit" class="btn btn-link">Search</button>
-              </th>
-            </tr>
+div.lead-card div.acronym-color-0 {
+    background-color:rgb(0,128,192);
+}
 
+div.lead-card div.acronym-color-1 {
+    background-color:rgb(0,0,160);
+}
+
+div.lead-card div.acronym-color-2 {
+    background-color:rgb(0,128,64);
+}
+
+div.lead-card div.acronym-color-3 {
+    background-color:rgb(255,128,0);
+}
+
+div.lead-card div.acronym-color-4 {
+    background-color:rgb(128,0,128);
+}
+
+div.lead-card div.acronym-color-5 {
+    background-color:rgb(128,0,255);
+}
+
+div.lead-card div.acronym-color-6 {
+    background-color:rgb(255,0,128);
+}
+
+div.lead-card div.acronym-color-7 {
+    background-color:rgb(0,255,128);
+}
+
+div.lead-card div.acronym-color-8 {
+    background-color:rgb(0,128,255);
+}
+
+div.lead-card div.acronym-color-9 {
+    background-color:rgb(0,128,128);
+}
+
+div.lead-card div.acronym span {
+    //margin-top:20px;
+    text-align:center;
+    vertical-align:middle;
+}
+
+div.lead-card div.insights {
+    position:absolute;
+    left:125px;
+    top:0;
+    width:400px;
+    hright:50px;
+    overflow:hidden;
+    margin-left: 25px;
+}
+
+div.lead-card div.insights span.name {
+    font-size:24px;
+}
+
+div.lead-card div.insights span.headline {
+    font-size:12px;
+}
+
+div.lead-card div.data {
+    position:absolute;
+    right:5px;
+    top:0;
+    width:155px;
+    hright:50px;
+    overflow:hidden;
+}
+
+div.lead-card div.data span.headline {
+    font-size:12px;
+}
+</style>
+
+  <section class='span8 box'>
+    <p><b>Records:</b> <%=status['row_from'].to_label%> to <%=status['row_to'].to_label%> <b>of</b> <%=status['total_rows'].to_label%></p>
+
+    <%
+    rows.each do |row|
+      acronym = row[:name].to_s[0..1].capitalize
+      i = acronym.chr.ord.to_i % 10
+    %>
+    <div class='span12 lead-card' id='sample<%=i%>'>
+      <div class='acronym acronym-color-<%=i%>'>
+          <span><%=acronym.to_s.encode_html%></span>
+      </div>
+      <div class='insights'>
+          <span class='name'><%=row[:name].to_s.encode_html%></span>
+          <br/>
+          <span class='headline li-headline'><%=row[:position].to_s.encode_html%></span>
+          <br/>
+          <span class='headline'><b>location:</b> <span class='li-location'><%=row[:stat_location_name].to_s.encode_html%></span></span>
+          <br/>
+          <span class='headline'><b>industry:</b> <span class='li-industry'><%=row[:stat_industry_name].to_s.encode_html%></span></span>
+      </div>
+      <div class='data'>
+          <%
+          if row[:stat_company_name].to_s.size > 0
+          %>
+          <span class='headline'><i class='icon-briefcase'></i> <span class='li-company'><%=row[:stat_company_name].to_s.encode_html%></span></span>
+          <br/>
+          <%
+          end
+          %>
 
           <%
-          rows.each do |row|
+          if row[:stat_has_email]
           %>
-            <tr>
-              <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
-              <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
-              <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
-              <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
-              <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
-              <td class="fix" title="<%=row[:stat_has_email].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_email].to_s%></td>
-              <td class="fix" title="<%=row[:stat_has_phone].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_phone].to_s%></td>
-            </tr>
+          <span data='headline'><i class='icon-envelope'></i> <span class='email'>***@****.com</span></span>
+          <br/>
           <%
-            end
+          end
           %>
-            </form>
-          </tbody>
-        </table>
-        <div class="pagination"></div>
-        <script>
-            drawPagination($(".pagination"), <%=page_number%>, <%=status['total_pages']%>);
-        </script>
-        <br>
-      </section>
-    </section>
-  </form>
+
+          <%
+          if row[:stat_has_phone]
+            %>
+          <span data='headline'><i class='icon-phone'></i> <span class='phone'>***@****.com</span></span>
+          <%
+          end
+          %>
+      </div>
+  </div>
+
+<!--
+          <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
+          <td class="fix" title="<%=row[:stat_has_email].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_email].to_s%></td>
+          <td class="fix" title="<%=row[:stat_has_phone].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_phone].to_s%></td>
+-->
+    <%
+    end
+    %>
+    <div class="pagination"></div>
+    <script>
+      drawPagination($(".pagination"), <%=page_number%>, <%=status['total_pages']%>);
+    </script>
+    <br>
+  </section>
 </section>
-
 
 <!-- Modal Exports Leads-->
 <div class="modal fade export_leads" >
@@ -173,7 +283,23 @@ puts status.to_s
     </div>
   </form>
 </div>
- Modal Save Search
+
+<!-- hidden form with fitlers to submit -->
+<section class='row-fluid' style='visibility:hidden;width=0;height=0;'>
+  <form id="filters-form" action="/leads/filter_results" method="post">
+    <input class="input input-block-level" id="positive_positions" name="positive_positions" value="<%= positive_positions.to_s.encode_html%>" />
+    <input class="input input-block-level" id="positive_industries" name="positive_industries" value="<%= positive_industries.to_s.encode_html%>" />
+    <input class="input input-block-level" id="positive_locations" name="positive_locations" value="<%=positive_locations.to_s.encode_html%>" />
+
+    <input class="input input-block-level" id="negative_positions" name="negative_positions" value="<%= negative_positions.to_s.encode_html%>" />
+    <input class="input input-block-level" id="negative_industries" name="negative_industries" value="<%= negative_industries.to_s.encode_html%>" />
+    <input class="input input-block-level" id="negative_locations" name="negative_locations" value="<%=negative_locations.to_s.encode_html%>" />
+
+    <button type="submit" class="btn btn-link" id='search' name='search'>Search</button>
+  </form>
+</section>
+
+<!-- Modal Save Search -->
 <div class="modal fade save_modal" >
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -199,62 +325,199 @@ puts status.to_s
 </div>
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function (){
-        $('.save_modal').hide();
-        $('.export_leads').hide();
-        $('#inputName').on('input', function(){
-            if($(this).val() !== ''){
-                $('#f-position').val($('#position-filter').val())
-                $('#f-location').val($('#location-filter').val())
-                $('#f-industry').val($('#industry_name').val())
-                $('#save-search').removeAttr('disabled');
-            }else{
-                $('#save-search').attr('disabled', 'disabled');
-            }
-        });
-        $('#file_name').on('input', function(){
-            if(validate_export_modal()){
-                $('#save-export').removeAttr('disabled');
-            }
-            else{
-                $('#save-export').attr('disabled', 'disabled');
-            }
-        });
-        $('#export_checkbox').on('change', function(){
-            if(validate_export_modal()){
-                $('#save-export').removeAttr('disabled');
-            }
-            else{
-                $('#save-export').attr('disabled', 'disabled');
-            }
-        });
-        $('#no_of_contacts').on('input', function(){
-            if(validate_export_modal()){
-                $('#save-export').removeAttr('disabled');
-            }
-            else{
-                $('#save-export').attr('disabled', 'disabled');
-            }
-        });
+    
+  // filters
+  var positions = document.getElementById('positions');
+  var industries = document.getElementById('industries');
+  var locations = document.getElementById('locations');
 
-    })
-    $('#reset-filters').on('click', function () {
-       window.location.reload();
+  // update the hidden textfields with the values of the filters
+  function update_hidden_fields() {
+    // positive positions
+    let i = 0;
+    let s = '';
+    filtersJs.getPositiveValues(positions).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
     });
-    function validate_export_modal(){
-        $('#e-position').val($('#position-filter').val())
-        $('#e-location').val($('#location-filter').val())
-        $('#e-industry').val($('#industry_name').val())
-        $('#export_only').val($("#export_checkbox").is(':checked'))
+    $('#positive_positions').val(s);
 
-        if ($('#file_name').val() !== '') {
-            if( $("#export_checkbox").is(':checked')  && $('#no_of_contacts').val() !== ''){
-                return true;
-            }
-            else return !$("#export_checkbox").is(':checked');
-        }
-        else{
-            return false;
-        }
+    // negative positions
+    i = 0;
+    s = '';
+    filtersJs.getNegativeValues(positions).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#negative_positions').val(s);
+
+    // positive industries
+    i = 0;
+    s = '';
+    filtersJs.getPositiveValues(industries).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#positive_industries').val(s);
+
+    // negative industries
+    i = 0;
+    s = '';
+    filtersJs.getNegativeValues(industries).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#negative_industries').val(s);
+
+    // positive locations
+    i = 0;
+    s = '';
+    filtersJs.getPositiveValues(locations).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#positive_locations').val(s);
+
+    // negative locations
+    i = 0;
+    s = '';
+    filtersJs.getNegativeValues(locations).forEach(function(value) {
+      if (i>0) { s += ','; }
+      s += value.trim();
+      i++;
+    });
+    $('#negative_locations').val(s);
+  }
+
+  // 
+  $(document).ready(function () {
+
+    // draw filters
+    filtersJs.draw(positions, {
+      label: 'Positions',
+      allowed_positive_keywords: true, // default value: true
+      allowed_negative_keywords: true, // default value: false
+      // catch event: update hidden textfield when filter is changed    
+      on_add_value: function (value) {
+        update_hidden_fields();
+      },
+      // catch event: update hidden textfield when filter is changed    
+      on_remove_value: function (value) {
+        update_hidden_fields();
+      },
+    });
+
+    filtersJs.draw(industries, {
+      label: 'Industries',
+      allowed_positive_keywords: true, // default value: true
+      allowed_negative_keywords: true, // default value: false
+      allowed_values: ['<%=Leads::FlIndustry.order(:name).all.map { |o| o.name.encode_html }.join("', '")%>'],      
+      // catch event: update hidden textfield when filter is changed    
+      on_add_value: function (value) {
+        update_hidden_fields();
+      },
+      // catch event: update hidden textfield when filter is changed    
+      on_remove_value: function (value) {
+        update_hidden_fields();
+      },
+    });
+
+    filtersJs.draw(locations, {
+      label: 'Locations',
+      allowed_positive_keywords: true, // default value: true
+      allowed_negative_keywords: true, // default value: false
+      // catch event: update hidden textfield when filter is changed    
+      on_add_value: function (value) {
+        update_hidden_fields();
+      },
+      // catch event: update hidden textfield when filter is changed    
+      on_remove_value: function (value) {
+        update_hidden_fields();
+      },
+    });
+
+    // add filters
+    <%
+    s.positions.each { |p| 
+      %>
+      filtersJs.addValue(positions, '<%=p.value.encode_html%>', <%=p.positive ? 'true' : 'false' %>)
+      <%
     }
+
+    s.industries.each { |i|
+      %>
+      filtersJs.addValue(industries, '<%=i.fl_industry.name.encode_html%>', <%=i.positive ? 'true' : 'false' %>)
+      <%
+    }
+
+    s.locations.each { |l|
+      %>
+      filtersJs.addValue(locations, '<%=l.value.encode_html%>', <%=l.positive ? 'true' : 'false' %>)
+      <%
+    }
+    %>
+
+    // modals
+    $('.save_modal').hide();
+    $('.export_leads').hide();
+    $('#inputName').on('input', function(){
+      if($(this).val() !== ''){
+        $('#f-position').val($('#positive_positions').val())
+        $('#f-location').val($('#positive_locations').val())
+        $('#f-industry').val($('#positive_industries').val())
+        $('#save-search').removeAttr('disabled');
+      }else{
+        $('#save-search').attr('disabled', 'disabled');
+      }
+    });
+    $('#file_name').on('input', function(){
+      if(validate_export_modal()){
+        $('#save-export').removeAttr('disabled');
+      }
+      else{
+        $('#save-export').attr('disabled', 'disabled');
+      }
+    });
+    $('#export_checkbox').on('change', function(){
+      if(validate_export_modal()){
+        $('#save-export').removeAttr('disabled');
+      }
+      else{
+        $('#save-export').attr('disabled', 'disabled');
+      }
+    });
+    $('#no_of_contacts').on('input', function(){
+      if(validate_export_modal()){
+        $('#save-export').removeAttr('disabled');
+      }
+      else{
+        $('#save-export').attr('disabled', 'disabled');
+      }
+    });
+  }); // $(document).ready
+
+  $('#reset-filters').on('click', function () {
+    window.location.reload();
+  });
+  
+  function validate_export_modal(){
+    $('#e-position').val($('#positive_positions').val())
+    $('#e-location').val($('#positive_locations').val())
+    $('#e-industry').val($('#positive_industries').val())
+    $('#export_only').val($("#export_checkbox").is(':checked'))
+
+    if ($('#file_name').val() !== '') {
+      if( $("#export_checkbox").is(':checked')  && $('#no_of_contacts').val() !== ''){
+        return true;
+      }
+      else return !$("#export_checkbox").is(':checked');
+    } else {
+      return false;
+    }
+  };
 </script>
