@@ -459,8 +459,16 @@ div.lead-card div.data span.headline {
     }
   }
 
+  // remove an export list
+  function remove_export_list(id_lead, id_export) {
+    // find the il with this data-id-lead='id_lead' and data-id-export='id_export'
+    let li = document.querySelector('li[data-id-lead="'+id_lead+'"][data-id-export-list="'+id_export+'"]');
+    // delete the element
+    li.remove();
+  }
+
   // receive a hash descriptor of the export related with the lead { id:, filename:, belonging: }
-  function add_export_list(id_lead, h) {
+  function add_export_list(id_lead, h, opacity='1.0') {
     // find the div
     let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
     // create the li element, with hand cursor
@@ -470,6 +478,7 @@ div.lead-card div.data span.headline {
     li.setAttribute('data-name', h.filename);
     li.setAttribute('data-belonging', h.belonging);
     li.style.cursor = 'pointer';
+    li.style.opacity = opacity;
     // create an icon-ok element, with style green text color
     let icon = document.createElement('i');
     icon.setAttribute('class', 'icon-ok');
@@ -480,7 +489,7 @@ div.lead-card div.data span.headline {
     } else {
       icon.setAttribute('style', 'color: gray');
     }
-    // add the icon and the name of the list to the anchor
+      // add the icon and the name of the list to the anchor
     li.appendChild(icon);
     li.appendChild(document.createTextNode(' '));
     li.appendChild(document.createTextNode(h.filename));
@@ -526,7 +535,6 @@ div.lead-card div.data span.headline {
       // find the icon about this export list and this lead
       let icon = document.querySelector('i[data-id-export-list="'+h.id+'"][data-id-lead="'+id_lead+'"]');
       // if the icon is green, change it to gray
-console.log($(li).attr('data-belonging'));
       if ($(li).attr('data-belonging') == 'true') {
         icon.setAttribute('style', 'color: gray');
         li.setAttribute('data-belonging', 'false');
@@ -609,6 +617,7 @@ console.log($(li).attr('data-belonging'));
     // 2. add the new list to all the export list dropdown
     // 3. delete the content of the input box
     $('button.btn-create-export-list').click(function(e) {
+      // variables
       let name = $(this).parent().find('input.input-export-lists').val();
       let id_lead = $(this).data('id-lead');
       // 1. call AJAX to create the new list
@@ -620,7 +629,10 @@ console.log($(li).attr('data-belonging'));
           // get the json response
           let response = JSON.parse(data);
           if (response.status == 'success') {
-            // the new list is added immedaitelly after the ajax call. don't wait for response because of an ux matter. 
+            // remove the dummy li now that I received the ID of the new export list.
+            remove_export_list(id_lead, '123');
+            // 2. add the new list to this the export list dropdown
+            add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
           } else {
             alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
           }
@@ -629,8 +641,9 @@ console.log($(li).attr('data-belonging'));
           alert('Unknown error occured while creating the new list:' + name);
         }
       });
-      // 2. add the new list to this the export list dropdown
-      add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
+      // better user experience: the new list is added immedaitelly after the ajax call. don't wait for response because of an ux matter. 
+      // so I add a dummy li until I receive the ID of the new export list.
+      add_export_list(id_lead, {id: '123', filename: name, belonging: true}, '0.5');
       // 3. delete the content of the input box belinging the parent ul element
       $('input.input-export-lists[data-id-lead="'+id_lead+'"]').val('');
       // JavaScript, stop additional event listeners
