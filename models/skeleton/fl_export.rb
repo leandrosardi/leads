@@ -11,6 +11,8 @@ module Leads
       raise "Errors found:\n#{errors.join("\n")}" if errors.size>0
       # map the hash to the attributes of the model.
       self.id = guid
+      self.id_search = h['id_search']
+      self.id_user = h['id_user']
       self.create_time = now
     end
 

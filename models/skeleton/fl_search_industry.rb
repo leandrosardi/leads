@@ -16,7 +16,7 @@ module Leads
         errors << "Key 'positive' is mandatory" if !h.has_key?('positive')
 
         # validation: value 'name' must exists in the table fl_industry
-        if h.has_key?('name')
+        if h.has_key?('name') && h['name'].to_s.length > 0
           industry = FlIndustry.where(:name=>h['name']).first
           errors << "Value 'name' must exists in the table fl_industry" if industry.nil?
         end
@@ -32,7 +32,7 @@ module Leads
 
     # map a hash descriptor to the attributes of the object
     def update(h)
-      self.id_industry = Leads::FlIndustry.where(:name=>h['name']).first.id
+      self.id_industry = h['name'].to_s.length > 0 ? Leads::FlIndustry.where(:name=>h['name']).first.id : nil
       self.positive = h['positive']
       self.id_search = h['id_search']
     end

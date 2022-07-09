@@ -1,0 +1,1 @@
+ALTER TABLE fl_search ADD COLUMN delete_time timestamp default NULL;
