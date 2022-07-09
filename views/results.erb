@@ -231,7 +231,7 @@ div.lead-card div.data span.headline {
             <li>
               <span>Create New List</span><br/>
               <input class='input input-medium input-export-lists' /><br/> 
-              <button class='btn btn-link'><i class='icon-plus'></i> Add</button>
+              <button class='btn btn-link btn-create-export-list' data-id-lead='<%=row[:id].to_guid%>'><i class='icon-plus'></i> Add</button>
             </li>
           </ul>
         </div>      
@@ -439,6 +439,7 @@ div.lead-card div.data span.headline {
 
   // 
   $(document).ready(function () {
+
     // better user experience: when click on any export button, set focus on the textfield
     $('button.btn-export-lists').mouseup(function() {
       var id_lead = $(this).data('id-lead');
@@ -447,6 +448,28 @@ div.lead-card div.data span.headline {
         $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] li input.input-export-lists').focus();
       }, 100);
     });  
+
+    // better user experience: when click on the '+ add' button, 
+    // 1. call AJAX to create the new list
+    // 2. add the new list to all the export list dropdown
+    // 3. delete the content of the input box
+    $('button.btn-create-export-list').mouseup(function() {
+      var name = $(this).parent().find('input.input-export-lists').val();
+      var id_lead = $(this).data('id-lead');
+      // 1. call AJAX to create the new list
+      $.ajax({
+        url: '/leads/ajax_create_export_list_and_export_lead',
+        type: 'POST',
+        data: { id_lead: id_lead },
+        success: function(data) {
+          // 2. add the new list to all the export list dropdown
+          // 3. delete the content of the input box
+          $('ul.ul-export-lists[data-id-lead="'+id_lead+'"]').append(data);
+        }, error: function(data) {
+          alert('Error: '+data.responseText);
+        }
+      });
+    });
 
     // draw filters
     filtersJs.draw(positions, {

@@ -83,7 +83,18 @@ post "/leads/filter_export_contacts", :auth => true do
     erb :"/extensions/leads/views/filter_export_contacts"
 end
 
-# TODO: add remaining filters about internal screens (searches, results, etc.)
+# AJAX 
+post "/ajax/leads/create_export_list_and_export_lead.json", :auth => true do
+    erb :"/extensions/leads/views/ajax/create_export_list_and_export_lead"
+end
+
+post "/ajax/leads/add_lead_to_export_list.json", :auth => true do
+    erb :"/extensions/leads/views/ajax/add_lead_to_export_list"
+end
+
+post "/ajax/leads/remove_lead_to_export_list.json", :auth => true do
+    erb :"/extensions/leads/views/ajax/remove_lead_to_export_list"
+end
 
 # API
 post "/api1.0/leads/merge.json", :api_key => true do
