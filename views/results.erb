@@ -525,8 +525,6 @@ div.lead-card div.data span.headline {
             // the titlt is updated immedaitelly after the ajax call. don't wait for response because of an ux matter. 
             // update the li opacity, to show that is has been processed successfully
             li.style.opacity = '1.0';
-            // unlock contact information
-            unlock_data(id_lead);
           } else {
             alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
           }
@@ -535,6 +533,9 @@ div.lead-card div.data span.headline {
           alert('Unknown error occured while updating the list:' + h.filename + '.');
         },
       });
+      // better user experience: unlock data immediatelly. don't wait until the ajax success
+      // unlock contact information
+      unlock_data(id_lead);
       // find the icon about this export list and this lead
       let icon = document.querySelector('i[data-id-export-list="'+h.id+'"][data-id-lead="'+id_lead+'"]');
       // if the icon is green, change it to gray
@@ -713,8 +714,6 @@ div.lead-card div.data span.headline {
             remove_export_list(id_lead, '123');
             // 2. add the new list to this the export list dropdown
             add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
-            // unlock contact info
-            unlock_data(id_lead);
           } else {
             alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
           }
@@ -723,6 +722,9 @@ div.lead-card div.data span.headline {
           alert('Unknown error occured while creating the new list:' + name);
         }
       });
+      // better user experience: unlock data immedaitelly after the ajax call. don't wait for response because of an ux matter. 
+      // unlock contact info
+      unlock_data(id_lead);
       // better user experience: the new list is added immedaitelly after the ajax call. don't wait for response because of an ux matter. 
       // so I add a dummy li until I receive the ID of the new export list.
       add_export_list(id_lead, {id: '123', filename: name, belonging: true}, '0.5');
