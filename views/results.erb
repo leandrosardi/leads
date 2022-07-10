@@ -240,6 +240,7 @@ div.lead-card div.data span.headline {
           end
           %>
 
+          <div class='contact-info' data-id-lead='<%=row[:id].to_guid%>'>
           <%
           if row[:stat_has_email]
           %>
@@ -256,6 +257,7 @@ div.lead-card div.data span.headline {
           <%
           end
           %>
+          </div>
       </div>
     </div>
     <%
@@ -523,7 +525,8 @@ div.lead-card div.data span.headline {
             // the titlt is updated immedaitelly after the ajax call. don't wait for response because of an ux matter. 
             // update the li opacity, to show that is has been processed successfully
             li.style.opacity = '1.0';
-
+            // unlock contact information
+            unlock_data(id_lead);
           } else {
             alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
           }
@@ -546,6 +549,31 @@ div.lead-card div.data span.headline {
       // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
       e.stopImmediatePropagation();
     });
+  }
+
+  function unlock_data(id_lead) {
+    // find the div
+    let div = document.querySelector('div.contact-info[data-id-lead="'+id_lead+'"]');
+    // remove everything inside the div
+    div.innerHTML = '';
+    // add loading legend
+    i = document.createElement('i');
+    i.innerHTML = 'Loading data...';
+    div.appendChild(i);
+    // call the ajax
+    $.ajax({
+      url: '/ajax/leads/get_lead_data.json',
+      type: 'POST',
+      data: {
+        id_lead: id_lead
+      },
+      success: function(data) {
+        // get the json response
+        let response = JSON.parse(data);
+      },
+      error: function(data) {
+        alert('Unknown error occured while updating the list:' + h.filename + '.');
+      },
   }
 
   // 
@@ -647,6 +675,8 @@ div.lead-card div.data span.headline {
             remove_export_list(id_lead, '123');
             // 2. add the new list to this the export list dropdown
             add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
+            // unlock contact info
+            unlock_data(id_lead);
           } else {
             alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
           }
