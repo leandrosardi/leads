@@ -54,6 +54,10 @@ get "/leads/exports", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/exports", :layout => :"/views/layouts/core"
 end
 
+get "/leads/filter_delete_saved_search", :auth => true, :agent => /(.*)/ do
+    erb :"/extensions/leads/views/filter_delete_saved_search", :layout => :"/views/layouts/core"
+end
+
 # filters
 post "/leads/filter_landing" do
     erb :"/extensions/leads/views/filter_landing"
