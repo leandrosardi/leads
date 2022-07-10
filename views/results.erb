@@ -214,7 +214,7 @@ div.lead-card div.data span.headline {
             <li class="divider"></li>
             <li>
               <p>Create New List</p>
-              <input class='input input-medium input-export-lists' /><br/> 
+              <input class='input input-medium input-export-lists' data-id-lead='<%=row[:id].to_guid%>' /><br/> 
               <button class='btn btn-link btn-create-export-list' data-id-lead='<%=row[:id].to_guid%>'><i class='icon-plus'></i> Add</button>
             </li>
           </ul>
@@ -476,7 +476,7 @@ div.lead-card div.data span.headline {
     li.setAttribute('data-id-export-list', h.id);
     li.setAttribute('data-id-lead', id_lead);
     li.setAttribute('data-name', h.filename);
-    li.setAttribute('data-belonging', h.belonging);
+    li.setAttribute('data-belonging', h.belonging.toString());
     li.style.cursor = 'pointer';
     li.style.opacity = opacity;
     // create an icon-ok element, with style green text color
@@ -591,6 +591,20 @@ div.lead-card div.data span.headline {
             response.exports.forEach(function(h) { 
               add_export_list(id_lead, h);
             });
+            // if there are no exports to show, show a message
+            if (response.exports.length == 0) {
+              // find the div
+              let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
+              // create the li element, with hand cursor
+              let li = document.createElement('li');
+              let center = document.createElement('center');
+              let i = document.createElement('i');
+              i.innerHTML = 'No export lists found';
+              center.appendChild(i);
+              li.appendChild(center);
+              // add the li to the ul
+              $(div).append(li);          
+            }
             // 6. enable the textfield 
             $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] input.input-export-lists').prop('disabled', false);
             // 7. call function to enable/disable the add button depending on the value of the textfield
@@ -649,6 +663,27 @@ div.lead-card div.data span.headline {
       // JavaScript, stop additional event listeners
       // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
       e.stopImmediatePropagation();
+    });
+
+    // avoid to close the ul when click on the input box
+    $('input.input-export-lists').click(function(e) {
+      // JavaScript, stop additional event listeners
+      // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
+      e.stopImmediatePropagation();
+    });
+
+    // better user experience: when press ENTER on any .input-export-lists, for click on the add button with same data-id-lead.
+    $('input.input-export-lists').keypress(function(e) {
+      if (e.which == 13) {
+        // find button .btn-create-export-list with same data-id-lead value
+        let id_lead = $(this).attr('data-id-lead');
+        let button = $('button.btn-create-export-list[data-id-lead="'+id_lead+'"]');
+        // if button is enabled
+        if ( button.prop('disabled') == false ) {
+          // click the button
+          button.click();
+        }
+      }
     });
 
     // draw filters
