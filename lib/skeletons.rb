@@ -9,4 +9,7 @@ require 'extensions/leads/models/skeleton/fl_search'
 require 'extensions/leads/models/skeleton/fl_search_industry'
 require 'extensions/leads/models/skeleton/fl_search_location'
 require 'extensions/leads/models/skeleton/fl_search_position'
+require 'extensions/leads/models/skeleton/user'
+require 'extensions/leads/models/skeleton/account'
+
 

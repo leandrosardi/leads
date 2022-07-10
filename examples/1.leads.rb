@@ -34,4 +34,4 @@ o = Leads::FlLead.merge ({
 
 o.save
 
-puts "o: #{o.to_h}"
+puts "o: #{o.to_hash}"

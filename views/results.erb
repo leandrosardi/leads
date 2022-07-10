@@ -72,108 +72,127 @@ status = s.status(i)
 
 <style>
 div.lead-card {
-    position:relative;
-    height:115px;
-    overflow:hidden;
-    width:100%;
-    margin-bottom: 25px;
+  position:relative;
+  height:115px;
+  overflow:hidden;
+  width:100%;
+  margin-bottom: 25px;
+  overflow: visible;
 }
 
 div.lead-card div.acronym {
-    position:absolute;
-    left:0;
-    top:0;
-    width:70px;
-    height:50px;
-    overflow:hidden;
-    border-radius:35px;
-    padding-top:20px;
-    font-size:32px;
-    text-align:center;
-    vertical-align:middle;
-    color:white;
+  position:absolute;
+  left:0;
+  top:0;
+  width:70px;
+  height:50px;
+  overflow:hidden;
+  border-radius:35px;
+  padding-top:20px;
+  font-size:32px;
+  text-align:center;
+  vertical-align:middle;
+  color:white;
 }
 
 div.lead-card div.acronym-color-0 {
-    background-color:rgb(0,128,192);
+  background-color:rgb(0,128,192);
 }
 
 div.lead-card div.acronym-color-1 {
-    background-color:rgb(0,0,160);
+  background-color:rgb(0,0,160);
 }
 
 div.lead-card div.acronym-color-2 {
-    background-color:rgb(0,128,64);
+  background-color:rgb(0,128,64);
 }
 
 div.lead-card div.acronym-color-3 {
-    background-color:rgb(255,128,0);
+  background-color:rgb(255,128,0);
 }
 
 div.lead-card div.acronym-color-4 {
-    background-color:rgb(128,0,128);
+  background-color:rgb(128,0,128);
 }
 
 div.lead-card div.acronym-color-5 {
-    background-color:rgb(128,0,255);
+  background-color:rgb(128,0,255);
 }
 
 div.lead-card div.acronym-color-6 {
-    background-color:rgb(255,0,128);
+  background-color:rgb(255,0,128);
 }
 
 div.lead-card div.acronym-color-7 {
-    background-color:rgb(0,255,128);
+  background-color:rgb(0,255,128);
 }
 
 div.lead-card div.acronym-color-8 {
-    background-color:rgb(0,128,255);
+  background-color:rgb(0,128,255);
 }
 
 div.lead-card div.acronym-color-9 {
-    background-color:rgb(0,128,128);
+  background-color:rgb(0,128,128);
 }
 
 div.lead-card div.acronym span {
-    //margin-top:20px;
-    text-align:center;
-    vertical-align:middle;
+  text-align:center;
+  vertical-align:middle;
+}
+
+div.lead-card div.buttons {
+  position:absolute;
+  right:5px;
+  width:170px;
+  top:0;
+}
+
+div.lead-card div.buttons div.btn-group {
+  position:relative;
+}
+
+div.lead-card div.buttons div.btn-group ul.dropdown-menu {
+  position: absolute;
+  right:0px;
+  top:25px;
+  width:155px;
 }
 
 div.lead-card div.insights {
-    position:absolute;
-    left:125px;
-    top:0;
-    width:400px;
-    hright:50px;
-    overflow:hidden;
-    margin-left: 25px;
+  position:absolute;
+  left:125px;
+  top:0;
+  width:calc(100% - 70px - 155px - 65px);
+  hright:50px;
+  overflow:hidden;
 }
 
 div.lead-card div.insights span.name {
-    font-size:24px;
+  font-size:24px;
 }
 
 div.lead-card div.insights span.headline {
-    font-size:12px;
+  font-size:12px;
 }
 
 div.lead-card div.data {
-    position:absolute;
-    right:5px;
-    top:0;
-    width:155px;
-    hright:50px;
-    overflow:hidden;
+  position:absolute;
+  right:5px;
+  top:35px;
+  width:155px;
+  hright:50px;
+  overflow:hidden;
+  z-order: 99999999;
 }
 
 div.lead-card div.data span.headline {
-    font-size:12px;
+  font-size:12px;
 }
 </style>
 
   <section class='span8 box'>
     <p><b>Records:</b> <%=status['row_from'].to_label%> to <%=status['row_to'].to_label%> <b>of</b> <%=status['total_rows'].to_label%></p>
+    <br/>
 
     <%
     rows.each do |row|
@@ -182,8 +201,26 @@ div.lead-card div.data span.headline {
     %>
     <div class='span12 lead-card' id='sample<%=i%>'>
       <div class='acronym acronym-color-<%=i%>'>
-          <span><%=acronym.to_s.encode_html%></span>
+        <span><%=acronym.to_s.encode_html%></span>
       </div>
+
+      <div class='buttons'>
+        <div class="btn-group">
+          <button class="btn btn-green dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown">Export <span class="caret"></span></button>
+          <ul class="dropdown-menu ul-export-lists" data-id-lead='<%=row[:id].to_guid%>'>
+            <div class='div-export-lists' data-id-lead='<%=row[:id].to_guid%>'>
+              <!-- fill the div by AJAX when the user clicks on the export button -->
+            </div>
+            <li class="divider"></li>
+            <li>
+              <p>Create New List</p>
+              <input class='input input-medium input-export-lists' data-id-lead='<%=row[:id].to_guid%>' /><br/> 
+              <button class='btn btn-link btn-create-export-list' data-id-lead='<%=row[:id].to_guid%>'><i class='icon-plus'></i> Add</button>
+            </li>
+          </ul>
+        </div>      
+      </div>
+
       <div class='insights'>
           <span class='name'><%=row[:name].to_s.encode_html%></span>
           <br/>
@@ -203,10 +240,11 @@ div.lead-card div.data span.headline {
           end
           %>
 
+          <div class='contact-info' data-id-lead='<%=row[:id].to_guid%>'>
           <%
           if row[:stat_has_email]
           %>
-          <span data='headline'><i class='icon-envelope'></i> <span class='email'>***@****.com</span></span>
+          <span class='headline'><i class='icon-envelope'></i> <span class='email'>***@****.com</span></span>
           <br/>
           <%
           end
@@ -215,22 +253,13 @@ div.lead-card div.data span.headline {
           <%
           if row[:stat_has_phone]
             %>
-          <span data='headline'><i class='icon-phone'></i> <span class='phone'>***@****.com</span></span>
+          <span class='headline'><i class='icon-phone'></i> <span class='phone'>***@****.com</span></span>
           <%
           end
           %>
+          </div>
       </div>
-  </div>
-
-<!--
-          <td class="fix" title="<%=row[:name].to_s.encode_html%>"><%=row[:name].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:position].to_s.encode_html%>"><%=row[:position].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:stat_company_name].to_s.encode_html%>"><%=row[:stat_company_name].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:stat_industry_name].to_s.encode_html%>"><%=row[:stat_industry_name].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:stat_location_name].to_s.encode_html%>"><%=row[:stat_location_name].to_s.encode_html%></td>
-          <td class="fix" title="<%=row[:stat_has_email].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_email].to_s%></td>
-          <td class="fix" title="<%=row[:stat_has_phone].to_s.encode_html%>" style="text-align:right;"><%=row[:stat_has_phone].to_s%></td>
--->
+    </div>
     <%
     end
     %>
@@ -394,8 +423,336 @@ div.lead-card div.data span.headline {
     $('#negative_locations').val(s);
   }
 
+  // enable/disable the add button depending on the value of the textfield
+  function enable_add_button(id_lead) {
+    // find the ul with this data-id-lead='id_lead'
+    let ul = document.querySelector('ul.ul-export-lists[data-id-lead="'+id_lead+'"]');
+    // find the button inside the ul
+    let button = ul.querySelector('button.btn-create-export-list');
+    // find the textfield inside the ul
+    let textfield = ul.querySelector('input.input-export-lists');
+    // if the textfield is empty, disable the button
+    if (textfield.value.trim() == '') {
+      // disable the button
+      button.disabled = true;
+      // remove any span just below the textfield
+      let span = ul.querySelector('span');
+      if (span) {
+        // remove span
+        span.remove();
+      }
+    } else {
+      // if the name already exists in the list, disabe the button
+      if (ul.querySelector('li[data-name="'+textfield.value.trim()+'"]')) {
+        // disable the button
+        button.disabled = true;
+        // show a red text 'Name already exists' just below the textfield
+        textfield.parentNode.insertBefore(document.createElement('span'), textfield.nextSibling).innerHTML = 'Name already exists';
+      } else {
+        // enable the button
+        button.disabled = false;
+        // remove any span just below the textfield
+        let span = ul.querySelector('span');
+        if (span) {
+          // remove span
+          span.remove();
+        }
+      }
+    }
+  }
+
+  // remove an export list
+  function remove_export_list(id_lead, id_export) {
+    // find the il with this data-id-lead='id_lead' and data-id-export='id_export'
+    let li = document.querySelector('li[data-id-lead="'+id_lead+'"][data-id-export-list="'+id_export+'"]');
+    // delete the element
+    li.remove();
+  }
+
+  // receive a hash descriptor of the export related with the lead { id:, filename:, belonging: }
+  function add_export_list(id_lead, h, opacity='1.0') {
+    // find the div
+    let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
+    // create the li element, with hand cursor
+    let li = document.createElement('li');
+    li.setAttribute('data-id-export-list', h.id);
+    li.setAttribute('data-id-lead', id_lead);
+    li.setAttribute('data-name', h.filename);
+    li.setAttribute('data-belonging', h.belonging.toString());
+    li.style.cursor = 'pointer';
+    li.style.opacity = opacity;
+    // create an icon-ok element, with style green text color
+    let icon = document.createElement('i');
+    icon.setAttribute('class', 'icon-ok');
+    icon.setAttribute('data-id-export-list', h.id);
+    icon.setAttribute('data-id-lead', id_lead);
+    if ( h.belonging ) { 
+      icon.setAttribute('style', 'color: green');
+    } else {
+      icon.setAttribute('style', 'color: gray');
+    }
+      // add the icon and the name of the list to the anchor
+    li.appendChild(icon);
+    li.appendChild(document.createTextNode(' '));
+    li.appendChild(document.createTextNode(h.filename));
+    // add the li to the ul
+    $(div).append(li);
+    // on click on the li, call ajax to add/remove the lead from/to the export list
+    li.addEventListener('click', function(e) {
+      // decide the access point to call
+      if ($(li).attr('data-belonging') == 'true') {
+        // remove from the list
+        access_point = 'remove_lead_from_export_list';
+      } else {
+        // add to the list
+        access_point = 'add_lead_to_export_list';
+      }
+      // set the li with 50% opacity, to show that it is being processed
+      li.style.opacity = '0.5';
+      // call the ajax
+      $.ajax({
+        url: '/ajax/leads/'+access_point+'.json',
+        type: 'POST',
+        data: {
+          id_lead: id_lead,
+          id_export: h.id
+        },
+        success: function(data) {
+          // get the json response
+          let response = JSON.parse(data);
+          // if the response is ok, update the icon
+          if (response.status == 'success') {
+            // the titlt is updated immedaitelly after the ajax call. don't wait for response because of an ux matter. 
+            // update the li opacity, to show that is has been processed successfully
+            li.style.opacity = '1.0';
+            // unlock contact information
+            unlock_data(id_lead);
+          } else {
+            alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
+          }
+        },
+        error: function(data) {
+          alert('Unknown error occured while updating the list:' + h.filename + '.');
+        },
+      });
+      // find the icon about this export list and this lead
+      let icon = document.querySelector('i[data-id-export-list="'+h.id+'"][data-id-lead="'+id_lead+'"]');
+      // if the icon is green, change it to gray
+      if ($(li).attr('data-belonging') == 'true') {
+        icon.setAttribute('style', 'color: gray');
+        li.setAttribute('data-belonging', 'false');
+      } else {
+        icon.setAttribute('style', 'color: green');
+        li.setAttribute('data-belonging', 'true');
+      }
+      // JavaScript, stop additional event listeners
+      // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
+      e.stopImmediatePropagation();
+    });
+  }
+
+  function unlock_data(id_lead) {
+    // find the div
+    let div = document.querySelector('div.contact-info[data-id-lead="'+id_lead+'"]');
+    // remove everything inside the div
+    div.innerHTML = '';
+    // add loading legend
+    i = document.createElement('i');
+    i.innerHTML = 'Loading data...';
+    div.appendChild(i);
+    // call the ajax
+    $.ajax({
+      url: '/ajax/leads/get_lead_data.json',
+      type: 'POST',
+      data: {
+        id_lead: id_lead
+      },
+      success: function(data) {
+        // get the json response
+        let response = JSON.parse(data);
+        // if the response is ok, update the div
+        if (response.status == 'success') {
+          // remove the loading legend
+          div.innerHTML = '';
+          // draw the datas
+          response.datas.forEach(function(h) {
+            // create the child span
+            let span = document.createElement('span');
+            // create icon with icon-envelope or icon-phone, depending on the type
+            // create span with class email or phone, depending on the type
+            // create anchor with href mailto or tel, depending on the type
+            let icon = document.createElement('i');
+            let a = document.createElement('a');
+            if ( h.type == <%=Leads::FlData::TYPE_EMAIL.to_s%> ) {
+              icon.setAttribute('class', 'icon-envelope');
+              span.setAttribute('class', 'email');
+              a.setAttribute('href', 'mailto:'+h.value);
+            } else if ( h.type == <%=Leads::FlData::TYPE_PHONE.to_s%> ) {
+              icon.setAttribute('class', 'icon-phone');
+              span.setAttribute('class', 'phone');
+              a.setAttribute('href', 'tel:'+h.value);
+            }
+            // set overflow hidden for the div
+            div.style.overflow = 'hidden';
+            a.style.overflow = 'hidden';
+            span.style.overflow = 'hidden';
+            // draw
+            a.appendChild(document.createTextNode(h.value));
+            span.appendChild(icon);
+            span.appendChild(document.createTextNode(' '));
+            span.appendChild(a);
+            span.appendChild(document.createElement('br'));
+            div.appendChild(span);
+          });
+        } else {
+          alert('An error occured while unlocking lead data. Error: ' + response.status);
+        }
+      },
+      error: function(data) {
+        alert('Unknown error occured while unlocking lead data.');
+      },
+    });
+  }
+
   // 
   $(document).ready(function () {
+
+    // en endit any textfield inside a ul,
+    // enable/disable the add button depending on the value of the textfield
+    // by calling function enable_add_button(id_lead)
+    $('ul.ul-export-lists').on('keyup', 'input.input-export-lists', function() {
+      enable_add_button($(this).closest('ul').data('id-lead'));
+    });
+
+    // better user experience: when click on any export button, 
+    // 1. disable the textfield
+    // 2. disable the add button
+    // 3. set '<center><i>Loading...</i></center>' as innerhtml of the div
+    // 4. call ajax to bring the full list of export lists, and wich are linked to this lead
+    // 5. add the export lists to the div.div-export-lists
+    // 6. enable the textfield 
+    // 7. call function to enable/disable the add button depending on the value of the textfield
+    // 8. set focus on the textfield
+    $('button.btn-export-lists').click(function() {
+      let id_lead = $(this).data('id-lead');
+      let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
+      // 1. disable the textfield
+      $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] input.input-export-lists').prop('disabled', true);
+      // 2. disable the add button
+      $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] button.btn-create-export-list').prop('disabled', true);
+      // 3. set '<center><i>Loading...</i></center>' as innerhtml of the div
+      div.innerHTML = '<center><i>Loading...</i></center>';
+      // 4. call ajax to bring the full list of export lists, and wich are linked to this lead
+      $.ajax({
+        url: '/ajax/leads/get_lists_linked_to_lead.json',
+        type: 'POST',
+        data: { id_lead: id_lead, name: name },
+        success: function(data) {
+          // get the json response
+          let response = JSON.parse(data);
+          if (response.status == 'success') {
+            // 5. add the export lists to the div.div-export-lists          
+            // remove all the lists
+            div.innerHTML = '';
+            response.exports.forEach(function(h) { 
+              add_export_list(id_lead, h);
+            });
+            // if there are no exports to show, show a message
+            if (response.exports.length == 0) {
+              // find the div
+              let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
+              // create the li element, with hand cursor
+              let li = document.createElement('li');
+              let center = document.createElement('center');
+              let i = document.createElement('i');
+              i.innerHTML = 'No export lists found';
+              center.appendChild(i);
+              li.appendChild(center);
+              // add the li to the ul
+              $(div).append(li);          
+            }
+            // 6. enable the textfield 
+            $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] input.input-export-lists').prop('disabled', false);
+            // 7. call function to enable/disable the add button depending on the value of the textfield
+            enable_add_button(id_lead);
+            // 8. set focus on the textfield
+            // becuase of any other javascript conflic, I have to  add a delay of 100ms before focus the inputbox.
+            setTimeout(function() {
+              $('ul.ul-export-lists[data-id-lead="'+id_lead+'"] li input.input-export-lists').focus();
+            }, 100);      
+          } else {
+            alert(response.status);
+            alert('An error occured trying to load the export lists. Error: ' + response.status);
+          }
+        }, error: function(data) {
+          // get the json response
+          let response = JSON.parse(data);
+          alert('Unknown error occured when loading the export lists.');
+        }
+      });
+    });  
+
+    // better user experience: when click on the '+ add' button, 
+    // 1. call AJAX to create the new list
+    // 2. add the new list to all the export list dropdown
+    // 3. delete the content of the input box
+    $('button.btn-create-export-list').click(function(e) {
+      // variables
+      let name = $(this).parent().find('input.input-export-lists').val();
+      let id_lead = $(this).data('id-lead');
+      // 1. call AJAX to create the new list
+      $.ajax({
+        url: '/ajax/leads/create_export_list_and_add_lead.json',
+        type: 'POST',
+        data: { id_lead: id_lead, name: name },
+        success: function(data) {
+          // get the json response
+          let response = JSON.parse(data);
+          if (response.status == 'success') {
+            // remove the dummy li now that I received the ID of the new export list.
+            remove_export_list(id_lead, '123');
+            // 2. add the new list to this the export list dropdown
+            add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
+            // unlock contact info
+            unlock_data(id_lead);
+          } else {
+            alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
+          }
+        },
+        error: function(data) {
+          alert('Unknown error occured while creating the new list:' + name);
+        }
+      });
+      // better user experience: the new list is added immedaitelly after the ajax call. don't wait for response because of an ux matter. 
+      // so I add a dummy li until I receive the ID of the new export list.
+      add_export_list(id_lead, {id: '123', filename: name, belonging: true}, '0.5');
+      // 3. delete the content of the input box belinging the parent ul element
+      $('input.input-export-lists[data-id-lead="'+id_lead+'"]').val('');
+      // JavaScript, stop additional event listeners
+      // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
+      e.stopImmediatePropagation();
+    });
+
+    // avoid to close the ul when click on the input box
+    $('input.input-export-lists').click(function(e) {
+      // JavaScript, stop additional event listeners
+      // reference: https://www.w3schools.com/jsref/event_stopimmediatepropagation.asp
+      e.stopImmediatePropagation();
+    });
+
+    // better user experience: when press ENTER on any .input-export-lists, for click on the add button with same data-id-lead.
+    $('input.input-export-lists').keypress(function(e) {
+      if (e.which == 13) {
+        // find button .btn-create-export-list with same data-id-lead value
+        let id_lead = $(this).attr('data-id-lead');
+        let button = $('button.btn-create-export-list[data-id-lead="'+id_lead+'"]');
+        // if button is enabled
+        if ( button.prop('disabled') == false ) {
+          // click the button
+          button.click();
+        }
+      }
+    });
 
     // draw filters
     filtersJs.draw(positions, {
