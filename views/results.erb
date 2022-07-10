@@ -244,7 +244,7 @@ div.lead-card div.data span.headline {
           <%
           if row[:stat_has_email]
           %>
-          <span data='headline'><i class='icon-envelope'></i> <span class='email'>***@****.com</span></span>
+          <span class='headline'><i class='icon-envelope'></i> <span class='email'>***@****.com</span></span>
           <br/>
           <%
           end
@@ -253,7 +253,7 @@ div.lead-card div.data span.headline {
           <%
           if row[:stat_has_phone]
             %>
-          <span data='headline'><i class='icon-phone'></i> <span class='phone'>***@****.com</span></span>
+          <span class='headline'><i class='icon-phone'></i> <span class='phone'>***@****.com</span></span>
           <%
           end
           %>
@@ -570,10 +570,48 @@ div.lead-card div.data span.headline {
       success: function(data) {
         // get the json response
         let response = JSON.parse(data);
+        // if the response is ok, update the div
+        if (response.status == 'success') {
+          // remove the loading legend
+          div.innerHTML = '';
+          // draw the datas
+          response.datas.forEach(function(h) {
+            // create the child span
+            let span = document.createElement('span');
+            // create icon with icon-envelope or icon-phone, depending on the type
+            // create span with class email or phone, depending on the type
+            // create anchor with href mailto or tel, depending on the type
+            let icon = document.createElement('i');
+            let a = document.createElement('a');
+            if ( h.type == <%=Leads::FlData::TYPE_EMAIL.to_s%> ) {
+              icon.setAttribute('class', 'icon-envelope');
+              span.setAttribute('class', 'email');
+              a.setAttribute('href', 'mailto:'+h.value);
+            } else if ( h.type == <%=Leads::FlData::TYPE_PHONE.to_s%> ) {
+              icon.setAttribute('class', 'icon-phone');
+              span.setAttribute('class', 'phone');
+              a.setAttribute('href', 'tel:'+h.value);
+            }
+            // set overflow hidden for the div
+            div.style.overflow = 'hidden';
+            a.style.overflow = 'hidden';
+            span.style.overflow = 'hidden';
+            // draw
+            a.appendChild(document.createTextNode(h.value));
+            span.appendChild(icon);
+            span.appendChild(document.createTextNode(' '));
+            span.appendChild(a);
+            span.appendChild(document.createElement('br'));
+            div.appendChild(span);
+          });
+        } else {
+          alert('An error occured while unlocking lead data. Error: ' + response.status);
+        }
       },
       error: function(data) {
-        alert('Unknown error occured while updating the list:' + h.filename + '.');
+        alert('Unknown error occured while unlocking lead data.');
       },
+    });
   }
 
   // 

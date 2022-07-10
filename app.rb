@@ -100,6 +100,10 @@ post "/ajax/leads/remove_lead_from_export_list.json", :auth => true do
     erb :"/extensions/leads/views/ajax/remove_lead_from_export_list"
 end
 
+post "/ajax/leads/get_lead_data.json", :auth => true do
+    erb :"/extensions/leads/views/ajax/get_lead_data"
+end
+
 # API
 post "/api1.0/leads/merge.json", :api_key => true do
     erb :"/extensions/leads/views/api1.0/merge"

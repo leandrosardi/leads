@@ -87,7 +87,7 @@ module Leads
     end
 
     # return a hash descriptor for the data.
-    def to_h
+    def to_hash
       { 'name' => name, 'url' => url }
     end
 

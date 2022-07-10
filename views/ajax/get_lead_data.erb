@@ -1,0 +1,18 @@
+<%
+return_message = {}
+begin
+    id_lead = params['id_lead']
+
+    # TODO: check if the user is allowed to see this lead.
+
+    # load the object
+    o = Leads::FlLead.where(:id=>id_lead).first
+
+    # return
+    return_message[:datas] = o.fl_datas.select { |d| d.type==Leads::FlData::TYPE_EMAIL || d.type==Leads::FlData::TYPE_PHONE }.map { |d| d.to_hash }
+    return_message[:status] = 'success'
+rescue => e
+    return_message[:status] = e.to_console
+end
+return return_message.to_json
+%>
