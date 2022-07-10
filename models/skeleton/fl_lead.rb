@@ -4,6 +4,12 @@ module Leads
     many_to_one :fl_industry, :class=>:'Leads::FlSearchIndustry', :key=>:id_industry
     many_to_one :fl_location, :class=>:'Leads::FlSearchLocation', :key=>:id_location
     one_to_many :fl_datas, :class=>:'Leads::FlData', :key=>:id_lead
+    one_to_many :fl_export_leads, :class=>'Leads::FlExportLead', :key=>:id_lead
+    
+    # get all the extensions
+    def exports
+      self.fl_export_leads.map{|e| e.fl_export}
+    end
 
     # validate the strucutre of the hash descritpor.
     # return an arrow of strings with the errors found. 

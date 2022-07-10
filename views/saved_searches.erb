@@ -47,15 +47,7 @@ q = "
     <div class="span6">
       <%=nav2("Leads", "/leads/results", "Saved Searches")%>
     </div>
-  </section>
-</div>
-
-<section class="row-fluid">
-  <div class='span11 box'>
-    <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
-    <table class="table table-stripped">
-    <thead>
-    <tr>
+    <div class="span6" align="right" style="text-align: right;alignment-adjust: right; margin-left: 0;">
       <form action="/leads/saved_searches" method="get">
       <div class="pull-right">
           <div class="span8">
@@ -67,42 +59,48 @@ q = "
           </button>
       </div>
       </form>
-    </tr>
+    </div>
+  </section>
+</div>
 
-    <tr>
-      <th style="width:100px;">Creation</i></th>
-      <th style="width:250px;">Name</th>
-      <th style="width:auto;">Description</th>
-      <th style="width:55px;"></th>
-      <th style="width:55px;"></th>
-    </tr>
+<section class="row-fluid">
+  <div class='span12 box'>
+    <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
+    <table class="table table-stripped">
+      <thead>
+        <tr>
+          <th style="width:100px;">Creation</i></th>
+          <th style="width:250px;">Name</th>
+          <th style="width:auto;">Description</th>
+          <th style="width:55px;"></th>
+          <th style="width:55px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+      <%
+        DB[q].all do |row|
+      %>
+        <tr>
+          <td><%=row[:create_time].to_s[0..9].encode_html%></td>
+          <td><%=row[:name].to_s.encode_html%></td>
+          <td><%=row[:description].to_s.encode_html%></td>
+          <td><a href='/leads/results/<%=row[:id].to_guid%>'>View</a></td>
+          <td>
+            <a class='btn btn-danger' title='Delete' href='/leads/filter_delete_saved_search?id=<%=row[:id].to_guid%>'>
+              Delete
+            </a>
+          </td>
+        </tr>
+      <%
+        end
+      %>
 
-    </thead>
-    <tbody>
-
-    <%
-      DB[q].all do |row|
-    %>
-      <tr>
-        <td><%=row[:create_time].to_s[0..9].encode_html%></td>
-        <td><%=row[:name].to_s.encode_html%></td>
-        <td><%=row[:description].to_s.encode_html%></td>
-        <td><a href='/leads/results/<%=row[:id].to_guid%>'>View</a></td>
-        <td>
-          <a class='btn btn-danger' title='Delete' href='/leads/filter_delete_saved_search?id=<%=row[:id].to_guid%>'>
-            Delete
-          </a>
-        </td>
-      </tr>
-    <%
-      end
-    %>
-
-    </tbody>
-  </table>
+      </tbody>
+    </table>
     <div class="pagination"></div>
-    <script>
-        drawPagination($(".pagination"), <%=page_number%>, <%=total_pages%>);
-    </script>
   </div>
 </section>
+
+<script>
+  drawPagination($(".pagination"), <%=page_number%>, <%=total_pages%>);
+</script>

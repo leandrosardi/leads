@@ -143,11 +143,27 @@ module Leads
     # This method works with the TableHelper module.
     # Return the FROM-WHERE part of the SQL query to retrieve the results of the table, with not pagination nor sorting, nor listed columns.
     # This method is used to build custom queries on other methods.
-    def core
-      q0 = "
-        FROM fl_lead l
-        WHERE 1=1
-      "
+    #
+    # if id_account is not nil, the query will return the number of export lists of such an account where the lead is included.
+    # if id_account is nil, the query will return the number of all export lists where the lead is included.
+    # 
+    def core(options={})
+      id_account = options[:id_account]
+      exports = id_account.nil? ? [] : Leads::Account.where(:id=>id_account).exports
+
+      # si no se especifica una cuenta, o si la cuenta no tienen export lists
+      if id_account.nil? || exports.size == 0
+        q0 = "
+          FROM fl_lead l
+          WHERE 1=1
+        "
+      else
+        q0 = "
+          FROM fl_lead l
+          LEFT JOIN fl_export_lead el ON el.id_lead=l.id
+          WHERE el.id_export IN ('#{exports.map {|e| e.id}.join("','")}')
+        "
+      end
 
       # filter by positive job positions
       a = self.positions.select { |p| p.positive }
@@ -205,7 +221,7 @@ module Leads
           q0 += " AND NOT l.stat_industry_name LIKE '%#{i.fl_industry.name.to_s.to_sql}%' "
         end
       end
-
+      
       # return
       q0
     end
@@ -236,7 +252,7 @@ module Leads
         { 'query_field' => 'l.stat_industry_name' },
         { 'query_field' => 'l.stat_location_name' },
         { 'query_field' => 'l.stat_has_email' },
-        { 'query_field' => 'l.stat_has_phone' },    
+        { 'query_field' => 'l.stat_has_phone' },  
       ]
     end
 

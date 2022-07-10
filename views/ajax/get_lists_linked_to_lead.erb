@@ -1,6 +1,7 @@
 <%
 return_message = { :exports => [], }
 begin
+=begin
     # get exports of current account
     BlackStack::Leads::Account.where(:id=>@login.user.id_account).first.exports.sort_by { |e| e.filename }.each do |e|
         return_message[:exports] << {
@@ -10,7 +11,26 @@ begin
             :belonging => Leads::FlExportLead.where(:id_export=>e.id, :id_lead=>params['id_lead'], :delete_time=>nil).first != nil,
         }
     end # end each export
-
+=end
+    q = "
+        SELECT e.id, e.filename, COUNT(el.id) AS belonging
+        FROM \"user\" u
+        JOIN fl_export e ON e.id_user = u.id
+        LEFT JOIN fl_export_lead el ON ( el.id_export = e.id AND el.id_lead = '#{params['id_lead']}' AND el.delete_time IS NULL )
+        WHERE u.id_account = '#{@login.user.id_account.to_guid}'
+        GROUP BY e.id, e.filename
+        ORDER BY e.filename
+    "
+    DB[q].all { |row|
+        return_message[:exports] << {
+            :id => row[:id].to_guid,
+            :filename => row[:filename],
+            :belonging => row[:belonging] != 0,
+        }
+        # release resources
+        DB.disconnect
+        GC.start
+    }
     # return
     return_message[:status] = 'success'
 rescue => e
