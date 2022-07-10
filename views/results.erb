@@ -335,21 +335,23 @@ div.lead-card div.data span.headline {
     <h3>Save this search</h3>
   </div>
   <form action="/leads/filter_save_search" id="search-form" method="post" class="form-horizontal">
-      <div class="modal-body">
-          <label  for="inputName">Name <i>(required)</i></label>
-          <input type="text" style="width: 97%" required id="inputName" maxlength="255" name="search-name" placeholder="Name">
-        <br><br>
-          <label for="inputDescription">Description</label>
-          <textarea name="search-description" style="width: 97%" placeholder="Description" maxlength="2000" id="inputPassword" cols="30" rows="10"></textarea>
-          <input type="hidden" name="total-rows" value="<%=status['total_rows']%>">
-          <input type="hidden" name="position" id="f-position">
-          <input type="hidden" name="industry" id="f-industry">
-          <input type="hidden" name="location" id="f-location">
-      </div>
-      <div class="modal-footer">
-        <a href="#" data-dismiss="modal" class="btn">Close</a>
-        <button type="submit" id="save-search" disabled class="btn btn-primary">Save</button>
-      </div>
+    <div class="modal-body">
+      <label  for="inputName">Name <i>(required)</i></label>
+      <input type="text" style="width: 97%" id="inputName" maxlength="255" name="search_name" placeholder="Name">
+      <br/><br/>
+      <label for="inputDescription">Description</label>
+      <textarea name="search_description" style="width: 97%" placeholder="Description" maxlength="2000" id="inputPassword" cols="30" rows="10"></textarea>
+      <input type="hidden" name="positive_positions" id='f_positive_positions' value="<%= positive_positions.to_s.encode_html%>" />
+      <input type="hidden" name="positive_industries" id='f_positive_industries' value="<%= positive_industries.to_s.encode_html%>" />
+      <input type="hidden" name="positive_locations" id='f_positive_locations' value="<%=positive_locations.to_s.encode_html%>" />
+      <input type="hidden" name="negative_positions" id='f_negative_positions' value="<%= negative_positions.to_s.encode_html%>" />
+      <input type="hidden" name="negative_industries" id='f_negative_industries' value="<%= negative_industries.to_s.encode_html%>" />
+      <input type="hidden" name="negative_locations" id='f_negative_locations' value="<%=negative_locations.to_s.encode_html%>" />
+    </div>
+    <div class="modal-footer">
+      <a href="#" data-dismiss="modal" class="btn">Close</a>
+      <button type="submit" id="save-search" disabled class="btn btn-primary">Save</button>
+    </div>
   </form>
 </div>
 
@@ -826,9 +828,12 @@ div.lead-card div.data span.headline {
     $('.export_leads').hide();
     $('#inputName').on('input', function(){
       if($(this).val() !== ''){
-        $('#f-position').val($('#positive_positions').val())
-        $('#f-location').val($('#positive_locations').val())
-        $('#f-industry').val($('#positive_industries').val())
+        $('#f_positive_positions').val($('#positive_positions').val())
+        $('#f_positive_locations').val($('#positive_locations').val())
+        $('#f_positive_industries').val($('#positive_industries').val())
+        $('#f_negative_positions').val($('#negative_positions').val())
+        $('#f_negative_locations').val($('#negative_locations').val())
+        $('#f_negative_industries').val($('#negative_industries').val())
         $('#save-search').removeAttr('disabled');
       }else{
         $('#save-search').attr('disabled', 'disabled');
