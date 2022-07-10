@@ -54,8 +54,8 @@ status = s.status(i)
       <%=nav2("Leads", "/leads/landing", "Results")%>
     </div>
     <div class="span6" align="right" style="text-align: right;alignment-adjust: right; margin-left: 0;">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".save_modal">Save Search</button>
-      <button type="button" class="btn btn-cyan" data-toggle="modal" data-target=".export_leads">Exports Leads</button>
+      <button type="button" class="btn btn-primary" data-toggle="modal" id='open_save_modal' data-target=".save_modal">Save Search</button>
+      <button type="button" class="btn btn-cyan" data-toggle="modal" id='open_export_leads_modal' data-target=".export_leads">Exports Leads</button>
     </div>
   </section>
 </div>
@@ -336,7 +336,7 @@ div.lead-card div.data span.headline {
   </div>
   <form action="/leads/filter_save_search" id="search-form" method="post" class="form-horizontal">
     <div class="modal-body">
-      <label  for="inputName">Name <i>(required)</i></label>
+      <label for="inputName">Name <i>(required)</i></label>
       <input type="text" style="width: 97%" id="inputName" maxlength="255" name="search_name" placeholder="Name">
       <br/><br/>
       <label for="inputDescription">Description</label>
@@ -822,12 +822,12 @@ div.lead-card div.data span.headline {
       <%
     }
     %>
-
+    
     // modals
     $('.save_modal').hide();
     $('.export_leads').hide();
-    $('#inputName').on('input', function(){
-      if($(this).val() !== ''){
+    $('#inputName').on('input', function() {
+      if($(this).val() !== '') {
         $('#f_positive_positions').val($('#positive_positions').val())
         $('#f_positive_locations').val($('#positive_locations').val())
         $('#f_positive_industries').val($('#positive_industries').val())
@@ -835,7 +835,7 @@ div.lead-card div.data span.headline {
         $('#f_negative_locations').val($('#negative_locations').val())
         $('#f_negative_industries').val($('#negative_industries').val())
         $('#save-search').removeAttr('disabled');
-      }else{
+      } else {
         $('#save-search').attr('disabled', 'disabled');
       }
     });
