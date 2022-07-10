@@ -1,33 +1,44 @@
 <%
   all = "
 	SELECT s.id, s.name, s.description, s.create_time, s.delete_time
-	FROM fl_search s where s.name is NOT NULL AND s.delete_time is NULL
+	FROM fl_search s 
+  JOIN \"user\" u ON ( s.id_user = u.id AND u.id_account = '#{@login.user.id_account.to_guid}' )
+  WHERE s.name IS NOT NULL 
+  AND s.delete_time is NULL
+  AND s.saved = true
 "
 
   page_size = 25
   total_rows = DB[all].count
-  total_pages = (total_rows.to_f/page_size.to_f).ceil
-  # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
-  # then, get user preferences regarding the page number on this screen
-  page_number = @login.user.preference("developers.tables.basics.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
-  # pagination correction to prevent glitches
-  page_number = 1 if page_number < 1
-  page_number = total_pages if page_number > total_pages
-  # calculate info for showing at the bottom of the table
-  from_row = (page_number.to_i-1) * page_size.to_i + 1
-  to_row = [page_number*page_size, total_rows].min
+  if total_rows>0
+    total_pages = (total_rows.to_f/page_size.to_f).ceil
+    # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
+    # then, get user preferences regarding the page number on this screen
+    page_number = @login.user.preference("developers.tables.basics.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
+    # pagination correction to prevent glitches
+    page_number = 1 if page_number < 1
+    page_number = total_pages if page_number > total_pages
+    # calculate info for showing at the bottom of the table
+    from_row = (page_number.to_i-1) * page_size.to_i + 1
+    to_row = [page_number*page_size, total_rows].min
+  else
+    total_pages = 1
+    page_number = 1
+    from_row = 0
+    to_row = 0
+  end
+
   filter_search = @login.user.preference("leads.saved_searches.filter.name", "", params[:search_filter])
 
     all += "
     AND s.name LIKE '%"+filter_search.to_s.to_sql+"%'
     " if filter_search.to_s.length > 0
 
-
-
   q = "
   "+all+"
-	LIMIT "+(page_number*page_size).to_label+"
-	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_label+"
+  ORDER BY s.create_time DESC
+	LIMIT "+page_size.to_s+"
+	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_s+"
   "
 %>
 
@@ -39,13 +50,11 @@
   </section>
 </div>
 
-
 <section class="row-fluid">
   <div class='span11 box'>
     <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
-  <table class="table table-bordered">
+    <table class="table table-stripped">
     <thead>
-
     <tr>
       <form action="/leads/saved_searches" method="get">
       <div class="pull-right">
@@ -61,9 +70,11 @@
     </tr>
 
     <tr>
-      <th>Saved on <i class="icon-sort-up"></i></th>
-      <th>Description </th>
-      <th>Delete</th>
+      <th style="width:100px;">Creation</i></th>
+      <th style="width:250px;">Name</th>
+      <th style="width:auto;">Description</th>
+      <th style="width:55px;"></th>
+      <th style="width:55px;"></th>
     </tr>
 
     </thead>
@@ -72,12 +83,13 @@
     <%
       DB[q].all do |row|
     %>
-      <% puts row.inspect %>
       <tr>
-        <td><%= row[:create_time] %></td>
-        <td><%=row[:description]%></td>
+        <td><%=row[:create_time].to_s[0..9].encode_html%></td>
+        <td><%=row[:name].to_s.encode_html%></td>
+        <td><%=row[:description].to_s.encode_html%></td>
+        <td><a href='/leads/results/<%=row[:id].to_guid%>'>View</a></td>
         <td>
-          <a class='btn btn-danger' title='Delte' href='/leads/filter_delete_saved_search?id=<%= row[:id].to_guid %>'>
+          <a class='btn btn-danger' title='Delete' href='/leads/filter_delete_saved_search?id=<%=row[:id].to_guid%>'>
             Delete
           </a>
         </td>

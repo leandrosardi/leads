@@ -1,5 +1,4 @@
 while true
-
   exports = Leads::FlExport.where(:create_file_start_time => NULL)
   exports.each do |export|
     export.create_file_start_time = now
@@ -18,5 +17,4 @@ while true
     export.create_file_success=true
     export.save
   end
-
 end
