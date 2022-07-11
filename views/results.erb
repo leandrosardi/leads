@@ -547,11 +547,11 @@ div.lead-card div.data span.headline {
             // update the li opacity, to show that is has been processed successfully
             li.style.opacity = '1.0';
           } else {
-            if ( response.stats =~ /No Credits/ ) {
-              window.location.replace('/leads/plans');
-            } else {
+//            if ( response.status =~ /No Credits/ ) {
+//              window.location.replace('/leads/plans');
+//            } else {
               alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
-            }
+//            }
           }
         },
         error: function(data) {
@@ -761,7 +761,7 @@ div.lead-card div.data span.headline {
             // 2. add the new list to this the export list dropdown
             add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
           } else {
-            if ( response.stats =~ /No Credits/ ) {
+            if ( response.status =~ /No Credits/ ) {
               window.location.replace('/leads/plans');
             } else {
               alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
