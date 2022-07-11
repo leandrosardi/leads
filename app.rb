@@ -34,10 +34,6 @@ get "/leads/plans", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/plans", :layout => :"/views/layouts/core"
 end
 
-get "/leads/welcome", :auth => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/welcome", :layout => :"/views/layouts/core"
-end
-
 get "/leads/saved_searches", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/saved_searches", :layout => :"/views/layouts/core"
 end

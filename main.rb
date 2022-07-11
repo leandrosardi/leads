@@ -14,27 +14,37 @@ module Leads
 end # module Leads
 
 # setup the product
-BlackStack::I2P::set_services([
-  { 
-    :code=>'leads', 
-    :name=>'B2B Contacts', 
-    :unit_name=>'records', 
-    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
-    :description=>'B2B Contacts with Emails & Phone Numbers',
-    :summary=>'B2B Contacts with verified email addresses, phone numbers and LinkedIn profiles. Target by job position, industry and location.',
-    :thumbnail=>"#{CS_HOME_WEBSITE}/leads/images/logo.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/leads/results",
-    :free_tier=>{
-        # add 10 records per month, for free
-        :credits=>10,
-        :period=>'month',
-        :units=>1,
+BlackStack::I2P::add_services([
+    { 
+        :code=>'leads', 
+        :name=>'B2B Contacts', 
+        :unit_name=>'records', 
+        :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+        # formal description to show in the list of products
+        :description=>'B2B Contacts with Emails & Phone Numbers',
+        # persuasive description to show in the sales letter
+        :title=>'The Best Data Quality, at the Best Price',
+        # larger persuasive description to show in the sales letter
+        :summary=>'B2B Contacts with verified <b>email addresses</b>, <b>phone numbers</b> and <b>LinkedIn profiles</b>.',
+        :thumbnail=>"#{CS_HOME_WEBSITE}/leads/images/logo.png",
+        :return_path=>"#{CS_HOME_WEBSITE}/leads/results",
+        # what is the life time of this product or service?
+        :credits_expiration_period => 'month',
+        :credits_expiration_units => 1,
+        # free tier configuration
+        :free_tier=>{
+            # add 10 records per month, for free
+            :credits=>10,
+            :period=>'month',
+            :units=>1,
+        },
+        # most popular plan configuratioon
+        :most_popular_plan => 'leads.batman',
     },
-  },
 ])
 
 # setup the plan
-BlackStack::I2P::set_plans([
+BlackStack::I2P::add_plans([
     {
         # which product is this plan belonging
         :service_code=>'leads', 
@@ -95,5 +105,5 @@ BlackStack::I2P::set_plans([
         :fee=>47, # this is the fee that your will charge to the account, as a special offer price.
         :period=>'month',
         :units=>1, # billed monthy
-
+    }
 ])

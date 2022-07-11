@@ -1,235 +1,106 @@
-	<section id='header' class="box" align='center' valign='middle'>
-		<div style='position:absolute;top:0;left:0;width:100%;height:16px;background-image: url("../leads/img/guarda.png");background-repeat: repeat-x;'></div>
+<%
+service_name = 'leads'
+# get the service descriptor
+service = BlackStack::I2P::service_descriptor(service_name)
+# get all plans for this service, who are subscriptiosn and who are public
+plans = BlackStack::I2P::plans_descriptor.select { |h| h[:service_code] == service_name && h[:type] == BlackStack::I2P::PAYMENT_SUBSCRIPTION && h[:public] == true }
+# calculate the number of columns needed
+columns = plans.size
+columns += 1 if service.has_key?(:free_tier)
+# calculate the spanx of each plan div
+spanx = 4
+if columns <= 2
+	spanx = 6
+elsif columns <= 4
+	if 12 % columns == 0
+		spanx = 12 / columns
+	else
+		spanx = 4
+	end 
+else # columns > 4
+	spanx = 4
+end
+# counter the number of plans drawn
+drawn = 0
+%>
 
-		<br/>
-		<br/>
-
-		<%
-		if (title.to_i == 1) # Welcome, luego de haber adquirido el TripWire
-		%>
-		<section class='row-fluid'>
-			<p style='font-size:28pt'><b>Welcome!</b> We are almost done!</p>
-		</section>
-			
-		<br/>
-		<section class='row-fluid'>
-			<p style='font-size:18pt'>
-				Do You Need Huge Data? (the <b>Silver Plan</b> is <b>12.5% Off</b> for Limited Time)
-			</p>
-		</section>		
-		<%
-		else
-		%>
-		<section class='row-fluid'>
-			<p style='font-size:28pt'>Risk-free 15-Day Trial for Just $1</p>
-		</section>
-			
-		<br/>
-		<section class='row-fluid'>
-			<p style='font-size:14pt'>Premium Filters. Phone Numbers. Verified Emails. And More.</p>
-		</section>
-		<%
-		end # if
-		%>
+<section class="container">
+	<section class="row-fluid">
+		<div class='span12'>
+			<center>
+				<h2><%=service[:title].to_s.encode_html%></h2>
+				<p style='font-size:16px;'><%=service[:summary].to_s%></p>
+				<br/>
+			</center>
+		</div>
 	</section>
-	
-	<br/>
 
-	  <section class="container-fluid">
-      <div class='container'>
-						
-			<div class='col-sm-4'>
-		    <div class="plan">
-		      <h3 class="plan-title"><b>Bronze</b>
-		      </h3>
-		      <p class="plan-price">$199<span class="plan-unit">per month</span></p> <!-- 18 cents per lead -->
-		      
-		      <ul class="plan-features">
-		        <li class="plan-feature">25 <span class="plan-feature-unit">searches</span></li>
-		        <li class="plan-feature">1,100 <span class="plan-feature-unit">leads</span> <span class="plan-feature-name">18&#162; per lead</span></li>
-		        <li class="plan-feature">6 <span class="plan-feature-unit">fields</span><span class="plan-feature-name"> email, phone, fax,<br/>address, revenue, employees</span></li>
-		        <li class="plan-feature">6 <span class="plan-feature-unit">filters</span><span class="plan-feature-name"> job position, industry,<br/>country, city, gender, keywords</span></li>
-		      </ul>
-		      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4J42LJE66SA5E" class="plan-button">Start Your 15-Day</a>
-		    </div>
-	    	</div>
-
-			<div class='col-sm-4'>
-		    <div class="plan plan-highlight">
-	      	  <p class="plan-recommended">Best Deal</p>
-		      <h3 class="plan-title"><b>Silver</b>
-		      </h3>
-		      <p class="plan-price">$349<span class="plan-unit">per month</span></p> <!-- 15 cents per lead -->		      
-		      <ul class="plan-features">
-		        <li class="plan-feature">75 <span class="plan-feature-unit">searches</span></li>
-		        <li class="plan-feature">2,660 <span class="plan-feature-unit">leads</span> <span class="plan-feature-name"><strike>15&#162;</strike> 13&#162; per lead</span></li>
-		        <li class="plan-feature">6 <span class="plan-feature-unit">fields</span><span class="plan-feature-name"> email, phone, fax,<br/>address, revenue, employees</span></li>
-		        <li class="plan-feature">6 <span class="plan-feature-unit">filters</span><span class="plan-feature-name"> job position, industry,<br/>country, city, gender, keywords</span></li>
-		      </ul>
-		      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TBFRPHR7WW4AU" class="plan-button">Start Your 15-Day</a>
-		    </div>
-	    	</div>
-
-			<div class='col-sm-4'>
-		    <div class="plan">
-		      <h3 class="plan-title"><b>Gold</b>
-		      </h3>
-		      <p class="plan-price">$699<span class="plan-unit">per month</span></p> <!-- 12 cents per lead -->
-		      <ul class="plan-features">
-		        <li class="plan-feature">&infin; <span class="plan-feature-unit">searches</span></li>
-		        <li class="plan-feature">5,880 <span class="plan-feature-unit">leads</span> <span class="plan-feature-name">12&#162; per lead</span></li>
-		        <li class="plan-feature">6 <span class="plan-feature-unit">fields</span><span class="plan-feature-name"> email, phone, fax,<br/>address, revenue, employees</span></li>
-		        <li class="plan-feature">6 <span class="plan-feature-unit">filters</span><span class="plan-feature-name"> job position, industry,<br/>country, city, gender, keywords</span></li>
-		      </ul>
-		      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNS4PSVAC3ACQ" class="plan-button">Start Your 15-Day</a>
-		    </div>
-	    	</div>
-
-			<%
-			if (title.to_i == 1) # Welcome, luego de haber adquirido el TripWire
+	<section class="row-fluid">
+		<%
+		# if there is a free-tier
+		if service.has_key?(:free_tier)
+			drawn += 1
 			%>
-			<div class='container'>
-				<a href='./welcome' target="_window" style='font-size:24px'>No, Thank. I Want to Proceed With My Current Plan.</a>
-			</div>
-			<br/>
-			<%
-			end
-			%>
-		</div>
-		<br/>
-		<br/>
-		<a href="#banner1" class="hero-start-link smooth-scroll anchor-link"><i class="fa fa-angle-double-down"></i></a>
-		</section>
-
-
-	<section id='banner1' class="cta-1 bg-dark padding-top-bottom text-center white-text">
-		<div class="container-fluid anima scale-in">
-			<div class="row">
-				<div class="col-sm-12">
-					<span>
-						"To succeed in sales, simply talk to lots of people every day.<br/> 
-						And here’s what’s exciting – there are lots of people!" -- Jim Rohn
-					</span>
-					<a class="btn smooth-scroll" href="#header"><b>15-Day Trial</b> Join now</a>
-				</div>	
-			</div>
-		</div>
-	</section>	
-	
-	<section id="features" class="features-1">
-		<div class="container-fluid padding-top-bottom">
-			<div class="row header">
-				<div class="col-md-12">
-					<h2>Features</h2>
-					<p>Simply the Best Services & Price</p>
+			<div class='span<%=spanx.to_s%>'>
+				<div class="plan">
+					<h3 class="plan-title"><b>Free</b></h3>
+					<p class="plan-price">$0<span class="plan-unit">forever</span></p>
+					<ul class="plan-features">
+						<li class="plan-feature"><%=service[:free_tier][:credits].to_i.to_label%> <span class="plan-feature-unit"><%=service[:unit_name].to_s%></span><br/><span class="plan-feature-name">every <%=service[:free_tier][:period]%></span></li>
+						<li class="plan-feature">&infin; <span class="plan-feature-unit">searches</span></li>
+						<li class="plan-feature">3 <span class="plan-feature-unit">filters</span><br/><span class="plan-feature-name"> position, industry, location</span></li>
+						<!--
+						<li class="plan-feature">community <span class="plan-feature-unit">support</span></li>
+						-->
+					</ul>
+					<a href="<%=service[:return_path].encode_html%>" class="plan-button">Go Free</a>
 				</div>
 			</div>
-			<div class="container">
-				<div class="row">
-		            <div class="col-md-4 col-sm-4 col-xs-12 anima scale-in ">
-		                <article class="text-center">
-			                <img src="img/screenshot2.png" alt="#" class="zoom-img img-responsive center-block">
-		                    <h3>ADVANCED FILTERS</h3>
-		                    <p>Search options let you find your target market within our platform by <b>Job Title</b>, <b>Location</b>, <b>Industry</b>, and <b>more</b>.</p>
-		                </article>
-		            </div>                       
-		            <div class="col-md-4 col-sm-4 col-xs-12 anima scale-in ">
-		                <article class="text-center">
-			                <img src="img/screenshot1.png" alt="#" class="zoom-img img-responsive center-block">
-		                    <h3>RESULTS PREVIEW</h3>
-		                    <p>See a summary of the contacts before you export with full data - including their emails and phone numbers.</p>
-		                </article>
-		            </div>                       
-					<div class="col-md-4 col-sm-4 col-xs-12 anima scale-in d1">
-		                <article class="text-center">	
-							<img src="img/screenshot4.png" alt="#" class="zoom-img img-responsive center-block">
-		                    <h3>EXPORT IMMEDIATELLY</h3>
-		                    <p>No need to go through a lengthy sales process.<br/><b>Download and use the list right away</b>.<br/>Manage multiple lists of leads.</p>
-		                </article>
-		            </div>             
-	            </div>             
-       		</div>
-		</div>	
+			<%
+		end # if service.has_key?(:free_tier)
+		%>
+
+		<%
+		# draw all plans
+		plans.each do |plan|
+			drawn += 1
+			%>
+			<div class='span<%=spanx.to_s%>'>
+				<div class="plan <%= plan[:item_number] == service[:most_popular_plan] ? 'plan-highlight' : '' %>">
+					<%
+					if plan[:item_number] == service[:most_popular_plan]
+						%>
+						<p class="plan-recommended">Most Popular</p>
+						<%
+					end
+					%>
+					<h3 class="plan-title"><b><%=plan[:name].to_s.encode_html%></b></h3>
+					<p class="plan-price">
+						<%
+						if plan[:normal_fee].to_f > plan[:fee].to_f
+						%>
+						<span class="plan-feature-name" style='font-size:16px; text-decoration:line-through;'>$<%=plan[:normal_fee].to_i.to_label%></span>
+						<%
+						end
+						%>
+
+						$<%=plan[:fee].to_i.to_label%>
+						<span class="plan-unit">per month</span>
+					</p>
+					<ul class="plan-features">
+						<li class="plan-feature"><%=plan[:credits].to_i.to_label%> <span class="plan-feature-unit"><%=service[:unit_name].to_s%></span><br/><span class="plan-feature-name">every <%=service[:free_tier][:period]%></span></li>
+						<li class="plan-feature">&infin; <span class="plan-feature-unit">searches</span></li>
+						<li class="plan-feature">3 <span class="plan-feature-unit">filters</span><br/><span class="plan-feature-name"> position, industry, location</span></li>
+						<!--
+						<li class="plan-feature">community <span class="plan-feature-unit">support</span></li>
+						-->
+					</ul>
+					<a href="/settings/filter_create_invoice?item_number=<%=plan[:item_number]%>&n=1" class="plan-button">Go <%=plan[:name].to_s.encode_html%></a>
+				</div>
+			</div>
+			<%
+		end # plans.each do |plan|
+		%>
 	</section>
+</section>
 
-        <section class="footer-1 text-center">
-            <div class="container-fluid">
-                <a href="#home" class="back-to-top smooth-scroll"><i class="fa fa-chevron-up"></i></a>
-                <p>Made with <i class="fa fa-heart color-text"></i> by <a href="http://www.ExpandedVenture.com" target='_window'>Expanded Venture</a>.</p>
-            </div>
-        </section>
-
-		<div class="modal fade text-modal" id="text-modal" tabindex="-1" role="dialog" aria-labelledby="smallModal" aria-hidden="true">
-		    <div class="modal-dialog modal-sm2">
-		        <div class="modal-content">
-		            <div class="modal-header bg-shop">
-		                <a class="close-modal" href="#" data-dismiss="modal">
-		                    <span class="menu-icon"></span>
-		                </a>
-		                <h2 class=""><b>License</b></h2>
-		            </div>
-		            <div class="modal-body">
-		                <p>In order to simplify the legal terms, here are the rules of the game written in plain English, that you are obliged to follow when using the digital goods at 1E-shop.</p>
-		                <p>
-		                    <br><strong>You are free to…</strong>
-		                </p>
-		                <ul>
-		                    <li>Use the digital goods in a website for yourself or a client for personal, open-source or commercial use.</li>
-		                    <li>Use the digital goods to create an icon for your app or button icons.</li>
-		                    <li>Use the digital goods to create a logo or other brand material.</li>
-		                </ul>
-		                <p>
-		                    <br><strong>You are forbidden to…</strong>
-		                </p>
-		                <ul>
-		                    <li>Re-sell the digital goods, host the digital goods or rent the digital goods (either in existing or modiﬁed form).</li>
-		                    <li>Include the digital goods with a website offered for sale or distributed for free.</li>
-		                    <li>Convert the digital goods to a theme to sell or distribute for free.</li>
-		                </ul>
-		                <br>
-		                <p>While attribution is optional, it is always appreciated. Intellectual property rights are not transferred with the download of the icons.</p>
-		                <p>Should you happen to lost the purchased good, let me know the email you've used upon your purchase, and I will provide you with the new files.</p>
-		            </div>
-
-		        </div>
-		    </div>
-		</div>
-
-		<div class="modal fade" id="product-modal" tabindex="-1" role="dialog" aria-labelledby="smallModal" aria-hidden="true">
-		    <div class="modal-dialog modal-sm2">
-		        <div class="modal-content">
-		            <div class="modal-header">
-		                <a class="close-modal" href="#" data-dismiss="modal">
-		                    <span class="menu-icon"></span>
-		                </a>
-		                <img src="img/cup1.jpg" alt="" class="img-responsive">
-		            </div>
-		            <div class="modal-body">
-		                <h3 class="text-center"><b>PaperCup - Mockup </b>($5,00)</h3>
-		            </div>
-		            <div class="modal-footer">
-		                <form id="buy" action="buy" class="myform" method="post" novalidate>
-		                    <div class="form-group">
-		                        <label class="control-label" for="contact-mail">Email</label>
-		                        <div class=" controls">
-		                            <input name="email" placeholder="PayPal Email" class="form-control input-lg requiredField" type="email" data-error-invalid="Invalid email address" data-error-empty="Enter email">
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="control-label">password</label>
-		                        <div class="controls">
-		                            <input id="password" class="form-control" type="password" placeholder="PayPal Password" name="password">
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <button type="button" class="btn btn-block">PAY NOW</button>
-		                    </div>
-		                    <p class="text-center"><a href="" data-dismiss="modal">Cancel</a>
-		                    </p>
-		                </form>
-		            </div>
-		        </div>
-		    </div>
-		</div>
-	</div>
-	</section>
