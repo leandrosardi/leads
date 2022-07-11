@@ -546,12 +546,14 @@ div.lead-card div.data span.headline {
             // the titlt is updated immedaitelly after the ajax call. don't wait for response because of an ux matter. 
             // update the li opacity, to show that is has been processed successfully
             li.style.opacity = '1.0';
+            // update the credits in the header
+            i2p_update_header('leads');
           } else {
-//            if ( response.status =~ /No Credits/ ) {
-//              window.location.replace('/leads/plans');
-//            } else {
+            if ( response.status =~ /No Credits/ ) {
+              window.location.replace('/leads/plans');
+            } else {
               alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
-//            }
+            }
           }
         },
         error: function(data) {
@@ -760,6 +762,8 @@ div.lead-card div.data span.headline {
             remove_export_list(id_lead, '123');
             // 2. add the new list to this the export list dropdown
             add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
+            // update the credits in the header
+            i2p_update_header('leads');
           } else {
             if ( response.status =~ /No Credits/ ) {
               window.location.replace('/leads/plans');
