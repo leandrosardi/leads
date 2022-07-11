@@ -213,7 +213,7 @@ div.lead-card div.data span.headline {
       <div class='buttons'>
       <%
       # if the account has no credits, and the leads has not been exported, then don't show the export button
-      if credits > 0 && !row[:exported]
+      if credits > 0 || row[:exported]
       %>
         <div class="btn-group">
           <button class="btn btn-<%=export_button_color%> dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown"><span class='caption'><%=export_button_text.to_s.encode_html%></span> <span class="caret"></span></button>
@@ -492,6 +492,8 @@ div.lead-card div.data span.headline {
   function add_export_list(id_lead, h, opacity='1.0') {
     // find the div
     let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
+    // remove '<i>' element with innert text 'No export lists found' from the div content
+    $('i:contains("No export lists found")').remove();
     // create the li element, with hand cursor
     let li = document.createElement('li');
     li.setAttribute('data-id-export-list', h.id);
@@ -545,7 +547,11 @@ div.lead-card div.data span.headline {
             // update the li opacity, to show that is has been processed successfully
             li.style.opacity = '1.0';
           } else {
-            alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
+            if ( response.stats =~ /No Credits/ ) {
+              window.location.replace('/leads/plans');
+            } else {
+              alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
+            }
           }
         },
         error: function(data) {
@@ -755,7 +761,11 @@ div.lead-card div.data span.headline {
             // 2. add the new list to this the export list dropdown
             add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
           } else {
-            alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
+            if ( response.stats =~ /No Credits/ ) {
+              window.location.replace('/leads/plans');
+            } else {
+              alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
+            }
           }
         },
         error: function(data) {
