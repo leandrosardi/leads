@@ -149,21 +149,12 @@ module Leads
     # 
     def core(h={})
       id_account = h['id_account']
-      exports = id_account.nil? ? [] : Leads::Account.where(:id=>id_account).exports
+      exports = id_account.nil? ? [] : BlackStack::Leads::Account.where(:id=>id_account).first.exports
 
-      # si no se especifica una cuenta, o si la cuenta no tienen export lists
-      if id_account.nil? || exports.size == 0
-        q0 = "
-          FROM fl_lead l
-          WHERE 1=1
-        "
-      else
-        q0 = "
-          FROM fl_lead l
-          LEFT JOIN fl_export_lead el ON el.id_lead=l.id
-          WHERE el.id_export IN ('#{exports.map {|e| e.id}.join("','")}')
-        "
-      end
+      q0 = "
+        FROM fl_lead l
+        WHERE 1=1
+      "
 
       # filter by positive job positions
       a = self.positions.select { |p| p.positive }
