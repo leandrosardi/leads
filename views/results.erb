@@ -13,8 +13,11 @@ s = Leads::FlSearch.new ({
     'industries' => [],
 })
 
+# credits
+credits = BlackStack::I2P::Account.where(:id=>@login.user.id_account).first.credits('leads')
+
 # getting the search
-sid = @login.user.preference("leads.results.filter.positive_positions", '', params[:sid])
+sid = @login.user.preference("leads.results.sid", '', params[:sid])
 
 # if the user has preference for any past search, then I use such a search
 # if the user has not preference for any past search, then I keep the dummy search defined above.
@@ -39,6 +42,7 @@ i = {
   'pagesize' => 25,
   'sortcolumn' => 'id',
   'sortorder' => 'asc',
+  'id_account' => @login.user.id_account, # additional parameter requried by FlSearch to build the query
 }
 
 # getting rows
@@ -198,6 +202,8 @@ div.lead-card div.data span.headline {
     rows.each do |row|
       acronym = row[:name].to_s[0..1].capitalize
       i = acronym.chr.ord.to_i % 10
+      export_button_color = row[:exported] ? 'blue' : 'green'
+      export_button_text = row[:exported] ? 'Exported' : 'Export'
     %>
     <div class='span12 lead-card' id='sample<%=i%>'>
       <div class='acronym acronym-color-<%=i%>'>
@@ -205,8 +211,12 @@ div.lead-card div.data span.headline {
       </div>
 
       <div class='buttons'>
+      <%
+      # if the account has no credits, and the leads has not been exported, then don't show the export button
+      if credits > 0 || row[:exported]
+      %>
         <div class="btn-group">
-          <button class="btn btn-green dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown">Export <span class="caret"></span></button>
+          <button class="btn btn-<%=export_button_color%> dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown"><span class='caption'><%=export_button_text.to_s.encode_html%></span> <span class="caret"></span></button>
           <ul class="dropdown-menu ul-export-lists" data-id-lead='<%=row[:id].to_guid%>'>
             <div class='div-export-lists' data-id-lead='<%=row[:id].to_guid%>'>
               <!-- fill the div by AJAX when the user clicks on the export button -->
@@ -219,6 +229,13 @@ div.lead-card div.data span.headline {
             </li>
           </ul>
         </div>      
+      <%
+      else # if credits > 0
+      %>
+        <a class='btn btn-green' href='/leads/plans'>Buy Credits!</a>
+      <%
+      end # if credits > 0
+      %>
       </div>
 
       <div class='insights'>
@@ -475,6 +492,8 @@ div.lead-card div.data span.headline {
   function add_export_list(id_lead, h, opacity='1.0') {
     // find the div
     let div = document.querySelector('div.div-export-lists[data-id-lead="'+id_lead+'"]');
+    // remove '<i>' element with innert text 'No export lists found' from the div content
+    $('i:contains("No export lists found")').remove();
     // create the li element, with hand cursor
     let li = document.createElement('li');
     li.setAttribute('data-id-export-list', h.id);
@@ -528,7 +547,11 @@ div.lead-card div.data span.headline {
             // update the li opacity, to show that is has been processed successfully
             li.style.opacity = '1.0';
           } else {
-            alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
+//            if ( response.status =~ /No Credits/ ) {
+//              window.location.replace('/leads/plans');
+//            } else {
+              alert('An error occured while updating the list:' + h.filename + '. Error: ' + response.status);
+//            }
           }
         },
         error: function(data) {
@@ -575,6 +598,16 @@ div.lead-card div.data span.headline {
         let response = JSON.parse(data);
         // if the response is ok, update the div
         if (response.status == 'success') {
+          // change export button .btn-export-lists color and text
+          // remove class btn-green
+          // remove class btn-blue
+          // add class btn-blue
+          // set 'Exported' as inner text in the span with class .caption inside such a buttton
+          let button = document.querySelector('button.btn-export-lists[data-id-lead="'+id_lead+'"]');
+          button.classList.remove('btn-green');
+          button.classList.remove('btn-blue');
+          button.classList.add('btn-blue');
+          button.querySelector('span.caption').innerHTML = 'Exported';
           // remove the loading legend
           div.innerHTML = '';
           // draw the datas
@@ -619,6 +652,17 @@ div.lead-card div.data span.headline {
 
   // 
   $(document).ready(function () {
+
+    // load data of already exported leads
+    <%
+    rows.each do |row|
+      if row[:exported]
+      %>
+        unlock_data('<%=row[:id].to_guid%>');
+      <%
+      end # if row[:exported]
+    end # rows.each
+    %>
 
     // en endit any textfield inside a ul,
     // enable/disable the add button depending on the value of the textfield
@@ -717,7 +761,11 @@ div.lead-card div.data span.headline {
             // 2. add the new list to this the export list dropdown
             add_export_list(id_lead, {id: response.id_export, filename: name, belonging: true});
           } else {
-            alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
+            if ( response.status =~ /No Credits/ ) {
+              window.location.replace('/leads/plans');
+            } else {
+              alert('An error occured while creating the new list:' + name + '. Error: ' + response.status);
+            }
           }
         },
         error: function(data) {

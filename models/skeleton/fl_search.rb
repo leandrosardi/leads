@@ -147,23 +147,14 @@ module Leads
     # if id_account is not nil, the query will return the number of export lists of such an account where the lead is included.
     # if id_account is nil, the query will return the number of all export lists where the lead is included.
     # 
-    def core(options={})
-      id_account = options[:id_account]
-      exports = id_account.nil? ? [] : Leads::Account.where(:id=>id_account).exports
+    def core(h={})
+      id_account = h['id_account']
+      exports = id_account.nil? ? [] : BlackStack::Leads::Account.where(:id=>id_account).first.exports
 
-      # si no se especifica una cuenta, o si la cuenta no tienen export lists
-      if id_account.nil? || exports.size == 0
-        q0 = "
-          FROM fl_lead l
-          WHERE 1=1
-        "
-      else
-        q0 = "
-          FROM fl_lead l
-          LEFT JOIN fl_export_lead el ON el.id_lead=l.id
-          WHERE el.id_export IN ('#{exports.map {|e| e.id}.join("','")}')
-        "
-      end
+      q0 = "
+        FROM fl_lead l
+        WHERE 1=1
+      "
 
       # filter by positive job positions
       a = self.positions.select { |p| p.positive }
@@ -228,7 +219,9 @@ module Leads
 
     # This method works with the TableHelper module.
     # return an array of hashes with the columns of the table
-    def columns
+    def columns(h={})
+      id_account = h[:id_account].nil? ? nil : h[:id_account]
+
       [
         { 'query_field' => 'l.id' }, 
         {
@@ -253,6 +246,20 @@ module Leads
         { 'query_field' => 'l.stat_location_name' },
         { 'query_field' => 'l.stat_has_email' },
         { 'query_field' => 'l.stat_has_phone' },  
+        { 'query_field' => "
+          (
+            CASE 
+            WHEN (
+              SELECT COUNT(*) AS n 
+              FROM fl_export_lead el
+              JOIN fl_export e ON e.id=el.id_export
+              JOIN \"user\" u ON (u.id=e.id_user #{id_account.nil? ? '' : "AND u.id_account='#{id_account}'"})
+              WHERE el.id_lead=l.id
+            ) > 0 THEN true
+            ELSE false
+            END
+          ) AS exported
+        "},
       ]
     end
 
