@@ -13,8 +13,11 @@ s = Leads::FlSearch.new ({
     'industries' => [],
 })
 
+# credits
+credits = BlackStack::I2P::Account.where(:id=>@login.user.id_account).first.credits('leads')
+
 # getting the search
-sid = @login.user.preference("leads.results.filter.positive_positions", '', params[:sid])
+sid = @login.user.preference("leads.results.sid", '', params[:sid])
 
 # if the user has preference for any past search, then I use such a search
 # if the user has not preference for any past search, then I keep the dummy search defined above.
@@ -208,6 +211,10 @@ div.lead-card div.data span.headline {
       </div>
 
       <div class='buttons'>
+      <%
+      # if the account has no credits, and the leads has not been exported, then don't show the export button
+      if credits > 0 && !row[:exported]
+      %>
         <div class="btn-group">
           <button class="btn btn-<%=export_button_color%> dropdown-toggle btn-export-lists" data-id-lead='<%=row[:id].to_guid%>' data-toggle="dropdown"><span class='caption'><%=export_button_text.to_s.encode_html%></span> <span class="caret"></span></button>
           <ul class="dropdown-menu ul-export-lists" data-id-lead='<%=row[:id].to_guid%>'>
@@ -222,6 +229,13 @@ div.lead-card div.data span.headline {
             </li>
           </ul>
         </div>      
+      <%
+      else # if credits > 0
+      %>
+        <a class='btn btn-green' href='/leads/plans'>Buy Credits!</a>
+      <%
+      end # if credits > 0
+      %>
       </div>
 
       <div class='insights'>
