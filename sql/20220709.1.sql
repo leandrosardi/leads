@@ -10,5 +10,5 @@ ALTER TABLE fl_export_lead ALTER COLUMN create_Time SET NOT NULL;
 
 ALTER TABLE fl_export_lead ADD COLUMN IF NOT EXISTS id_user UUID NULL;
 
-ALTER TABLE fl_export_lead ADD CONSTRAINT fk_fl_export_lead__id_user FOREIGN KEY (id_user) REFERENCES "user"(id);
+--ALTER TABLE fl_export_lead ADD CONSTRAINT fk_fl_export_lead__id_user FOREIGN KEY (id_user) REFERENCES "user"(id);
 
