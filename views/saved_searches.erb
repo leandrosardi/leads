@@ -14,7 +14,7 @@ if total_rows>0
   total_pages = (total_rows.to_f/page_size.to_f).ceil
   # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
   # then, get user preferences regarding the page number on this screen
-  page_number = @login.user.preference("developers.tables.basics.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
+  page_number = @login.user.preference("leads.searches.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
   # pagination correction to prevent glitches
   page_number = 1 if page_number < 1
   page_number = total_pages if page_number > total_pages
@@ -28,10 +28,10 @@ else
   to_row = 0
 end
 
-filter_search = @login.user.preference("leads.saved_searches.filter.name", "", params[:search_filter])
+filter_search = @login.user.preference('leads.searches.filter.name', '', params[:name])
 
 all += "
-  AND s.name LIKE '%"+filter_search.to_s.to_sql+"%'
+  AND UPPER(s.name) LIKE '%"+filter_search.to_s.upcase.to_sql+"%'
 " if filter_search.to_s.length > 0
 
 q = "
@@ -51,7 +51,7 @@ q = "
       <form action="/leads/saved_searches" method="get">
       <div class="pull-right">
           <div class="span8">
-            <input type='text' class='input-block-level select-all-on-focus' value="<%= filter_search %>" id='search_filter' name='search_filter'/>
+            <input type='text' class='input-block-level select-all-on-focus' value="<%= filter_search %>" id='name' name='name'/>
           </div>
 
           <button class="btn btn-blue btn-medium btn-submit" style="margin-left: 2px;" type="submit" onclick="">

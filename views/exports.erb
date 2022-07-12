@@ -1,68 +1,98 @@
 <%
-  all = "
-	SELECT e.id_search, e.create_time, s.no_of_results, s.no_of_companies, s.name
-	FROM fl_export e inner join fl_search s on e.id_search = s.id
+all = "
+	SELECT 
+    e.id,    
+    e.filename, 
+    e.create_time, 
+
+    -- export parameters
+    e.id_search, -- decide if this is a bulk or manual export
+    e.number_of_records, -- number of records requested for bulk exports
+    COALESCE(e.allow_multiple_contacts_per_company, false) as allow_multiple_contacts_per_company, -- allow multiple contacts per company, only for bulk exports
+
+    -- file creation status
+    create_file_start_time,
+    create_file_end_time,
+    create_file_success,
+
+    -- file creation result
+    e.no_of_results, -- how many leads exported
+    e.no_of_companies -- how many unique companies exported
+
+	FROM fl_export e 
+  JOIN \"user\" u ON ( e.id_user = u.id AND u.id_account = '#{@login.user.id_account.to_guid}' )
+  WHERE 1=1
 "
 
-  page_size = 25
-  total_rows = DB[all].count
+filter_search = @login.user.preference('leads.exports.filter.name', "", params[:name])
+
+all += "
+  AND UPPER(e.filename) LIKE '%#{filter_search.to_s.upcase.to_sql}%'
+" if filter_search.to_s.length > 0
+
+all += "
+  ORDER BY e.create_time DESC
+" 
+
+page_size = 25
+total_rows = DB[all].count
+if total_rows>0
   total_pages = (total_rows.to_f/page_size.to_f).ceil
   # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
   # then, get user preferences regarding the page number on this screen
-  page_number = @login.user.preference("developers.tables.basics.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
+  page_number = @login.user.preference("leads.exports.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
   # pagination correction to prevent glitches
   page_number = 1 if page_number < 1
   page_number = total_pages if page_number > total_pages
   # calculate info for showing at the bottom of the table
   from_row = (page_number.to_i-1) * page_size.to_i + 1
   to_row = [page_number*page_size, total_rows].min
-  filter_search = @login.user.preference("leads.saved_searches.filter.name", "", params[:search_filter])
+else
+  total_pages = 1
+  page_number = 1
+  from_row = 0
+  to_row = 0
+end
 
-  all += "
-    AND s.name LIKE '%"+filter_search.to_s.to_sql+"%'
-    " if filter_search.to_s.length > 0
-
-
-
-  q = "
-  "+all+"
-	LIMIT "+(page_number*page_size).to_label+"
-	OFFSET "+((page_number.to_i - 1) * page_size.to_i).to_label+"
-  "
+q = "
+"+all+"
+  LIMIT #{page_size.to_s}
+  OFFSET #{((page_number.to_i - 1) * page_size.to_i).to_s}
+"
 %>
 
 <section class="row-fluid">
   <section class='span6'>
     <%=nav2("Leads", "/leads/results", "Exports")%>
   </section>
+  <section class='span6'>
+    <form action="/leads/exports" method="get">
+      <div class="pull-right">
+        <div class="span8">
+          <input type='text' class='input-block-level select-all-on-focus' id='name' name='name'/>
+        </div>
+
+        <button class="btn btn-blue btn-medium btn-submit" style="margin-left: 2px;" type="submit" onclick="">
+          <i class='icon-search'></i> Search
+        </button>
+      </div>
+    </form>
+  </section>
 </section>
 
 <section class="container">
   <section class="row-fluid box">
     <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
-    <table class="table table-bordered">
+    <table class="table table-striped">
       <thead>
-        <tr>
-          <form action="/leads/exports" method="get">
-          <div class="pull-right">
-            <div class="span8">
-              <input type='text' class='input-block-level select-all-on-focus' id='search_filter' name='search_filter'/>
-            </div>
-
-            <button class="btn btn-blue btn-medium btn-submit" style="margin-left: 2px;" type="submit" onclick="">
-              <i class='icon-search'></i> Search
-            </button>
-          </div>
-            </form>
-        </tr>
-
-        <tr>
-          <th>No. of Results <i class="icon-sort-up"></i></th>
-          <th>No. of Companies <i class="icon-sort-up"></i></th>
-          <th>Creation Date <i class="icon-sort-up"></i></th>
-          <th>Download </th>
-        </tr>
-
+          <th style='width:75px;'>Creation</th>
+          <th style='width:auto;'>Name</th>
+          <th style='width:75px;'>Type</th> <!-- bulk or manual export ? -->
+          <th style='width:75px; text-align:right;'>Contacts<br/>Requested</th>
+          <th style='width:75px; text-align:right;''>Multiple<br/>Companies</th>
+          <th style='width:75px; text-align:right;'>Total<br/>Contacts</th>
+          <th style='width:75px; text-align:right;'>Total<br/>Companies</th>
+          <th style='width:75px;'>Download</th>
         </thead>
         <tbody>
         <%
@@ -70,15 +100,18 @@
         %>
           <% puts row.inspect %>
           <tr>
-            <td><%= row[:no_of_results] %></td>
-            <td><%=row[:no_of_companies]%></td>
+            <td class='fix'><%=row[:create_time].to_s[0..9].encode_html%></td>
+            <td class='fix'><%=row[:filename].to_s.encode_html%></td>
+
+            <td class='fix'><%=row[:id_search].nil? ? "<span class='badge badge-gray' title='You created this export list manually, by exporting leads individually.'>manual</span>" : "<span class='badge badge-blue' title='You created this export list manually, by requesting a bulk export of a search.'>bulk</span>"%></td>
+            <td class='fix' style='text-align:right;'><%=row[:id_search].nil? ? 'n/a' : row[:number_of_records].to_i.to_label%></td>
+            <td class='fix' style='text-align:right;'><%=row[:id_search].nil? ? 'n/a' : ( row[:allow_multiple_contacts_per_company] ? "<span class='badge badge-blue'>yes</span>" : "<span class='badge badge-gray'>no</span>" )%></td>
+
+            <td class='fix' style='text-align:right;'><%=row[:no_of_results].to_i.to_label%></td>
+            <td class='fix' style='text-align:right;'><%=row[:no_of_companies].to_i.to_label%></td>
+
             <td>
-                <%= row[:create_time] %>
-            </td>
-            <td>
-              <a href="/leads/results/<%= row[:id_search] %>/download" class="btn btn-blue btn-medium">
-                <i class='icon-download-alt'></i> Download
-              </a>
+              <a href="/leads/results/<%= row[:id_search] %>/download" class="btn btn-link"><i class='icon-cloud-download'></i></a>
             </td>
           </tr>
         <%
