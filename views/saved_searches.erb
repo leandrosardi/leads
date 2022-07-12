@@ -69,11 +69,11 @@ q = "
     <table class="table table-stripped">
       <thead>
         <tr>
-          <th style="width:100px;">Creation</i></th>
-          <th style="width:250px;">Name</th>
+          <th style="width:75px;">Creation</i></th>
+          <th style="width:100px;">Name</th>
           <th style="width:auto;">Description</th>
-          <th style="width:55px;"></th>
-          <th style="width:55px;"></th>
+          <th style="width:35px;"></th>
+          <th style="width:35px;"></th>
         </tr>
       </thead>
       <tbody>
@@ -85,11 +85,7 @@ q = "
           <td><%=row[:name].to_s.encode_html%></td>
           <td><%=row[:description].to_s.encode_html%></td>
           <td><a href='/leads/results/<%=row[:id].to_guid%>'>View</a></td>
-          <td>
-            <a class='btn btn-danger' title='Delete' href='/leads/filter_delete_saved_search?id=<%=row[:id].to_guid%>'>
-              Delete
-            </a>
-          </td>
+          <td><a class='btn btn-link' title='Delete' href='/leads/filter_delete_saved_search?id=<%=row[:id].to_guid%>'><i class='icon-trash'></i></a></td>
         </tr>
       <%
         end
