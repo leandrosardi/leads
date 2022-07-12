@@ -85,26 +85,35 @@ q = "
     <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
     <table class="table table-striped">
       <thead>
-          <th style='width:75px;'>Creation</th>
-          <th style='width:auto;'>Name</th>
-          <th style='width:75px;'>Type</th> <!-- bulk or manual export ? -->
-          <th style='width:75px; text-align:right;'>Contacts<br/>Requested</th>
-          <th style='width:75px; text-align:right;''>Multiple<br/>Companies</th>
-          <th style='width:75px; text-align:right;'>Total<br/>Contacts</th>
-          <th style='width:75px; text-align:right;'>Total<br/>Companies</th>
-          <th style='width:75px;'>Download</th>
-        </thead>
-        <tbody>
+        <th style='width:75px;'>Creation</th>
+        <th style='width:auto;'>Name</th>
+        <th style='width:75px;'>Type</th> <!-- bulk or manual export ? -->
+        <th style='width:75px; text-align:right;'>Contacts<br/>Requested</th>
+        <th style='width:75px; text-align:right;''>Multiple<br/>Companies</th>
+        <th style='width:75px; text-align:right;'>Total<br/>Contacts</th>
+        <th style='width:75px; text-align:right;'>Total<br/>Companies</th>
+        <th style='width:75px;'>Download</th>
+      </thead>
+      <tbody>
         <%
-          DB[q].all do |row|
+        if DB[q].first.nil?
+          %>
+          <tr>
+            <td colspan='8' style='text-align:center;height:65px;vertical-align:middle;'>No results found</td>
+          </tr>
+          <%
+        end
         %>
-          <% puts row.inspect %>
+
+        <%
+        DB[q].all do |row|
+          %>
           <tr>
             <td class='fix'><%=row[:create_time].to_s[0..9].encode_html%></td>
             <td class='fix'><%=row[:filename].to_s.encode_html%></td>
 
             <td class='fix'><%=row[:id_search].nil? ? "<span class='badge badge-gray' title='You created this export list manually, by exporting leads individually.'>manual</span>" : "<span class='badge badge-blue' title='You created this export list manually, by requesting a bulk export of a search.'>bulk</span>"%></td>
-            <td class='fix' style='text-align:right;'><%=row[:id_search].nil? ? 'n/a' : row[:number_of_records].to_i.to_label%></td>
+            <td class='fix' style='text-align:right;'><%=row[:id_search].nil? ? 'n/a' : ( row[:number_of_records].nil? ? '-' : row[:number_of_records].to_i.to_label )%></td>
             <td class='fix' style='text-align:right;'><%=row[:id_search].nil? ? 'n/a' : ( row[:allow_multiple_contacts_per_company] ? "<span class='badge badge-blue'>yes</span>" : "<span class='badge badge-gray'>no</span>" )%></td>
 
             <td class='fix' style='text-align:right;'><%=row[:create_file_success] && !row[:create_file_end_time].nil? ? row[:no_of_results].to_i.to_label : '-'%></td>
@@ -128,8 +137,8 @@ q = "
               %>
             </td>
           </tr>
-        <%
-          end
+          <%
+        end
         %>
       </tbody>
     </table>

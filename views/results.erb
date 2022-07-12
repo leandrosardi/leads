@@ -16,8 +16,13 @@ s = Leads::FlSearch.new ({
 # credits
 credits = BlackStack::I2P::Account.where(:id=>@login.user.id_account).first.credits('leads')
 
-# getting the search
+# getting the search preference
 sid = @login.user.preference("leads.results.sid", '', params[:sid])
+
+# export modal preferences
+allow_many_contacts_per_company = @login.user.preference('leads.exports.allow_many_contacts_per_company', true, nil)
+export_only_first = @login.user.preference('leads.exports.export_only_first', false, nil)
+number_of_records = @login.user.preference('leads.exports.number_of_records', 10, nil)
 
 # if the user has preference for any past search, then I use such a search
 # if the user has not preference for any past search, then I keep the dummy search defined above.
@@ -307,24 +312,17 @@ div.lead-card div.data span.headline {
     <div class="modal-body">
       <div class="row-fluid">Contacts per Company</div>
       <div class="radio">
-        <label><input type="radio" name="optradio" checked>Multiple (Recommended)</label>
-      </div>
-      <div class="radio">
-        <label><input type="radio" name="optradio" >One</label>
+        <label><input type="checkbox" name="allow_many_contacts_per_company" <%=allow_many_contacts_per_company ? 'checked' : ''%>> Allow Many Contacts per Company <i>(Recommended)</i></label>
       </div>
       <div style="margin-top: 5px;">Total Contacts </div>
       <div>
         <div class="radio">
           <label>
-            <input type="checkbox" id="export_checkbox">
-            <input type="hidden" id="export_only" name="export_only">
-            Export only first
-            <input type="text" id="no_of_contacts" name="no_of_contacts" placeholder="102">
-            contacts</label>
+            <input type="checkbox" id="export_only_first" name="export_only_first" <%=export_only_first ? 'checked' : ''%>> Export only first <input type="text" id="number_of_records" name="number_of_records" placeholder="Write a number here." value='<%=export_only_first && number_of_records.to_i > 0 ? number_of_records.to_i.to_s : ''%>'> contacts</label>
         </div>
       </div>
       <div class="row-fluid">Name your file
-        <input type="text" id="file_name" name="file_name" placeholder="sample">
+        <input type="text" id="filename" name="filename" placeholder="sample">
         .csv
       </div>
       <input type="hidden" class="positive_positions" name="positive_positions" id='positive_positions' value="<%= positive_positions.to_s.encode_html%>" />
@@ -904,7 +902,7 @@ div.lead-card div.data span.headline {
       }
     });
 
-    $('#file_name').on('input', function(){
+    $('#filename').on('input', function(){
       if(validate_export_modal()){
         $('#save-export').removeAttr('disabled');
       }
@@ -913,22 +911,13 @@ div.lead-card div.data span.headline {
       }
     });
 
-    $('#export_checkbox').on('change', function(){
-      if(validate_export_modal()){
-        $('#save-export').removeAttr('disabled');
+    $('#number_of_records').on('input', function(){
+      if ($('#number_of_records').val() == '') {
+        $('#export_only_first').prop('checked', false);
+      } else {
+        $('#export_only_first').prop('checked', true);
       }
-      else{
-        $('#save-export').attr('disabled', 'disabled');
-      }
-    });
-
-    $('#no_of_contacts').on('input', function(){
-      if(validate_export_modal()){
-        $('#save-export').removeAttr('disabled');
-      }
-      else{
-        $('#save-export').attr('disabled', 'disabled');
-      }
+      validate_export_modal();
     });
   }); // $(document).ready
 
@@ -937,18 +926,9 @@ div.lead-card div.data span.headline {
   });
   
   function validate_export_modal(){
-    $('#e-position').val($('#positive_positions').val())
-    $('#e-location').val($('#positive_locations').val())
-    $('#e-industry').val($('#positive_industries').val())
-    $('#export_only').val($("#export_checkbox").is(':checked'))
-
-    if ($('#file_name').val() !== '') {
-      if( $("#export_checkbox").is(':checked')  && $('#no_of_contacts').val() !== ''){
-        return true;
-      }
-      else return !$("#export_checkbox").is(':checked');
-    } else {
+    if ($('#filename').val() == '') {
       return false;
     }
+    return true;
   };
 </script>
