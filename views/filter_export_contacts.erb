@@ -1,60 +1,18 @@
 <%
-  # map some params who are specific for for the filter
-  redirect_on_error = session['redirect_on_error']
-
-  # setup default values
-  redirect_on_error = "/leads/results" if redirect_on_error.to_s.size == 0
-  redirect_on_success = "/leads/results" if redirect_on_success.to_s.size == 0
-
-  begin
-
-    contact_per_company = params["optradio"] if params["optradio"] != nil
-    export_only_first = params["export_only"] if params["export_only"] != nil
-    no_of_contacts = params["no_of_contacts"] if params["no_of_contacts"] != nil
-    file_name = params["file_name"] if params["file_name"] != nil
-    total_rows = params["total-rows"]
-
-
-    @login.user.preference('leads.exports.settings.contact_per_company', '', contact_per_company)
-    @login.user.preference('leads.exports.settings.export_only_first', '', export_only_first)
-    @login.user.preference('leads.exports.settings.no_of_contacts', '', no_of_contacts)
-    @login.user.preference('leads.exports.settings.file_name', '', file_name)
-
-    filter_position = @login.user.preference("leads.exports.filter.filter_position", "", params[:position])
-    filter_industry = @login.user.preference("leads.exports.filter.filter_industry", "", params[:industry])
-    filter_location = @login.user.preference("leads.exports.filter.filter_location", "", params[:location])
-
-
-    s = nil
-    DB.transaction do
-      # sace search
-      s = Leads::FlSearch.new({'saved' =>  false, 'id_user' =>  @login.user.id, 'name' =>  file_name,
-                               'description' =>  nil,
-                               'no_of_results' =>  total_rows.to_i, 'no_of_companies' =>  nil,
-                               'positions' =>  [{"value" =>  filter_position, "positive" =>  true}],
-                               'locations' =>  [{"value" =>  filter_location, "positive" =>  true}],
-                               'industries' =>  [{"name" =>  filter_industry, "positive" =>  true}] })
-      s.save
-
-      export = Leads::FlExport.new
-      export.id_user = @login.user.id
-      export.id_search = s.id
-      export.id = guid
-      export.create_time = now
-      export.save
-    end # transaction
-
-
-  rescue => e
-    # libero recursos
-    DB.disconnect
-    GC.start
-    # return errors
-    redirect "#{redirect_on_error}?err="+ CGI::escape(e.message)
-  end
+begin
+  contact_per_company = params["optradio"] if params["optradio"] != nil
+  export_only_first = params["export_only"] if params["export_only"] != nil
+  no_of_contacts = params["no_of_contacts"] if params["no_of_contacts"] != nil
+  file_name = params["file_name"] if params["file_name"] != nil
+  total_rows = params["total-rows"]
 
 
 
-  # redirect
-  redirect "#{redirect_on_success}?msg=Export+Job+Created"
+  # return errors
+#  redirect "/leads/results?msg="+ CGI::escape('Export List Created Successfully.')
+
+rescue => e
+  # return errors
+  redirect "/leads/results?err="+ CGI::escape(e.message)
+end
 %>

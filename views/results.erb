@@ -327,10 +327,12 @@ div.lead-card div.data span.headline {
         <input type="text" id="file_name" name="file_name" placeholder="sample">
         .csv
       </div>
-      <input type="hidden" name="total-rows" value="<%=status['total_rows']%>">
-      <input type="hidden" name="position" id="e-position">
-      <input type="hidden" name="industry" id="e-industry">
-      <input type="hidden" name="location" id="e-location">
+      <input type="hidden" class="positive_positions" name="positive_positions" id='positive_positions' value="<%= positive_positions.to_s.encode_html%>" />
+      <input type="hidden" class="positive_industries" name="positive_industries" id='positive_industries' value="<%= positive_industries.to_s.encode_html%>" />
+      <input type="hidden" class="positive_locations" name="positive_locations" id='positive_locations' value="<%=positive_locations.to_s.encode_html%>" />
+      <input type="hidden" class="negative_positions" name="negative_positions" id='negative_positions' value="<%= negative_positions.to_s.encode_html%>" />
+      <input type="hidden" class="negative_industries" name="negative_industries" id='negative_industries' value="<%= negative_industries.to_s.encode_html%>" />
+      <input type="hidden" class="negative_locations" name="negative_locations" id='negative_locations' value="<%=negative_locations.to_s.encode_html%>" />
     </div>
     <div class="modal-footer">
       <a href="#" data-dismiss="modal" class="btn">Close</a>
@@ -342,13 +344,13 @@ div.lead-card div.data span.headline {
 <!-- hidden form with fitlers to submit -->
 <section class='row-fluid' style='visibility:hidden;width=0;height=0;'>
   <form id="filters-form" action="/leads/filter_results" method="post">
-    <input class="input input-block-level" id="positive_positions" name="positive_positions" value="<%= positive_positions.to_s.encode_html%>" />
-    <input class="input input-block-level" id="positive_industries" name="positive_industries" value="<%= positive_industries.to_s.encode_html%>" />
-    <input class="input input-block-level" id="positive_locations" name="positive_locations" value="<%=positive_locations.to_s.encode_html%>" />
+    <input type="text" id="positive_positions" class="positive_positions" name="positive_positions" value="<%= positive_positions.to_s.encode_html%>" />
+    <input type="text" id="positive_industries" class="positive_industries" name="positive_industries" value="<%= positive_industries.to_s.encode_html%>" />
+    <input type="text" id="positive_locations" class="positive_locations" name="positive_locations" value="<%=positive_locations.to_s.encode_html%>" />
 
-    <input class="input input-block-level" id="negative_positions" name="negative_positions" value="<%= negative_positions.to_s.encode_html%>" />
-    <input class="input input-block-level" id="negative_industries" name="negative_industries" value="<%= negative_industries.to_s.encode_html%>" />
-    <input class="input input-block-level" id="negative_locations" name="negative_locations" value="<%=negative_locations.to_s.encode_html%>" />
+    <input type="text" id="negative_positions" class="negative_positions" name="negative_positions" value="<%= negative_positions.to_s.encode_html%>" />
+    <input type="text" id="negative_industries" class="negative_industries" name="negative_industries" value="<%= negative_industries.to_s.encode_html%>" />
+    <input type="text" id="negative_locations" class="negative_locations" name="negative_locations" value="<%=negative_locations.to_s.encode_html%>" />
 
     <button type="submit" class="btn btn-link" id='search' name='search'>Search</button>
   </form>
@@ -367,12 +369,12 @@ div.lead-card div.data span.headline {
       <br/><br/>
       <label for="inputDescription">Description</label>
       <textarea name="search_description" style="width: 97%" placeholder="Description" maxlength="2000" id="inputPassword" cols="30" rows="10"></textarea>
-      <input type="hidden" name="positive_positions" id='f_positive_positions' value="<%= positive_positions.to_s.encode_html%>" />
-      <input type="hidden" name="positive_industries" id='f_positive_industries' value="<%= positive_industries.to_s.encode_html%>" />
-      <input type="hidden" name="positive_locations" id='f_positive_locations' value="<%=positive_locations.to_s.encode_html%>" />
-      <input type="hidden" name="negative_positions" id='f_negative_positions' value="<%= negative_positions.to_s.encode_html%>" />
-      <input type="hidden" name="negative_industries" id='f_negative_industries' value="<%= negative_industries.to_s.encode_html%>" />
-      <input type="hidden" name="negative_locations" id='f_negative_locations' value="<%=negative_locations.to_s.encode_html%>" />
+      <input type="hidden" class="positive_positions" name="positive_positions" id='positive_positions' value="<%= positive_positions.to_s.encode_html%>" />
+      <input type="hidden" class="positive_industries" name="positive_industries" id='positive_industries' value="<%= positive_industries.to_s.encode_html%>" />
+      <input type="hidden" class="positive_locations" name="positive_locations" id='positive_locations' value="<%=positive_locations.to_s.encode_html%>" />
+      <input type="hidden" class="negative_positions" name="negative_positions" id='negative_positions' value="<%= negative_positions.to_s.encode_html%>" />
+      <input type="hidden" class="negative_industries" name="negative_industries" id='negative_industries' value="<%= negative_industries.to_s.encode_html%>" />
+      <input type="hidden" class="negative_locations" name="negative_locations" id='negative_locations' value="<%=negative_locations.to_s.encode_html%>" />
     </div>
     <div class="modal-footer">
       <a href="#" data-dismiss="modal" class="btn">Close</a>
@@ -398,7 +400,7 @@ div.lead-card div.data span.headline {
       s += value.trim();
       i++;
     });
-    $('#positive_positions').val(s);
+    $('.positive_positions').val(s);
 
     // negative positions
     i = 0;
@@ -408,7 +410,7 @@ div.lead-card div.data span.headline {
       s += value.trim();
       i++;
     });
-    $('#negative_positions').val(s);
+    $('.negative_positions').val(s);
 
     // positive industries
     i = 0;
@@ -418,7 +420,7 @@ div.lead-card div.data span.headline {
       s += value.trim();
       i++;
     });
-    $('#positive_industries').val(s);
+    $('.positive_industries').val(s);
 
     // negative industries
     i = 0;
@@ -428,7 +430,7 @@ div.lead-card div.data span.headline {
       s += value.trim();
       i++;
     });
-    $('#negative_industries').val(s);
+    $('.negative_industries').val(s);
 
     // positive locations
     i = 0;
@@ -438,7 +440,7 @@ div.lead-card div.data span.headline {
       s += value.trim();
       i++;
     });
-    $('#positive_locations').val(s);
+    $('.positive_locations').val(s);
 
     // negative locations
     i = 0;
@@ -448,7 +450,7 @@ div.lead-card div.data span.headline {
       s += value.trim();
       i++;
     });
-    $('#negative_locations').val(s);
+    $('.negative_locations').val(s);
   }
 
   // enable/disable the add button depending on the value of the textfield
@@ -887,6 +889,7 @@ div.lead-card div.data span.headline {
     // modals
     $('.save_modal').hide();
     $('.export_leads').hide();
+
     $('#inputName').on('input', function() {
       if($(this).val() !== '') {
         $('#f_positive_positions').val($('#positive_positions').val())
@@ -900,6 +903,7 @@ div.lead-card div.data span.headline {
         $('#save-search').attr('disabled', 'disabled');
       }
     });
+
     $('#file_name').on('input', function(){
       if(validate_export_modal()){
         $('#save-export').removeAttr('disabled');
@@ -908,6 +912,7 @@ div.lead-card div.data span.headline {
         $('#save-export').attr('disabled', 'disabled');
       }
     });
+
     $('#export_checkbox').on('change', function(){
       if(validate_export_modal()){
         $('#save-export').removeAttr('disabled');
@@ -916,6 +921,7 @@ div.lead-card div.data span.headline {
         $('#save-export').attr('disabled', 'disabled');
       }
     });
+
     $('#no_of_contacts').on('input', function(){
       if(validate_export_modal()){
         $('#save-export').removeAttr('disabled');
