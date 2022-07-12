@@ -31,6 +31,11 @@ module Leads
       end
     end
 
+    # return a descripive name for the type of this object
+    def type_name
+      Leads::FlData.type_name(self.type)
+    end
+
     # validate the format of the value `v`, depending on the type `t`.
     def self.validate_value(t, v)
       if t == Leads::FlData::TYPE_PHONE
