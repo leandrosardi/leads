@@ -20,7 +20,7 @@ begin
   raise "If you choose 'Export Only First', the number of records must be an integer higher than 0" if !number_of_records.nil? && number_of_records == 0
 
   # validation: filename must be a valid filename
-  raise "Filename must be a valid filename (only letters, under-dashes and dots are allowed)" if filename !~ /^[a-zA-Z\_\.]+$/
+  raise "Filename must be a valid filename (only letters, numbers, underscores and dots are allowed)" if filename !~ /^[0-9a-zA-Z\_\.]+$/
 
   # validate: this account has not any other export with this filename
   raise "Filename already exists" if BlackStack::Leads::Account.where(:id=>@login.user.id_account).first.exports.select { |e| e.filename.upcase == filename.upcase }.size > 0
