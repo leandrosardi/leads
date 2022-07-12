@@ -11,9 +11,9 @@ all = "
     COALESCE(e.allow_multiple_contacts_per_company, false) as allow_multiple_contacts_per_company, -- allow multiple contacts per company, only for bulk exports
 
     -- file creation status
-    create_file_start_time,
-    create_file_end_time,
-    create_file_success,
+    e.create_file_start_time,
+    e.create_file_end_time,
+    COALESCE(e.create_file_success, false) as create_file_success,
 
     -- file creation result
     e.no_of_results, -- how many leads exported
@@ -107,11 +107,25 @@ q = "
             <td class='fix' style='text-align:right;'><%=row[:id_search].nil? ? 'n/a' : row[:number_of_records].to_i.to_label%></td>
             <td class='fix' style='text-align:right;'><%=row[:id_search].nil? ? 'n/a' : ( row[:allow_multiple_contacts_per_company] ? "<span class='badge badge-blue'>yes</span>" : "<span class='badge badge-gray'>no</span>" )%></td>
 
-            <td class='fix' style='text-align:right;'><%=row[:no_of_results].to_i.to_label%></td>
-            <td class='fix' style='text-align:right;'><%=row[:no_of_companies].to_i.to_label%></td>
+            <td class='fix' style='text-align:right;'><%=row[:create_file_success] && !row[:create_file_end_time].nil? ? row[:no_of_results].to_i.to_label : '-'%></td>
+            <td class='fix' style='text-align:right;'><%=row[:create_file_success] && !row[:create_file_end_time].nil? ? row[:no_of_companies].to_i.to_label : '-'%></td>
 
             <td>
-              <a href="/leads/results/<%= row[:id_search] %>/download" class="btn btn-link"><i class='icon-cloud-download'></i></a>
+              <%
+              if row[:create_file_success] && !row[:create_file_end_time].nil? 
+                %>
+                <a href="/leads/results/<%= row[:id_search] %>/download" class="btn btn-link"><i class='icon-cloud-download'></i></a>
+                <%
+              elsif !row[:create_file_success] && !row[:create_file_end_time].nil? 
+                %>
+                <i style='color:red;'>failed</i>
+                <%
+              else
+                %>
+                <i>pending</i>
+                <%
+              end
+              %>
             </td>
           </tr>
         <%
