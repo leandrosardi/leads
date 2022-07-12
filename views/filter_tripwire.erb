@@ -11,10 +11,11 @@ begin
         'no_of_companies' => -1,
         'positions' => selected_positions.map { |position| { 'value' => position, 'positive' => true } },
         'locations' => [],
-        'industries' => [
-            { 'name' => industry_name, 'positive' => true },
-        ],
+        'industries' => [],
     })
+
+    o['industries'] << industry_name.to_s if industry_name.to_s.length > 0
+
     o.save
     redirect "/leads/results/#{o.id.to_guid}?number=1"
 rescue => e

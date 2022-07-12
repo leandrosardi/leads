@@ -1,7 +1,6 @@
 <%
 	industry_name = @login.user.preference('leads.wizard.industry_name', '', nil)
 	err = params[:err]
-	industries_list = []
 %>
 
 <% if err!=nil %>
@@ -28,7 +27,6 @@
 			<datalist id="industries_list">
 				<% 
 				Leads::FlIndustry.all.each do |industry| 
-					industries_list << industry
 					%>
 					<option onclick="set_button_state()" value="<%= industry.name.to_s.encode_html %>"> <%= industry.name.to_s.encode_html %> </option>
 					<%
@@ -71,9 +69,7 @@
 
 		let selected_value = $('#industry_name').val()
 
-		console.log(selected_value)
-
-		return values.indexOf(selected_value) !== -1;
+		return selected_value == '' || values.indexOf(selected_value) !== -1;
 	}
 
 	function set_button_state(){
