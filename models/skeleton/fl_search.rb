@@ -248,6 +248,15 @@ module Leads
         { 'query_field' => 'l.stat_has_phone' },  
         { 'query_field' => "
           (
+            SELECT d.value
+            FROM fl_data d
+            WHERE d.id_lead=l.id
+            AND d.type = #{Leads::FlData::TYPE_LINKEDIN.to_s}
+            LIMIT 1
+          ) AS linkedin_url
+        "},
+        { 'query_field' => "
+          (
             CASE 
             WHEN (
               SELECT COUNT(*) AS n 

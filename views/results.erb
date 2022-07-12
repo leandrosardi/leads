@@ -241,7 +241,14 @@ div.lead-card div.data span.headline {
       </div>
 
       <div class='insights'>
-          <span class='name'><%=row[:name].to_s.encode_html%></span>
+          <span class='name'><%=row[:name].to_s.encode_html%> </span>
+          <%
+          if !row[:linkedin_url].nil?
+          %>
+          <a href='<%=row[:linkedin_url].to_s.encode_html%>' target='_window'><i class='icon-linkedin'></i></a>
+          <%
+          end
+          %>
           <br/>
           <span class='headline li-headline'><%=row[:position].to_s.encode_html%></span>
           <br/>
