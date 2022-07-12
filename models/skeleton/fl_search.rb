@@ -161,7 +161,7 @@ module Leads
       if a.size > 0
         q0 += " AND ( "
         a.each_with_index do |p,i|
-          q0 += " l.position LIKE '%#{p.value.to_s.to_sql}%' "
+          q0 += " UPPER(l.position) LIKE '%#{p.value.to_s.upcase.to_sql}%' "
           q0 += " OR " if i<a.size-1
         end
         q0 += " ) "
