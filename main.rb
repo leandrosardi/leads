@@ -51,6 +51,38 @@ BlackStack::I2P::add_plans([
         # recurrent billing plan or one-time payments
         :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,  
         # show this plan in the UI
+        :public=>false,
+        # is this a One-Time Offer?
+        # true: this plan is available only if the account has not any invoice using this plan
+        # false: this plan can be purchased many times
+        :one_time_offer=>true,  
+        # plan description
+        :item_number=>'leads.offer', 
+        :name=>'90% Off', 
+        # trial configuration
+        :trial_credits=>280, 
+        :trial_fee=>7, 
+        :trial_units=>1, 
+        :trial_period=>'month',     
+        # billing details
+        :credits=>28, 
+        :normal_fee=>7, # cognitive bias: expensive fee to show it strikethrough, as the normal price. But it's a lie. 
+        :fee=>7, # this is the fee that your will charge to the account, as a special offer price.
+        :period=>'month',
+        :units=>1, # billed monthy
+		# Force credits expiration in the moment when the client 
+		# renew with a new payment from the same subscription.
+		# Activate this option for every allocation service.
+		:expiration_on_next_payment => true, # default true
+		# Additional period after the billing cycle - Extend 2 weeks after the billing cycle - Referemce: https://github.com/ExpandedVenture/ConnectionSphere/issues/283.
+		:expiration_lead_period => 'day', #'M', # default day
+		:expiration_lead_units => 365 #3, # default 0
+    }, {
+        # which product is this plan belonging
+        :service_code=>'leads', 
+        # recurrent billing plan or one-time payments
+        :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,  
+        # show this plan in the UI
         :public=>true,
         # is this a One-Time Offer?
         # true: this plan is available only if the account has not any invoice using this plan
@@ -65,6 +97,13 @@ BlackStack::I2P::add_plans([
         :fee=>7, # this is the fee that your will charge to the account, as a special offer price.
         :period=>'month',
         :units=>1, # billed monthy
+		# Force credits expiration in the moment when the client 
+		# renew with a new payment from the same subscription.
+		# Activate this option for every allocation service.
+		:expiration_on_next_payment => true, # default true
+		# Additional period after the billing cycle - Extend 2 weeks after the billing cycle - Referemce: https://github.com/ExpandedVenture/ConnectionSphere/issues/283.
+		:expiration_lead_period => 'day', #'M', # default day
+		:expiration_lead_units => 365 #3, # default 0
     }, {
         # which product is this plan belonging
         :service_code=>'leads', 
@@ -85,6 +124,13 @@ BlackStack::I2P::add_plans([
         :fee=>27, # this is the fee that your will charge to the account, as a special offer price.
         :period=>'month',
         :units=>1, # billed monthy
+		# Force credits expiration in the moment when the client 
+		# renew with a new payment from the same subscription.
+		# Activate this option for every allocation service.
+		:expiration_on_next_payment => true, # default true
+		# Additional period after the billing cycle - Extend 2 weeks after the billing cycle - Referemce: https://github.com/ExpandedVenture/ConnectionSphere/issues/283.
+		:expiration_lead_period => 'day', #'M', # default day
+		:expiration_lead_units => 365 #3, # default 0
     }, {
         # which product is this plan belonging
         :service_code=>'leads', 
@@ -105,5 +151,12 @@ BlackStack::I2P::add_plans([
         :fee=>47, # this is the fee that your will charge to the account, as a special offer price.
         :period=>'month',
         :units=>1, # billed monthy
+		# Force credits expiration in the moment when the client 
+		# renew with a new payment from the same subscription.
+		# Activate this option for every allocation service.
+		:expiration_on_next_payment => true, # default true
+		# Additional period after the billing cycle - Extend 2 weeks after the billing cycle - Referemce: https://github.com/ExpandedVenture/ConnectionSphere/issues/283.
+		:expiration_lead_period => 'day', #'M', # default day
+		:expiration_lead_units => 365 #3, # default 0
     }
 ])

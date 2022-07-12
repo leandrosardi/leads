@@ -1,0 +1,23 @@
+<%
+begin
+    selected_positions = @login.user.preference('leads.wizard.job_positions', '', nil).split(/,/)
+    industry_name = @login.user.preference('leads.wizard.industry_name', '', nil)
+    o = Leads::FlSearch.new ({
+        'name' => "Wizard search #{now}",
+        'description' => "Wizard search #{now}.",
+        'id_user' => BlackStack::MySaaS::User.first.id,
+        'saved' => false,
+        'no_of_results' => -1,
+        'no_of_companies' => -1,
+        'positions' => selected_positions.map { |position| { 'value' => position, 'positive' => true } },
+        'locations' => [],
+        'industries' => [
+            { 'name' => industry_name, 'positive' => true },
+        ],
+    })
+    o.save
+    redirect "/leads/results/#{o.id.to_guid}?number=1"
+rescue => e
+    redirect "/leads/step2?err="+ CGI::escape(e.message)
+end
+%>

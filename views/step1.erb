@@ -1,25 +1,17 @@
 <%
-	msgerr = params[:msgerr]
-	err = params[:err]
-	msg = params[:msg]
+selected_positions = @login.user.preference('leads.wizard.job_positions', '', nil).split(/,/)
+err = params[:err]
 %>
-<% if msgerr!=nil %>
-	<div class="alert alert-error">
-		<a href="#" class="close" data-dismiss="alert"><i class='icon-remove-sign'></i></a><%=msgerr.to_s.encode_html%>
-	</div>
-<% end # err %>
 
-<% if err!=nil %>
+<% 
+if !err.nil? 
+%>
 	<div class="alert alert-error">
 		<%=err.to_s.encode_html%>
 	</div>
-<% end # err %>
-
-<% if msg!=nil %>
-	<div class="alert alert-info">
-		<a href="#" class="close" data-dismiss="alert"><i class='icon-remove-sign'></i></a><%=msg.encode_html%>
-	</div>
-<% end # msg %>
+<% 
+end # err
+%>
 
 <section class="box" height='500px' align='center' valign='middle'>
 	<br/>
@@ -34,54 +26,29 @@
 	<form method='post' action='/leads/filter_step1'>
 		<section class='row-fluid'>
 			<table align='center' valign='middle' cellspacing="1px" cellpadding="5px">
-			<%
-				arPositions = Leads::JOBPOSITIONS
-				arPositions.uniq!
-				n = 0
-				while (n<arPositions.size)
-				%>
 				<tr valign='middle' style='vertical-align:middle;' >
-					<%
-					checked=""
-					if (session[arPositions[n].to_sym].to_s.size>0)
-						checked="checked"
-					end
-					%>
-					<td width='50px' style='vertical-align:middle;' align='center'><input type='checkbox' style='font-size:28pt;transform:scale(2.5, 2.5);' value='<%=arPositions[n]%>' id='<%=arPositions[n]%>' name='<%=arPositions[n]%>' <%=checked%>></td>
-					<td width='50px' style='vertical-align:bottom;' align='left'><p style='font-size:14pt'><%=arPositions[n]%></p></td>
-					<td width='50px'></td>
-					<%
-					n=n+1
-					if (n<arPositions.size)
-						checked=""
-						if (session[arPositions[n].to_sym].to_s.size>0)
-							checked="checked"
-						end
-					%>
-					<td width='50px' style='vertical-align:middle;' align='center'><input type='checkbox' style='font-size:28pt;transform:scale(2.5, 2.5);' value='<%=arPositions[n]%>' id='<%=arPositions[n]%>' name='<%=arPositions[n]%>' <%=checked%>></td>
-					<td width='50px' style='vertical-align:bottom;' align='left'><p style='font-size:14pt'><%=arPositions[n]%></p></td>
-					<td width='50px'></td>
-					<%
-					end
-
-					n=n+1
-					if (n<arPositions.size)
-						checked=""
-						if (session[arPositions[n].to_sym].to_s.size>0)
-							checked="checked"
-						end
-					%>
-					<td width='50px' style='vertical-align:middle;' align='center'><input type='checkbox' style='font-size:28pt;transform:scale(2.5, 2.5);' value='<%=arPositions[n]%>' id='<%=arPositions[n]%>' name='<%=arPositions[n]%>' <%=checked%>></td>
-					<td width='50px' style='vertical-align:bottom;' align='left'><p style='font-size:14pt'><%=arPositions[n]%></p></td>
-					<%
-					end
-
-					n=n+1
-					%>
-				</tr>
 				<%
-				end # while
+				n = 0
+				Leads::JOBPOSITIONS.each { |pos|
+					checked = selected_positions.include?(pos) ? 'checked' : ''
+
+					if n % 3 == 0
+						%>
+						</tr>
+						<tr valign='middle' style='vertical-align:middle;' >
+						<%
+					end
+
+					%>
+					<td width='50px' style='vertical-align:middle;' align='center'><input type='checkbox' style='font-size:28pt;transform:scale(2.5, 2.5);' value='<%=pos%>' id='<%=pos%>' name='<%=pos%>' <%=checked%>></td>
+					<td width='50px' style='vertical-align:bottom;' align='left'><p style='font-size:14pt'><%=pos%></p></td>
+					<td width='50px'></td>
+
+					<%
+					n +=1
+				} # while
 				%>
+				</tr>
 			
 				<tr valign='middle'>
 					<td align='right' colspan=8>
@@ -92,14 +59,13 @@
 			</table>
 		</section>	
 		<br/>
-		<section class='row-fluid'>
+		<section class='row-fluid text-right'>
 			<button class="btn btn-primary btn-large" id="step1-next" disabled>Next <i class="icon-long-arrow-right"></i></button>&nbsp;&nbsp;
 		</section>
 	</form>
 </section>
 
 <script type="text/javascript" charset="utf-8">
-
 	$(document).ready(function() {
 
 		set_button_state();
@@ -123,5 +89,4 @@
 			$("#step1-next").attr("disabled","disabled");
 		}
 	}
-	
 </script>

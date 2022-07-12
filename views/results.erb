@@ -58,8 +58,10 @@ status = s.status(i)
       <%=nav2("Leads", "/leads/landing", "Results")%>
     </div>
     <div class="span6" align="right" style="text-align: right;alignment-adjust: right; margin-left: 0;">
-      <button type="button" class="btn btn-primary" data-toggle="modal" id='open_save_modal' data-target=".save_modal">Save Search</button>
-      <button type="button" class="btn btn-cyan" data-toggle="modal" id='open_export_leads_modal' data-target=".export_leads">Exports Leads</button>
+      <a class="btn btn-blue" id='new_search' href='/leads/step1'><i class='icon-plus'></i> New</a>
+      <button type="button" class="btn btn-gray" data-toggle="modal" id='open_save_modal' data-target=".save_modal">Save Search</button>
+      <button type="button" class="btn btn-gray" data-toggle="modal" id='open_export_leads_modal' data-target=".export_leads">Exports Leads</button>
+      <a class="btn btn-green" id='add_credits' href='/leads/plans'>Add Credits</a>
     </div>
   </section>
 </div>

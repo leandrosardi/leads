@@ -1,26 +1,14 @@
 <%
-	msgerr = params[:msgerr]
+	industry_name = @login.user.preference('leads.wizard.industry_name', '', nil)
 	err = params[:err]
-	msg = params[:msg]
 	industries_list = []
 %>
-<% if msgerr!=nil %>
-	<div class="alert alert-error">
-		<a href="#" class="close" data-dismiss="alert"><i class='icon-remove-sign'></i></a><%=msgerr.to_s.encode_html%>
-	</div>
-<% end # err %>
 
 <% if err!=nil %>
 	<div class="alert alert-error">
 		<%=err.to_s.encode_html%>
 	</div>
 <% end # err %>
-
-<% if msg!=nil %>
-	<div class="alert alert-info">
-		<a href="#" class="close" data-dismiss="alert"><i class='icon-remove-sign'></i></a><%=msg.encode_html%>
-	</div>
-<% end # msg %>
 
 <section class="box" height='500px' align='center' valign='middle'>
 	<br/>
@@ -36,13 +24,18 @@
 	<section class='row-fluid'>
 		<div class='span3'></div>
 		<div class='span6' style="margin-left: 80px;">
-				<input  style='font-size:14pt;height:45px;width:550px;text-align:left; ' type="text" class="awesomplete" name="industry_name" id="industry_name" list="industries_list" placeholder="Start writing your Industry here" autocomplete="false" value="" tabindex="6">
+			<input  style='font-size:14pt;height:45px;width:550px;text-align:left; ' type="text" class="awesomplete" name="industry_name" id="industry_name" list="industries_list" placeholder="Start writing your Industry here" autocomplete="false" value="<%=industry_name.to_s.encode_html%>" tabindex="6">
 			<datalist id="industries_list">
-				<!-- TODO: iterate of table of industries industries here -->
-				<% Leads::FlIndustry.all.each do |industry| %>
-					<% industries_list.push(industry) %>
-					<option onclick="set_button_state()" value="<%= industry.name %>"> <%= industry.name %> </option>
-				<% end %>
+				<% 
+				Leads::FlIndustry.all.each do |industry| 
+					industries_list << industry
+					%>
+					<option onclick="set_button_state()" value="<%= industry.name.to_s.encode_html %>"> <%= industry.name.to_s.encode_html %> </option>
+					<%
+					GC.start
+					DB.disconnect
+				end
+				%>
 			</datalist>
 		</div>
 	</section>

@@ -67,7 +67,7 @@ post "/leads/filter_step2", :auth => true do
     erb :"/extensions/leads/views/filter_step2"
 end
 
-post "/leads/filter_tripwire", :auth => true do
+get "/leads/filter_tripwire", :auth => true do
     erb :"/extensions/leads/views/filter_tripwire"
 end
 
