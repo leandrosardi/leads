@@ -220,7 +220,7 @@ module Leads
     # This method works with the TableHelper module.
     # return an array of hashes with the columns of the table
     def columns(h={})
-      id_account = h[:id_account].nil? ? nil : h[:id_account]
+      id_account = h['id_account'].nil? ? nil : h['id_account']
 
       [
         { 'query_field' => 'l.id' }, 
