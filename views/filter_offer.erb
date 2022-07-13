@@ -13,9 +13,7 @@ begin
         'locations' => [],
         'industries' => [],
     }
-
-    h['industries'] << industry_name.to_s if industry_name.to_s.length > 0
-
+    h['industries'] << { 'name' => industry_name.to_s, 'positive' => true } if industry_name.to_s.length > 0
     o = Leads::FlSearch.new(h)
     o.save
     redirect "/leads/results/#{o.id.to_guid}?number=1"
