@@ -1,7 +1,7 @@
 <%
 begin
   @login.user.preference('leads.wizard.industry_name', '', params[:industry_name])
-  redirect "/leads/tripwire"
+  redirect "/leads/offer"
 rescue => e
   redirect "/leads/step2?err="+ CGI::escape(e.message)
 end

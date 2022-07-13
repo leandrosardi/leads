@@ -1,4 +1,6 @@
 <%
+account = BlackStack::I2P::Account.where(:id=>@login.user.id_account).first
+
 # creating a dummy search, in case that user has not any preference yet.
 # such a dummy search won't never be saved in the database.
 s = Leads::FlSearch.new ({
@@ -66,7 +68,18 @@ status = s.status(i)
       <a class="btn btn-blue" id='new_search' href='/leads/step1'><i class='icon-plus'></i> New</a>
       <button type="button" class="btn btn-gray" data-toggle="modal" id='open_save_modal' data-target=".save_modal">Save Search</button>
       <button type="button" class="btn btn-gray" data-toggle="modal" id='open_export_leads_modal' data-target=".export_leads">Exports Leads</button>
+      <%
+      if account.disabled_trial?
+      %>
       <a class="btn btn-green" id='add_credits' href='/leads/plans'>Buy Credits!</a>
+      <%
+      else
+      %>
+      <a class="btn btn-green" id='add_credits' href='/leads/offer'><i class='icon-gift'></i> Claim 90% Off!</a>
+      <%
+      end
+      %>
+
     </div>
   </section>
 </div>

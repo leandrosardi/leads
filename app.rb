@@ -12,8 +12,8 @@ get "/leads/", :auth => true, :agent => /(.*)/ do
 end
 
 # public screens (landing page)
-get "/leads/landing", :agent => /(.*)/ do
-    erb :"/extensions/leads/views/landing", :layout => :"/views/layouts/public"
+get "/leads/signup", :agent => /(.*)/ do
+    erb :"/extensions/leads/views/signup", :layout => :"/views/layouts/public"
 end
 
 # internal wizard (funnel) screens
@@ -25,8 +25,13 @@ get "/leads/step2", :auth => true, :agent => /(.*)/ do
     erb :"/extensions/leads/views/step2", :layout => :"/views/layouts/public"
 end
 
-get "/leads/tripwire", :auth => true, :agent => /(.*)/ do
-    erb :"/extensions/leads/views/tripwire", :layout => :"/views/layouts/public"
+get "/leads/offer", :auth => true, :agent => /(.*)/ do
+    account = BlackStack::I2P::Account.where(:id=>@login.user.id_account).first
+    if account.disabled_trial?
+        redirect '/leads/plans' 
+    else
+        erb :"/extensions/leads/views/offer", :layout => :"/views/layouts/public"
+    end
 end
 
 # internal app screens
@@ -67,8 +72,8 @@ post "/leads/filter_step2", :auth => true do
     erb :"/extensions/leads/views/filter_step2"
 end
 
-get "/leads/filter_tripwire", :auth => true do
-    erb :"/extensions/leads/views/filter_tripwire"
+get "/leads/filter_offer", :auth => true do
+    erb :"/extensions/leads/views/filter_offer"
 end
 
 post "/leads/filter_results", :auth => true do
