@@ -513,13 +513,14 @@ div.lead-card div.data span.headline {
     li.style.opacity = opacity;
     // create an icon-ok element, with style green text color
     let icon = document.createElement('i');
-    icon.setAttribute('class', 'icon-ok');
     icon.setAttribute('data-id-export-list', h.id);
     icon.setAttribute('data-id-lead', id_lead);
     if ( h.belonging ) { 
       icon.setAttribute('style', 'color: green');
+      icon.setAttribute('class', 'icon-check');
     } else {
       icon.setAttribute('style', 'color: gray');
+      icon.setAttribute('class', 'icon-check-empty');
     }
       // add the icon and the name of the list to the anchor
     li.appendChild(icon);
@@ -577,9 +578,11 @@ div.lead-card div.data span.headline {
       // if the icon is green, change it to gray
       if ($(li).attr('data-belonging') == 'true') {
         icon.setAttribute('style', 'color: gray');
+        icon.setAttribute('class', 'icon-check-empty');
         li.setAttribute('data-belonging', 'false');
       } else {
         icon.setAttribute('style', 'color: green');
+        icon.setAttribute('class', 'icon-check');
         li.setAttribute('data-belonging', 'true');
       }
       // JavaScript, stop additional event listeners
