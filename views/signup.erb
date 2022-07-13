@@ -1,6 +1,6 @@
 <%
 err = params[:err]
-email = params[:email]
+email = session[:email]
 %>
 <html>
 	<head>
@@ -48,11 +48,11 @@ email = params[:email]
 				<%
 				if err.to_s.size > 0
 				%>
-				<p style='color:red;'><%=err%>.</p>
+				<p style='color:red; font-size:28px;'><%=err%></p>
 				<%
 				else
 				%>
-				<p>Enter your email below to get a sample.</p>
+				<p>Sign Up Below to Get a Sample.</p>
 				<%
 				end # if err.to_s.size > 0
 				%>
@@ -60,12 +60,19 @@ email = params[:email]
 				<div class="flex-container text-left">
 
 
-					<form class='fancy-form span5' action="../filter_signup" method="post" style="margin-top: 15px;">
+					<form class='fancy-form span5' action="/signup" method="post" style="margin-top: 15px;">
+						<input type="hidden" name="redirect_on_success" id="redirect_on_success" value="/leads/step1?service=leads" />
+						<input type="hidden" name="redirect_on_error" id="redirect_on_error" value="/leads/signup" />
+						<input type="hidden" name="companyname" id="id_companyname" value="Unknown Company Name" />
+						<input type="hidden" name="username" id="id_username" value="Fellow Marketer"  />
 						<fieldset>
 							<div class="fields">
-								<input id="id_email" name='email' class=" span5 input-block-level" type="text" placeholder="your@email.com" tabindex=1 value='<%=email.to_s.encode_html%>' required>
+								<input id="id_email" name='email' class=" span5 input-block-level" type="text" placeholder="your@email.com" tabindex=1 onfocus="this.select();" value='<%=email.to_s.encode_html%>' required>
 							</div>
-							<button class="btn btn-large btn-primary" type="submit" value='START' tabindex=2>START</button>
+							<div class="fields">
+								<input id="id_password" name='password' class=" span5 input-block-level" type="password" placeholder="your password" tabindex=2 value='' required>
+							</div>
+							<button class="btn btn-large btn-primary" type="submit" value='START' tabindex=3>SIGNUP</button>
 						</fieldset>
 					</form>
 				</div>
@@ -74,7 +81,7 @@ email = params[:email]
 			<br/>
 
 			<footer id="pagefooter">
-				<p class="pull-right" style="margin-left: 20px;">&copy;<%=Date.today.year.to_s%> <%=COMPANY_NAME%>.</p>
+				<p class="pull-right" style="margin-left: 20px;">&copy;<%=Date.today.year.to_s%> <%=COMPANY_NAME%>. - <a class='btn btn-blue' href='/leads/login'>Members Area</a></p>
 			</footer>
 		</div> <!-- /container -->
 

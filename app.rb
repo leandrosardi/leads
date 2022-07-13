@@ -11,9 +11,14 @@ get "/leads/", :auth => true, :agent => /(.*)/ do
     redirect2 "/leads/results", params
 end
 
-# public screens (landing page)
+# public screens (signup/landing page)
 get "/leads/signup", :agent => /(.*)/ do
     erb :"/extensions/leads/views/signup"
+end
+
+# public screens (login page)
+get "/leads/login", :agent => /(.*)/ do
+    erb :"/extensions/leads/views/login", :layout => :"/views/layouts/public"
 end
 
 # internal wizard (funnel) screens
