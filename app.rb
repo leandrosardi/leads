@@ -13,7 +13,7 @@ end
 
 # public screens (landing page)
 get "/leads/signup", :agent => /(.*)/ do
-    erb :"/extensions/leads/views/signup", :layout => :"/views/layouts/public"
+    erb :"/extensions/leads/views/signup"
 end
 
 # internal wizard (funnel) screens
