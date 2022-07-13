@@ -123,7 +123,7 @@ q = "
               <%
               if row[:create_file_success] && !row[:create_file_end_time].nil? 
                 %>
-                <a href="/clients/<%=@login.user.id_account.to_guid%>/leads.exports/<%=row[:id].to_guid%>.csv" class="btn btn-link"><i class='icon-cloud-download'></i></a>
+                <a href="/clients/<%=@login.user.id_account.to_guid%>/leads.exports/<%=row[:filename].to_s.encode_html%>.csv" class="btn btn-link"><i class='icon-cloud-download'></i></a>
                 <%
               elsif !row[:create_file_success] && !row[:create_file_end_time].nil? 
                 %>

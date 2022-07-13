@@ -79,16 +79,16 @@ module Leads
       l = BlackStack::DummyLogger.new(nil) if l.nil?
       ret = ""
       self.fl_export_leads.each { |x|
-        raise "Lead #{x.id_lead} has not data" if x.datas.size == 0
-        x.datas.each { |d|
+        raise "Lead #{x.id_lead} has not data" if x.fl_lead.fl_datas.size == 0
+        x.fl_lead.fl_datas.each { |d|
           ret += "#{x.id_lead},"
-          ret += "\"#{x.fl_lead.name.gsub('"', '')}\","
-          ret += "\"#{x.fl_lead.position.gsub('"', '')}\","
-          ret += "\"#{x.fl_lead.stat_company_name.gsub('"', '')}\","
-          ret += "\"#{x.fl_lead.stat_industry_name.gsub('"', '')}\","
-          ret += "\"#{x.fl_lead.stat_location_name.gsub('"', '')}\","
-          ret += "\"#{d.type_name.to_s.gsub('"', '')}\","
-          ret += "\"#{d.value.gsub('"', '')}\","
+          ret += "\"#{x.fl_lead.name.to_s.gsub('"', '')}\","
+          ret += "\"#{x.fl_lead.position.to_s.gsub('"', '')}\","
+          ret += "\"#{x.fl_lead.stat_company_name.to_s.gsub('"', '')}\","
+          ret += "\"#{x.fl_lead.stat_industry_name.to_s.gsub('"', '')}\","
+          ret += "\"#{x.fl_lead.stat_location_name.to_s.gsub('"', '')}\","
+          ret += "\"#{d.type_name.to_s.to_s.gsub('"', '')}\","
+          ret += "\"#{(d.type.to_i == Leads::FlData::TYPE_PHONE.to_i ? "'" : '') + d.value.to_s.gsub('"', '')}\","
           ret += "\n"
         }
       }
@@ -113,5 +113,17 @@ module Leads
       end
       l.done
     end
+
+    # return the unique companies in the export
+    def count_companies
+      q = "
+        SELECT COUNT(DISTINCT l.id_company) AS n
+        FROM fl_export_lead el
+        JOIN fl_lead l ON ( l.id = el.id_lead )
+        WHERE el.id_export = '#{self.id}'
+      "
+      DB[q].first[:n]
+    end
+
   end
 end

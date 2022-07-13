@@ -23,8 +23,7 @@ while true
   l.done
 
   # iterate all exports with no start time, and a search.
-  exports = Leads::FlExport.where(:create_file_start_time=>nil).all
-  exports.each do |export|
+  Leads::FlExport.where(:create_file_start_time=>nil).all.each do |export|
     l.logs "Processing export #{export.id}"
     begin
       l.logs 'Flag start_time... '
@@ -45,6 +44,8 @@ while true
       l.done
 
       l.logs 'Flag end_time... '
+      export.no_of_results = export.fl_export_leads.count
+      export.no_of_companies = export.count_companies
       export.create_file_end_time = now
       export.create_file_success=true
       export.save
@@ -61,5 +62,10 @@ while true
     end
     l.done
 
-  end
-end
+  end # exports.each 
+
+  l.logs 'Sleeping... '
+  sleep(10)
+  l.done
+
+end # while true
