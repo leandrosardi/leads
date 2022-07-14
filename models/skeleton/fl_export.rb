@@ -48,7 +48,7 @@ module Leads
       if n>0
         q = "
           SELECT DISTINCT l.id
-          #{self.core}
+          #{self.fl_search.core}
           -- este lead no tuvo que haber sido exportado a ninguna otra lista de esta cuenta
           AND l.id NOT IN (
             SELECT DISTINCT el.id_lead
