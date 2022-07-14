@@ -3,7 +3,7 @@ service_name = 'leads'
 # get the service descriptor
 service = BlackStack::I2P::service_descriptor(service_name)
 # get all plans for this service, who are subscriptiosn and who are public
-plans = BlackStack::I2P::plans_descriptor.select { |h| h[:service_code] == service_name && h[:type] == BlackStack::I2P::PAYMENT_SUBSCRIPTION && h[:public] == true }
+plans = BlackStack::I2P::plans_descriptor.select { |h| h[:service_code] == service_name && h[:type].to_s == BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s && h[:public] == true }
 # calculate the number of columns needed
 columns = plans.size
 columns += 1 if service.has_key?(:free_tier)
