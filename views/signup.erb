@@ -6,7 +6,7 @@ err = params[:err]
 redirect_on_success = session['redirect_on_success']
 
 # setup default values
-redirect_on_success = '/leads/results?service=leads' if redirect_on_success.to_s.size == 0
+redirect_on_success = '/leads/step1?service=leads' if redirect_on_success.to_s.size == 0
 %>
 <html>
 	<head>
