@@ -232,7 +232,17 @@ puts s.leads({
 })
 ```
 
-## 7. Disclaimers
+## 7. Running Offline Export Process
+
+It is pending to add the starting of this offline job to the deployer.
+Meanwhile, you can start this by running the command below.
+
+```bash
+cd ~/code/mysaas/extensions/leads/p
+nohup ruby export.rb &
+```
+
+## 8. Disclaimers
 
 This project is still under construction.
 
