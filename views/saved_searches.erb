@@ -81,11 +81,11 @@ q = "
         DB[q].all do |row|
       %>
         <tr>
-          <td><%=row[:create_time].to_s[0..9].encode_html%></td>
-          <td><%=row[:name].to_s.encode_html%></td>
-          <td><%=row[:description].to_s.encode_html%></td>
-          <td><a href='/leads/results/<%=row[:id].to_guid%>'>View</a></td>
-          <td><a class='btn btn-link' title='Delete' href='/leads/filter_delete_saved_search?id=<%=row[:id].to_guid%>'><i class='icon-trash'></i></a></td>
+          <td class='fix'><%=row[:create_time].to_s[0..9].encode_html%></td>
+          <td class='fix'><%=row[:name].to_s.encode_html%></td>
+          <td class='fix'><%=row[:description].to_s.encode_html%></td>
+          <td class='fix'><a href='/leads/results/<%=row[:id].to_guid%>'>View</a></td>
+          <td class='fix'><a class='btn btn-link' title='Delete' href='/leads/filter_delete_saved_search?id=<%=row[:id].to_guid%>'><i class='icon-trash'></i></a></td>
         </tr>
       <%
         end

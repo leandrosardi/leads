@@ -1,6 +1,12 @@
 <%
+email = session['email']
 err = params[:err]
-email = session[:email]
+
+# map some params who are specific for for the filter
+redirect_on_success = session['redirect_on_success']
+
+# setup default values
+redirect_on_success = '/leads/results?service=leads' if redirect_on_success.to_s.size == 0
 %>
 <html>
 	<head>
@@ -61,7 +67,7 @@ email = session[:email]
 
 
 					<form class='fancy-form span5' action="/signup" method="post" style="margin-top: 15px;">
-						<input type="hidden" name="redirect_on_success" id="redirect_on_success" value="/leads/step1?service=leads" />
+						<input type="hidden" name="redirect_on_success" id="redirect_on_success" value="<%=redirect_on_success.to_s.encode_html%>" />
 						<input type="hidden" name="redirect_on_error" id="redirect_on_error" value="/leads/signup" />
 						<input type="hidden" name="companyname" id="id_companyname" value="Unknown Company Name" />
 						<input type="hidden" name="username" id="id_username" value="Fellow Marketer"  />

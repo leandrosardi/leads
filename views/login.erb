@@ -2,8 +2,13 @@
 email = session['email'].to_s
 err = params[:err]
 msg = params[:msg]
-%>
 
+# map some params who are specific for for the filter
+redirect_on_success = session['redirect_on_success']
+
+# setup default values
+redirect_on_success = '/leads/results?service=leads' if redirect_on_success.to_s.size == 0
+%>
 <section class='row-fluid  signin-page' style='vertical-align: middle; height: 100%;' height='100%'>
 	<div class='span4 signin-page'>
 		<!-- Page content
@@ -41,8 +46,7 @@ msg = params[:msg]
 			%>
 
 			<form action="/login" method="post">
-				<input type="hidden" name="action" id="id_action" value="signin">
-				<input type="hidden" name="redirect_on_success" id="redirect_on_success" value="/leads/results?service=leads" />
+				<input type="hidden" name="redirect_on_success" id="redirect_on_success" value="<%=redirect_on_success.to_s.encode_html%>" />
 				<input type="hidden" name="redirect_on_error" id="redirect_on_error" value="/leads/login" />
 				<fieldset>
 					<div class="fields">
