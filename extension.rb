@@ -36,7 +36,7 @@ BlackStack::Extensions::add ({
 
     # deployment routines
     :deployment_routines => [{
-        :name => 'start-mysaas',
+        :name => 'start-export-process',
         :commands => [{ 
             # back up old configuration file
             # setup new configuration file
@@ -46,8 +46,6 @@ BlackStack::Extensions::add ({
                 export RUBYLIB=/home/%ssh_username%/code/mysaas > /dev/null 2>&1;
                 nohup ruby export.rb > /dev/null 2>&1 &
             ",
-            :matches => [ /Already installed ruby/ ],
-            #:nomatches => [ { :nomatch => /.+/, :error_description => 'No output expected.' } ],
             :sudo => false,
         }],
     }],
