@@ -5,10 +5,10 @@ def redirect2(url, params)
 end
 
 # default screen
-get "/leads", :auth => true, :agent => /(.*)/ do
+get "/leads", :agent => /(.*)/ do
     redirect2 "/leads/signup", params
 end
-get "/leads/", :auth => true, :agent => /(.*)/ do
+get "/leads/", :agent => /(.*)/ do
     redirect2 "/leads/signup", params
 end
 
