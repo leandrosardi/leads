@@ -943,19 +943,19 @@ div.lead-card div.buttons div.btn-group ul.dropdown-menu {
     <%
     s.positions.each { |p| 
       %>
-      filtersJs.addValue(positions, '<%=p.value.encode_html%>', <%=p.positive ? 'true' : 'false' %>)
+      filtersJs.addValue(positions, '<%=p.value%>', <%=p.positive ? 'true' : 'false' %>)
       <%
     }
 
     s.industries.each { |i|
       %>
-      filtersJs.addValue(industries, '<%=i.fl_industry.name.encode_html%>', <%=i.positive ? 'true' : 'false' %>)
+      filtersJs.addValue(industries, '<%=i.fl_industry.name%>', <%=i.positive ? 'true' : 'false' %>)
       <%
     }
 
     s.locations.each { |l|
       %>
-      filtersJs.addValue(locations, '<%=l.value.encode_html%>', <%=l.positive ? 'true' : 'false' %>)
+      filtersJs.addValue(locations, '<%=l.value%>', <%=l.positive ? 'true' : 'false' %>)
       <%
     }
     %>
