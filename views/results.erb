@@ -65,11 +65,11 @@ status = s.status(i)
       <%=nav2("Leads", "/leads/landing", "Results")%>
     </div>
     <div class="span6" align="right" style="text-align: right;alignment-adjust: right; margin-left: 0;">
-      <a class="btn btn-blue" id='new_search' href='/leads/step1'><i class='icon-plus'></i> New</a>
+      <a class="btn btn-blue" id='new_search' href='/leads/step1' title='Start a New Search'><i class='icon-plus'></i> New</a>
       <%
       if account.disabled_trial?
       %>
-      <a class="btn btn-green" id='add_credits' href='/leads/plans'>Buy Credits!</a>
+      <a class="btn btn-green" id='add_credits' href='/leads/plans' title='Get Credits to Unlock Records'>Buy Credits!</a>
       <%
       else
       %>
@@ -77,8 +77,8 @@ status = s.status(i)
       <%
       end
       %>
-      <button type="button" class="btn btn-gray" data-toggle="modal" id='open_save_modal' data-target=".save_modal">Save Search</button>
-      <button type="button" class="btn btn-gray" data-toggle="modal" id='open_export_leads_modal' data-target=".export_leads">Exports Leads</button>
+      <button type="button" class="btn btn-gray" data-toggle="modal" id='open_save_modal' data-target=".save_modal" title='Save Search'>Save</button>
+      <button type="button" class="btn btn-gray" data-toggle="modal" id='open_export_leads_modal' data-target=".export_leads" title='Export Leads'>Export</button>
     </div>
   </section>
 </div>

@@ -35,7 +35,7 @@ drawn = 0
 		</div>
 	</section>
 
-	<section class="row-fluid">
+	<section class="row-fluid"'>
 		<%
 		# if there is a free-tier
 		if service.has_key?(:free_tier)
@@ -63,7 +63,7 @@ drawn = 0
 		plans.each do |plan|
 			drawn += 1
 			%>
-			<div class='span<%=spanx.to_s%>'>
+			<div class='span<%=spanx.to_s%> plans'>
 				<div class="plan <%= plan[:item_number] == service[:most_popular_plan] ? 'plan-highlight' : '' %>">
 					<%
 					if plan[:item_number] == service[:most_popular_plan]
