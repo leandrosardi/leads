@@ -10,7 +10,7 @@ plan = BlackStack::I2P::plans_descriptor.select { |h| h[:item_number] == 'leads.
 	<section class="row-fluid">
 		<div class='span12'>
 			<center>
-				<h1>--- One-Time Offer ---</h1>
+				<h1>---One-Time Offer---</h1>
 				<p style='font-size:24px;'><b>280 Records</b> - <b>90% Off</b></p>
 				<br/>
 			</center>
@@ -19,7 +19,7 @@ plan = BlackStack::I2P::plans_descriptor.select { |h| h[:item_number] == 'leads.
 
 	<section class="row-fluid">
 		<div class='span2'></div>
-		<div class='span4'>
+		<div class='span4 plans'>
 			<div class="plan plan-highlight">
 				<p class="plan-recommended">One-Time Offer</p>
 				<h3 class="plan-title"><b><%=plan[:name].to_s.encode_html%></b></h3>
@@ -40,7 +40,7 @@ plan = BlackStack::I2P::plans_descriptor.select { |h| h[:item_number] == 'leads.
 				<a href="/settings/filter_create_invoice?item_number=<%=plan[:item_number]%>&n=1" class="plan-button">Go <%=plan[:name].to_s.encode_html%></a>
 			</div>
 		</div>
-		<div class='span4'>
+		<div class='span4 plans'>
 			<div class="plan">
 				<h3 class="plan-title"><b>Free</b></h3>
 				<p class="plan-price">$0<span class="plan-unit">forever</span></p>
