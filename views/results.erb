@@ -94,29 +94,6 @@ status = s.status(i)
   </section>
 
 <style>
-div.lead-card {
-  position:relative;
-  height:115px;
-  overflow:hidden;
-  width:100%;
-  margin-bottom: 25px;
-  overflow: visible;
-}
-
-div.lead-card div.acronym {
-  position:absolute;
-  left:0;
-  top:0;
-  width:70px;
-  height:50px;
-  overflow:hidden;
-  border-radius:35px;
-  padding-top:20px;
-  font-size:32px;
-  text-align:center;
-  vertical-align:middle;
-  color:white;
-}
 
 div.lead-card div.acronym-color-0 {
   background-color:rgb(0,128,192);
@@ -163,31 +140,8 @@ div.lead-card div.acronym span {
   vertical-align:middle;
 }
 
-div.lead-card div.buttons {
-  position:absolute;
-  right:5px;
-  width:170px;
-  top:0;
-}
-
 div.lead-card div.buttons div.btn-group {
   position:relative;
-}
-
-div.lead-card div.buttons div.btn-group ul.dropdown-menu {
-  position: absolute;
-  right:0px;
-  top:25px;
-  width:155px;
-}
-
-div.lead-card div.insights {
-  position:absolute;
-  left:125px;
-  top:0;
-  width:calc(100% - 70px - 155px - 65px);
-  hright:50px;
-  overflow:hidden;
 }
 
 div.lead-card div.insights span.name {
@@ -198,18 +152,124 @@ div.lead-card div.insights span.headline {
   font-size:12px;
 }
 
-div.lead-card div.data {
-  position:absolute;
-  right:5px;
-  top:35px;
-  width:155px;
-  hright:50px;
-  overflow:hidden;
-  z-order: 99999999;
-}
-
 div.lead-card div.data span.headline {
   font-size:12px;
+}
+
+div.lead-card div.buttons div.btn-group ul.dropdown-menu {
+  position: absolute;
+  right:0px;
+  top:25px;
+  width:155px;
+}
+
+@media (min-width: 485px) {
+  /* CSS that should be displayed if width is higher than 485px goes here */
+  div.lead-card {
+    position:relative;
+    height: 155px;
+    display: block;
+    overflow: auto;
+    width:100%;
+    margin-bottom: 25px;
+    overflow: visible;
+  }
+
+  div.lead-card div.acronym {
+    position:absolute;
+    left:0;
+    top:0;
+    width:70px;
+    height:50px;
+    display: block;
+    overflow: auto;
+    border-radius:35px;
+    padding-top:20px;
+    font-size:32px;
+    text-align:center;
+    vertical-align:middle;
+    color:white;
+  }
+
+  div.lead-card div.buttons {
+    position:absolute;
+    right:5px;
+    width:170px;
+    top:0;
+  }
+
+  div.lead-card div.insights {
+    position:absolute;
+    left:125px;
+    top:0;
+    width:calc(100% - 70px - 155px - 65px);
+    display: block;
+    overflow: auto;
+  }
+
+  div.lead-card div.data {
+    position:absolute;
+    right:5px;
+    top:35px;
+    width:155px;
+    display: block;
+    overflow: auto;
+    z-order: 99999999;
+  }
+}
+
+@media (max-width: 485px) {
+  /* CSS that should be displayed if width is equal to or less than 485px goes here */
+  div.lead-card {
+    position:relative;
+    height: 175px;
+    display: block;
+    overflow: auto;
+    width:100%;
+    margin-bottom: 25px;
+    overflow: visible;
+  }
+
+  div.lead-card div.acronym {
+    position:absolute;
+    left:0;
+    top:0;
+    width:70px;
+    height:50px;
+    display: block;
+    overflow: auto;
+    border-radius:35px;
+    padding-top:20px;
+    font-size:32px;
+    text-align:center;
+    vertical-align:middle;
+    color:white;
+  }
+
+  div.lead-card div.buttons {
+    position:absolute;
+    left:0px;
+    top: 75px;
+  }
+
+  div.lead-card div.insights {
+    position:relative;
+    left:125px;
+    top:0;
+    width:calc(100% - 70px);
+    display: block;
+    overflow: auto;
+  }
+
+  div.lead-card div.data {
+    position:relative;
+    left:125px;
+    margin-top: 10px;
+    width:calc(100%-70px);
+    display: block;
+    overflow: auto;
+    z-order: 99999999;
+  }
 }
 </style>
 
@@ -227,6 +287,23 @@ div.lead-card div.data span.headline {
     <div class='span12 lead-card' id='sample<%=i%>'>
       <div class='acronym acronym-color-<%=i%>'>
         <span><%=acronym.to_s.encode_html%></span>
+      </div>
+
+      <div class='insights'>
+          <span class='name'><%=row[:name].to_s.encode_html%> </span>
+          <%
+          if !row[:linkedin_url].nil?
+          %>
+          <a href='<%=row[:linkedin_url].to_s.encode_html%>' target='_window'><i class='icon-linkedin'></i></a>
+          <%
+          end
+          %>
+          <br/>
+          <span class='headline li-headline'><%=row[:position].to_s.encode_html%></span>
+          <br/>
+          <span class='headline'><b>location:</b> <span class='li-location'><%=row[:stat_location_name].to_s.encode_html%></span></span>
+          <br/>
+          <span class='headline'><b>industry:</b> <span class='li-industry'><%=row[:stat_industry_name].to_s.encode_html%></span></span>
       </div>
 
       <div class='buttons'>
@@ -257,22 +334,6 @@ div.lead-card div.data span.headline {
       %>
       </div>
 
-      <div class='insights'>
-          <span class='name'><%=row[:name].to_s.encode_html%> </span>
-          <%
-          if !row[:linkedin_url].nil?
-          %>
-          <a href='<%=row[:linkedin_url].to_s.encode_html%>' target='_window'><i class='icon-linkedin'></i></a>
-          <%
-          end
-          %>
-          <br/>
-          <span class='headline li-headline'><%=row[:position].to_s.encode_html%></span>
-          <br/>
-          <span class='headline'><b>location:</b> <span class='li-location'><%=row[:stat_location_name].to_s.encode_html%></span></span>
-          <br/>
-          <span class='headline'><b>industry:</b> <span class='li-industry'><%=row[:stat_industry_name].to_s.encode_html%></span></span>
-      </div>
       <div class='data'>
           <%
           if row[:stat_company_name].to_s.size > 0
