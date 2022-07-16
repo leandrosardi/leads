@@ -1,14 +1,12 @@
 ![GitHub issues](https://img.shields.io/github/issues/leandrosardi/leads) ![GitHub](https://img.shields.io/github/license/leandrosardi/leads) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/leandrosardi/leads) ![GitHub last commit](https://img.shields.io/github/last-commit/leandrosardi/leads)
 
-![logo](./public/leads/images/logo.png)
+![logo](./public/leads/images/screenshot.png)
 
 # Leads
 
 **Leads** is an extension of [MySaaS](https://github.com/leandrosardi/mysaas) to publish a makeplace of B2B contacts databases.
 
 Find a live example here: [https://ConnectionSphere.com/leads](https://ConnectionSphere.com/leads)
-
-![logo](./public/leads/images/screenshot.png)
 
 **Outline:**
 
