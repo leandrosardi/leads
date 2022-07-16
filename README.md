@@ -8,6 +8,8 @@
 
 Find a live example here: [https://ConnectionSphere.com/leads](https://ConnectionSphere.com/leads)
 
+![logo](./public/leads/images/screenshot.png)
+
 **Outline:**
 
 1. [Getting Started](#1-getting-started).
