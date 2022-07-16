@@ -4,6 +4,15 @@
 
 # Leads
 
+1. [Getting Started](#1-getting-started).
+2. [Merging a New Leads to the Database](#2-merging-a-new-lead-to-the-database).
+3. [Merging Many Leads to the Database](#3-merging-many-leads-to-the-database).
+4. [Creating Searches](#4-creating-searches).
+5. [Retrieving Table Rows](#5-retrieving-table-rows).
+6. [Retrieving Leads](#6-retrieving-leads).
+7. [Running Offline Export Process](#7-running-offline-export-process).
+8. [Disclaimers](#8-disclaimers).
+
 **Leads** is an extension of MySaaS to offer B2B databases.
 
 ## 1. Getting Started
@@ -34,9 +43,9 @@ git clone https://github.com/leandrosardi/leads/
 BlackStack::Extensions.append :leads
 ```
 
-**Step 4:** Setup **Leads** as an [I2P](https://github.com/leandrosardi/i2p) product and plans.
+**Step 4:** Setup **Leads** as an [I2P](https://github.com/leandrosardi/i2p) product with plans. _(optional)_
 
-The source code of **Leads** extensions is assuming that there is an I2P product called `'leads'`, with some plans defined too.
+Some screens of the **Leads** extensions are assuming that there is an I2P product called `'leads'`, with some plans defined too.
 
 You should add both product and plans in the `config.rb` of **[MySaaS](https://github.com/leandrosardi/mysaas)**.
 
