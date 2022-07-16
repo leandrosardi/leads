@@ -4,7 +4,7 @@
 
 # Leads
 
-**Leads** is an extension of MySaaS to publish a makeplace of B2B contacts databases.
+**Leads** is an extension of [MySaaS](https://github.com/leandrosardi/mysaas) to publish a makeplace of B2B contacts databases.
 
 Find a live example here: [https://ConnectionSphere.com/leads](https://ConnectionSphere.com/leads)
 
