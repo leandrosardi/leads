@@ -1,3 +1,7 @@
+![GitHub issues](https://img.shields.io/github/issues/leandrosardi/leads) ![GitHub](https://img.shields.io/github/license/leandrosardi/leads) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/leandrosardi/leads) ![GitHub last commit](https://img.shields.io/github/last-commit/leandrosardi/leads)
+
+![logo](.public/leads/images/logo.png)
+
 # Leads
 
 **Leads** is an extension of MySaaS to offer B2B databases.
