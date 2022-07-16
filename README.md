@@ -6,6 +6,10 @@
 
 **Leads** is an extension of MySaaS to publish a makeplace of B2B contacts databases.
 
+Find a live example here: [https://ConnectionSphere.com/leads](https://ConnectionSphere.com/leads)
+
+**Outline:**
+
 1. [Getting Started](#1-getting-started).
 2. [Merging a New Leads to the Database](#2-merging-a-new-lead-to-the-database).
 3. [Merging Many Leads to the Database](#3-merging-many-leads-to-the-database).
