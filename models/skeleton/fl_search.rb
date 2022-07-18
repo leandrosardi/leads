@@ -282,6 +282,11 @@ module Leads
       }
     end
 
+    # total number of unique leads with leads mathcing with this search
+    def count_leads
+      DB["SELECT COUNT(DISTINCT id) AS n #{self.core}"].first[:n]
+    end
+
     # total number of unique companies with leads mathcing with this search
     def count_companies
       DB["SELECT COUNT(DISTINCT id_company) AS n #{self.core}"].first[:n]

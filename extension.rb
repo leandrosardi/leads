@@ -47,6 +47,16 @@ BlackStack::Extensions::add ({
                 nohup ruby export.rb > /dev/null 2>&1 &
             ",
             :sudo => false,
+        }, {
+            # back up old configuration file
+            # setup new configuration file
+            :command => "
+                source /home/%ssh_username%/.rvm/scripts/rvm; rvm install 3.1.2; rvm --default use 3.1.2 > /dev/null 2>&1;
+                cd /home/%ssh_username%/code/mysaas/extensions/leads/p > /dev/null 2>&1; 
+                export RUBYLIB=/home/%ssh_username%/code/mysaas > /dev/null 2>&1;
+                nohup ruby stat.search.rb > /dev/null 2>&1 &
+            ",
+            :sudo => false,
         }],
     }],
 })
